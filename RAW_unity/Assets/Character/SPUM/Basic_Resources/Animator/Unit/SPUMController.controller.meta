@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: e9358c226bb09e24da9c5f7064768810
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 192104
+  packageName: Pixel Units - SPUM Bundle Pack Basic
+  packageVersion: 3.0.0
+  assetPath: Assets/SPUM/Basic_Resources/Animator/Unit/SPUMController.controller
+  uploadId: 691421
