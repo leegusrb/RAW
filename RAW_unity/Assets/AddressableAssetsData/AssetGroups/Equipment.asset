@@ -1,0 +1,103 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: Equipment
+  m_EditorClassIdentifier: 
+  m_GroupName: Equipment
+  m_GUID: d404ba9970d4c044badd470686b8bada
+  m_SerializeEntries:
+  - m_GUID: 0f4813b52b3b74ca6a74d7027ead4b9d
+    m_Address: Assets/DataBase/Equipment/Hair_3.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1810f09d324df46289d58e432045bcd1
+    m_Address: Assets/DataBase/Equipment/Armor_1.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 304386aad927e4d3281f05c505bb4f54
+    m_Address: Assets/DataBase/Equipment/Armor_5.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 317140fbba14844a3b93f39a688ff60a
+    m_Address: Assets/DataBase/Equipment/Eye1.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 45e990fcc26754c2ebdcb9d89be8d65b
+    m_Address: Assets/DataBase/Equipment/Eye.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 4f4d6264408da453a8511876ebec8ae3
+    m_Address: Assets/DataBase/Equipment/Foot_1.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 61f60bf66a0684be3b448f6e237a3f12
+    m_Address: Assets/DataBase/Equipment/Armor_8.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 6fc5cbe113e51416e9daa8f0ba7ee5dd
+    m_Address: Assets/DataBase/Equipment/Hair_2.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 97dd5eff083df4f76985e690e6d60a23
+    m_Address: Assets/DataBase/Equipment/Hair_1.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a05ebb241a0b14dec9a0d4bdd31301a3
+    m_Address: Assets/DataBase/Equipment/Cloth_3.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d7a1a0aeecfbf49a2af4eb4ac19f90e3
+    m_Address: Assets/DataBase/Equipment/Cloth_2.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: da6895bd4082d441cbe5911031d0f43b
+    m_Address: Assets/DataBase/Equipment/Cloth_4.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: deb413cebdc864517b43b7beaa19d2a5
+    m_Address: Assets/DataBase/Equipment/Cloth_1.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e2579aadb18ab4cf1b2461fb9e0f0cdf
+    m_Address: Assets/DataBase/Equipment/Eye0.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ed0836d2b0b084f2a842be7fa476e1e5
+    m_Address: Assets/DataBase/Equipment/Foot_2.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: fbddd4306af2b47458c43097d5b91f87
+    m_Address: Assets/DataBase/Equipment/Armor_3.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 3b5edd7aec209644e94688b273c74fb7, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: 0c1677534a5cbb94087fe0b644b26e42, type: 2}
+    - {fileID: 11400000, guid: f43587aad28ce404097c33e7530e97ce, type: 2}
