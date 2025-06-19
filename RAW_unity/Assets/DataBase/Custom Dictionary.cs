@@ -97,4 +97,8 @@ namespace CustomDict
 
     [System.Serializable]
     public class SerializeDictEquipmentSpriteRenderer : SerializableDictionary<EquipmentSlot, SpriteRenderer> { }
+
+    [System.Serializable]
+    public class SerializeDictBodyColor : SerializableDictionary<EquipmentSlot, Color> { }
+
 }

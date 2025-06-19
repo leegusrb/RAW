@@ -25,6 +25,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 28e59b8a1aa61e543bdb55515a957a9d
+    m_Address: Assets/DataBase/Equipment/Back_1.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 304386aad927e4d3281f05c505bb4f54
     m_Address: Assets/DataBase/Equipment/Armor_5.png
     m_ReadOnly: 0
@@ -32,6 +37,16 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 317140fbba14844a3b93f39a688ff60a
     m_Address: Assets/DataBase/Equipment/Eye1.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 37f88f4c290f444ff8434e7b094bee9e
+    m_Address: Assets/DataBase/Equipment/FaceHair_3.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3d7b37f79491e724d99cab75dfafabdd
+    m_Address: Assets/DataBase/Equipment/FaceHair_4.png
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -65,6 +80,46 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a956e577cf9364311a98ed24c3bad799
+    m_Address: Assets/DataBase/Equipment/Eye2.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b1c6b014ee8384bde8873e80c5b3784c
+    m_Address: Assets/DataBase/Equipment/Ward_1.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b8a3f9debf9a740ebba84d95c6700721
+    m_Address: Assets/DataBase/Equipment/Bow_1.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b93999d07022b4f388c4508c844cb984
+    m_Address: Assets/DataBase/Equipment/Eye3.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: bf396ee22a706a24dba8f20538815062
+    m_Address: Assets/DataBase/Equipment/FaceHair_2.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c881fe1f539449842b243ff9a21298eb
+    m_Address: Assets/DataBase/Equipment/FaceHair_1.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d0b03f580ff14441c9fe2b0ccde411ca
+    m_Address: Assets/DataBase/Equipment/Eye4.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d3fa5454509bfe9428ccc7066d86d0f3
+    m_Address: Assets/DataBase/Equipment/FaceHair_5.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: d7a1a0aeecfbf49a2af4eb4ac19f90e3
     m_Address: Assets/DataBase/Equipment/Cloth_2.png
     m_ReadOnly: 0
@@ -80,6 +135,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: df96032537d4c482e9b20c674c73dc45
+    m_Address: Assets/DataBase/Equipment/Sword_1.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: e2579aadb18ab4cf1b2461fb9e0f0cdf
     m_Address: Assets/DataBase/Equipment/Eye0.png
     m_ReadOnly: 0
@@ -87,6 +147,11 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: ed0836d2b0b084f2a842be7fa476e1e5
     m_Address: Assets/DataBase/Equipment/Foot_2.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f17058e2bd3c44745bd37eb71c41adf1
+    m_Address: Assets/DataBase/Equipment/Axe_1.png
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

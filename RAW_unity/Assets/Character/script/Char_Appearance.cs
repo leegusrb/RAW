@@ -1,6 +1,7 @@
 using CustomDict;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Net;
 using UnityEditor.PackageManager.Requests;
 using UnityEngine;
@@ -69,10 +70,10 @@ public class Char_Appearance : MonoBehaviour
 
     
     public SerializeDictCurrentEquipment currentEquipmentDict;
-
     
     public SerializeDictEquipmentSpriteRenderer equipmentSpriteRenderer;
 
+    public SerializeDictBodyColor bodyColor;
 
     void Start()
     {
@@ -103,7 +104,12 @@ public class Char_Appearance : MonoBehaviour
                         break;
                     case "Eye":
                         SetEye(currentEquipmentDict[slot]);
-                        break;                    
+                        break;
+                    case "Hair":
+                    case "FaceHair":
+                        SetSprite(equipmentSpriteRenderer[slot], DataBase.Instance.equipmentAddress + currentEquipmentDict[slot]);
+                        SetHairColor(slot, bodyColor[slot]);
+                        break;
                     default:
                         SetSprite(equipmentSpriteRenderer[slot], DataBase.Instance.equipmentAddress + currentEquipmentDict[slot]);
                         break;
@@ -125,7 +131,6 @@ public class Char_Appearance : MonoBehaviour
             {
                 Debug.LogError($"Failed to load sprite at address: {address}");
             }
-
         };
     }
     
@@ -160,10 +165,12 @@ public class Char_Appearance : MonoBehaviour
         SetSprite(equipmentSpriteRenderer[EquipmentSlot.LeftEyeFront], DataBase.Instance.equipmentAddress + address + "[Front]");
         SetSprite(equipmentSpriteRenderer[EquipmentSlot.RightEyeBack], DataBase.Instance.equipmentAddress + address + "[Back]");
         SetSprite(equipmentSpriteRenderer[EquipmentSlot.RightEyeFront], DataBase.Instance.equipmentAddress + address + "[Front]");
+        equipmentSpriteRenderer[EquipmentSlot.LeftEyeFront].color = bodyColor[EquipmentSlot.LeftEyeBack];
+        equipmentSpriteRenderer[EquipmentSlot.RightEyeFront].color = bodyColor[EquipmentSlot.RightEyeBack];
     }
-    void SetHairEyEColor()
+    void SetHairColor(EquipmentSlot slot, UnityEngine.Color color)
     {
-
+        equipmentSpriteRenderer[slot].color = color;        
     }
     
 
