@@ -4,24 +4,25 @@ using UnityEngine;
 using UnityEngine.UI;
 using Unity.Services.Core;
 using Unity.Services.Authentication;
+using TMPro;
 
 
 public class AuthenticationManager : MonoBehaviour
 {
 
     [Header("Sign Up UI")]
-    public InputField signUpIdInput;
-    public InputField signUpPasswordInput;
+    public TMP_InputField signUpIdInput;
+    public TMP_InputField signUpPasswordInput;
     public Button signUpButton;
 
     [Header("Sign In UI")]
-    public InputField signInIdInput;
-    public InputField signInPasswordInput;
+    public TMP_InputField signInIdInput;
+    public TMP_InputField signInPasswordInput;
     public Button SignInButton;
 
     [Header("Status")]
     public Button signOutButton;
-    public Text statusText;
+    public TMP_Text statusText;
 
     async void Awake()
     {
@@ -42,8 +43,9 @@ public class AuthenticationManager : MonoBehaviour
     {
         AuthenticationService.Instance.SignedIn += () =>
         {
-            string PlayerId = AuthenticationService.Instance.PlayerId;
-            
+            string playerId = AuthenticationService.Instance.PlayerId;
+            SetStatus($"Signed In! Player ID: {playerId}");
+            Debug.Log($"Player ID: {playerId}");
         };
 
         AuthenticationService.Instance.SignInFailed += (err) =>
@@ -59,8 +61,10 @@ public class AuthenticationManager : MonoBehaviour
 
     public async void SignUpWithIdPassword()
     {
-        string id = signInIdInput.text;
-        string password = signInPasswordInput.text;
+        string id = signUpIdInput.text;
+        string password = signUpPasswordInput.text;
+        Debug.Log(id);
+        Debug.Log(password);
 
         if (string.IsNullOrWhiteSpace(id) || string.IsNullOrWhiteSpace(password)) {
             SetStatus("Id and password cannot be empty.");
