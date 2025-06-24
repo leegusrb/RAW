@@ -2686,7 +2686,7 @@ GameObject:
   - component: {fileID: 1421628330}
   - component: {fileID: 1421628329}
   m_Layer: 5
-  m_Name: SignUpPassword (1)
+  m_Name: SignUpPasswordCheck
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3216,9 +3216,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d4d4c60706bfd4cc38345d829bc61af8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  signUpIdInput: {fileID: 0}
-  signUpPasswordInput: {fileID: 0}
-  signUpButton: {fileID: 0}
+  signUpIdInput: {fileID: 346799106}
+  signUpPasswordInput: {fileID: 1733353486}
+  signUpButton: {fileID: 2112990383}
   signInIdInput: {fileID: 2003195046}
   signInPasswordInput: {fileID: 1819245567}
   SignInButton: {fileID: 1555569903}
