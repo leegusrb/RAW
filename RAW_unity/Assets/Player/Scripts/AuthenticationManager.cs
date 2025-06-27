@@ -1,9 +1,11 @@
 using System;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Unity.Services.Core;
 using Unity.Services.Authentication;
+using Unity.Services.CloudSave;
 using TMPro;
 
 
@@ -119,6 +121,8 @@ public class AuthenticationManager : MonoBehaviour
         {
             SetStatus("로그인 중...");
             await AuthenticationService.Instance.SignInWithUsernamePasswordAsync(id, password);
+            SetStatus("데이터 불러오는중...");
+            await LoadPlayerData();
             SetStatus("로그인 성공!");
             Debug.Log("로그인 성공!");
             // 메인메뉴 씬으로 전환
@@ -157,6 +161,7 @@ public class AuthenticationManager : MonoBehaviour
         {
             SetStatus("회원가입 진행 중...");
             await AuthenticationService.Instance.SignUpWithUsernamePasswordAsync(id, password);
+            await SaveInitialPlayerData(id);
             SetStatus("회원가입 성공! 로그인 페이지로 이동합니다.");
             Debug.Log("Sign up is successful.");
             Invoke("ShowSignInPage", 2f);
@@ -182,6 +187,46 @@ public class AuthenticationManager : MonoBehaviour
         catch (Exception ex)
         {
             SetStatus($"Sign out failed: {ex.Message}");
+        }
+    }
+    #endregion
+
+    #region Data Handling
+    private async Task SaveInitialPlayerData(string id)
+    {
+        var playerData = new Dictionary<string, object>
+        {
+            { "Username", id },
+            { "Level", 1 },
+            { "Gold", 100 },
+            { "CreatedAt", System.DateTime.UtcNow.ToString("O") } // 계정 생성일 (ISO 8601 형식)
+        };
+
+        await CloudSaveService.Instance.Data.Player.SaveAsync(playerData);
+        Debug.Log("Initial player data saved to Cloud Save!");
+    }
+
+    private async Task LoadPlayerData()
+    {
+        // 불러올 데이터의 키(Key) 목록 지정
+        var keysToLoad = new HashSet<string> { "Username", "Level", "Gold" };
+        var loadedData = await CloudSaveService.Instance.Data.Player.LoadAsync(keysToLoad);
+
+        // 불러온 데이터 확인 및 사용
+        if (loadedData.TryGetValue("Username", out var usernameItem))
+        {
+            string username = usernameItem.Value.GetAs<string>();
+            Debug.Log($"Loaded Username: {username}");
+        }
+        if (loadedData.TryGetValue("Level", out var levelItem))
+        {
+            int level = levelItem.Value.GetAs<int>();
+            Debug.Log($"Loaded Level: {level}");
+        }
+        if (loadedData.TryGetValue("Gold", out var goldItem))
+        {
+            int gold = goldItem.Value.GetAs<int>();
+            Debug.Log($"Loaded Gold: {gold}");
         }
     }
     #endregion
