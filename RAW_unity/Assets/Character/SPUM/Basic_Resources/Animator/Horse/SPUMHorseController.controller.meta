@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 87250caa4eec27040bc5650f38894ee7
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 9100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 192104
+  packageName: Pixel Units - SPUM Bundle Pack Basic
+  packageVersion: 3.0.0
+  assetPath: Assets/SPUM/Basic_Resources/Animator/Horse/SPUMHorseController.controller
+  uploadId: 691421

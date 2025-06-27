@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 28ac21711b0ec40a0812d33a586eb7ec
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 192104
+  packageName: Pixel Units - SPUM Bundle Pack Basic
+  packageVersion: 3.0.0
+  assetPath: Assets/SPUM/Script/Data/SPUM_Prefabs.cs
+  uploadId: 691421
