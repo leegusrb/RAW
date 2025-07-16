@@ -19,10 +19,16 @@ public class Char_Control : MonoBehaviour
     private float obstacleAvoidDistance;
     private Coroutine targetPointing;
 
-    public float moveSpeed;
-
     private bool isFollowingWall = false;
     private Vector2 obstacleAvoidDirection;
+
+    [SerializeField]
+    private Char_State characterState;
+
+    [SerializeField]
+    private Animator animator;
+
+    private bool isMoving;
     void Start()
     {
 
@@ -60,36 +66,80 @@ public class Char_Control : MonoBehaviour
 
     void MoveCharacter()
     {
-        Vector2 currentPosition = transform.position;
-        Vector2 targetDirection = (targetPos - currentPosition).normalized;
-        float targetDist = Vector2.Distance(transform.position, targetPos);
-        // 목표 방향으로 Raycast 쏘기
-        RaycastHit2D hit = Physics2D.Raycast(currentPosition, targetDirection, targetDist, obstacleLayer);       
-        if (hit.collider != null)
+        if (characterState.isMovable == true)
         {
-            if (isFollowingWall == true)
-            {
-                transform.position += (Vector3)(obstacleAvoidDirection * moveSpeed * Time.deltaTime);
+            if (Vector2.Distance(targetPos, transform.position) < 0.001f)
+            {                
+                StopMove();
             }
             else
             {
-                float obstacleDistance = Vector2.Distance(transform.position, hit.point);
-                if (obstacleDistance < obstacleAvoidDistance)
+                Vector2 currentPosition = transform.position;
+                Vector2 targetDirection = (targetPos - currentPosition).normalized;
+                float targetDist = Vector2.Distance(transform.position, targetPos);
+                // 목표 방향으로 Raycast 쏘기
+                RaycastHit2D hit = Physics2D.Raycast(currentPosition, targetDirection, targetDist, obstacleLayer);
+                if (hit.collider != null)
                 {
-                    CalObstacleAvoidDirection(hit);
-                    isFollowingWall = true;
+                    if (isFollowingWall == true)
+                    {
+                        DoMove(targetDirection);
+                    }
+                    else
+                    {
+                        float obstacleDistance = Vector2.Distance(transform.position, hit.point);
+                        if (obstacleDistance < obstacleAvoidDistance)
+                        {
+                            CalObstacleAvoidDirection(hit);
+                            isFollowingWall = true;
+                        }
+                        else
+                        {
+                            DoMove(targetDirection);
+                        }
+                    }
                 }
                 else
                 {
-                    transform.position += (Vector3)(targetDirection * moveSpeed * Time.deltaTime);
+                    isFollowingWall = false;
+                    DoMove(targetDirection);
                 }
             }
         }
         else
         {
-            isFollowingWall = false;
-            transform.position += (Vector3)(targetDirection * moveSpeed * Time.deltaTime);
+            StopMove();
         }
+    }
+
+    void DoMove(Vector2 targetDirection)
+    {        
+        if(isMoving == false)
+        {
+            isMoving = true;
+            animator.SetBool("isMoving", true);
+        }
+        transform.position += (Vector3)(targetDirection * characterState.moveSpeed * Time.deltaTime);
+        if (targetDirection.x > 0)
+        {
+            transform.localScale = new Vector3(-1, 1, 1);
+
+        }
+        else
+        {
+            transform.localScale = new Vector3(1, 1, 1);
+        }
+    }
+
+    void StopMove()
+    {
+        targetPos = transform.position;
+        if (isMoving == true)
+        {
+            isMoving = false;
+            animator.SetBool("isMoving", false);
+        }
+        isFollowingWall = false;
     }
 
     void CalObstacleAvoidDirection(RaycastHit2D hit)

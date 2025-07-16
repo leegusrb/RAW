@@ -815,6 +815,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b1d1b587ef04c4b78accd9412b85b135, type: 3}
+--- !u!95 &1059497483 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 1529180482477143032, guid: 67dbb23091e48f9418e69cd1c99a178b, type: 3}
+  m_PrefabInstance: {fileID: 6384901998301933019}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1078556197
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -6316,6 +6321,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 2598696420236482373, guid: 67dbb23091e48f9418e69cd1c99a178b, type: 3}
       insertIndex: -1
       addedObject: {fileID: 6384901998301933023}
+    - targetCorrespondingSourceObject: {fileID: 2598696420236482373, guid: 67dbb23091e48f9418e69cd1c99a178b, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6384901998301933024}
   m_SourcePrefab: {fileID: 100100000, guid: 67dbb23091e48f9418e69cd1c99a178b, type: 3}
 --- !u!114 &6384901998301933020 stripped
 MonoBehaviour:
@@ -6349,7 +6357,22 @@ MonoBehaviour:
   targetPointer: {fileID: 1823703970}
   pointingDuration: 0.25
   obstacleAvoidDistance: 0.1
-  moveSpeed: 2
+  characterState: {fileID: 6384901998301933024}
+  animator: {fileID: 1059497483}
+--- !u!114 &6384901998301933024
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 180583233}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c33a06031b0ba6041ba31d60746e47a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isMovable: 0
+  moveSpeed: 1
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
