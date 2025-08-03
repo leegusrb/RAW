@@ -8,23 +8,23 @@ public class Char_Control : MonoBehaviour
     [SerializeField]
     private LayerMask groundLayer;
     [SerializeField]
-    private LayerMask obstacleLayer;
-    [SerializeField]
-    private GameObject targetPointer;
-    [SerializeField]
-    private float pointingDuration;
+    private LayerMask obstacleLayer;    
     [SerializeField]
     private LayerMask playerLayer;
     [SerializeField]
     private LayerMask monsterLayer;
 
+    
+    [SerializeField]
+    private GameObject targetPointer;
     private Vector2 targetPos;
-    [SerializeField]
-    private float obstacleAvoidDistance;
+    private float pointingDuration = 0.25f;        
     private Coroutine targetPointing;
-    [SerializeField]
-    private bool isFollowingWall = false;
+
+    private float obstacleAvoidDistance = 0.1f;
     private Vector2 obstacleAvoidDirection;
+    private bool isFollowingWall = false;
+    
 
     [SerializeField]
     private Char_State characterState;
@@ -45,13 +45,12 @@ public class Char_Control : MonoBehaviour
     private GameObject skillRangeIndicator;
 
     SkillSpec currentCastingSkill;
-    //private GameObject currentSkillIndicator;
-
-
     private bool isIndicatingSkill;
+
     void Start()
     {
         HideIndicator();
+        targetPos = transform.position;
     }
 
     // Update is called once per frame
@@ -62,14 +61,12 @@ public class Char_Control : MonoBehaviour
         {
             SetTargetPos();
             if (isIndicatingSkill)
-            {
-                HideIndicator();
-            }
+                HideIndicator();            
         }
         if (Input.GetKeyDown(KeyCode.Q) || Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.E) || Input.GetKeyDown(KeyCode.R) || Input.GetKeyDown(KeyCode.A))
         {
             string now_input_key = Input.inputString.ToLower();
-            ShowIndicator(now_input_key);
+            ShowIndicator(now_input_key);            
         }
         if (Input.GetMouseButtonDown(0))
         {
