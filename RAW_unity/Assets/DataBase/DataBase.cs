@@ -1,3 +1,4 @@
+using CustomDict;
 using JetBrains.Annotations;
 using System;
 using UnityEngine;
@@ -39,6 +40,14 @@ public enum EquipmentSlot
 }
 
 
+public enum KeyMapping
+{
+    Q,
+    W,
+    E,
+    R
+}
+
 
 public class DataBase : MonoBehaviour
 {
@@ -47,7 +56,9 @@ public class DataBase : MonoBehaviour
     public int EquipmnetSlotSize = Enum.GetValues(typeof(EquipmentSlot)).Length;
     public EquipmentSlot equipmnetSlot;
     public string equipmentAddress = "Assets/DataBase/Equipment/";
-
+    public KeyMapping customKeyMap;
+    public CustomDictKeyMap KeyMap = new CustomDictKeyMap();
+    public CustomDictSkill mySkill = new CustomDictSkill();
     public static DataBase Instance;
     private void Awake()
     {

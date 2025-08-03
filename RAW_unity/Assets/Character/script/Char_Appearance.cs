@@ -69,11 +69,11 @@ public class Char_Appearance : MonoBehaviour
     private SpriteRenderer rightFootCloth;
 
     
-    public SerializeDictCurrentEquipment currentEquipmentDict;
+    public CustomDictCurrentEquipment currentEquipmentDict;
     
-    public SerializeDictEquipmentSpriteRenderer equipmentSpriteRenderer;
+    public CustomDictEquipmentSpriteRenderer equipmentSpriteRenderer;
 
-    public SerializeDictBodyColor bodyColor;
+    public CustomDictBodyColor bodyColor;
 
     void Start()
     {
