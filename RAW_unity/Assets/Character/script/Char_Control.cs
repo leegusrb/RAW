@@ -1,3 +1,4 @@
+ï»¿using CustomDict;
 using System.Collections;
 using UnityEngine;
 using static UnityEngine.GraphicsBuffer;
@@ -18,7 +19,7 @@ public class Char_Control : MonoBehaviour
     [SerializeField]
     private float obstacleAvoidDistance;
     private Coroutine targetPointing;
-
+    [SerializeField]
     private bool isFollowingWall = false;
     private Vector2 obstacleAvoidDirection;
 
@@ -53,11 +54,11 @@ public class Char_Control : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+
         if (Input.GetMouseButtonDown(1))
         {
             SetTargetPos();
         }
-        MoveCharacter();
         if (Input.GetKeyDown(KeyCode.Q) || Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.E) || Input.GetKeyDown(KeyCode.R) || Input.GetKeyDown(KeyCode.A))
         {
             string now_input_key = Input.inputString.ToLower();
@@ -78,10 +79,19 @@ public class Char_Control : MonoBehaviour
                 HideIndicator();
             }
         }
+        if (characterState.isMovable == true)
+        {
+            MoveCharacter();
+        }
+        else
+        {
+            StopMove();
+        }
         if (isIndicatingSkill)
         {
             IndicateSkill();
         }
+    }
 
     void IndicateSkill()
     {
@@ -137,50 +147,55 @@ public class Char_Control : MonoBehaviour
 
     void MoveCharacter()
     {
-        if (characterState.isMovable == true)
+        Vector2 currentPosition = transform.position;
+        Vector2 targetDirection = (targetPos - currentPosition).normalized;
+        float targetDist = Vector2.Distance(currentPosition, targetPos);
+        if (Vector2.Distance(targetPos, currentPosition) > 0.001f)
         {
-            if (Vector2.Distance(targetPos, transform.position) < 0.001f)
-            {                
-                StopMove();
-            }
-            else
+            RaycastHit2D hit = Physics2D.Raycast(currentPosition, targetDirection, targetDist, obstacleLayer);
+            bool isObstructed = CheckObstacle(hit, currentPosition);
+            if (isObstructed)
             {
-                Vector2 currentPosition = transform.position;
-                Vector2 targetDirection = (targetPos - currentPosition).normalized;
-                float targetDist = Vector2.Distance(transform.position, targetPos);
-                // ¸ñÇ¥ ¹æÇâÀ¸·Î Raycast ½î±â
-                RaycastHit2D hit = Physics2D.Raycast(currentPosition, targetDirection, targetDist, obstacleLayer);
-                if (hit.collider != null)
+                if (isFollowingWall)
                 {
-                    if (isFollowingWall == true)
-                    {
-                        DoMove(targetDirection);
-                    }
-                    else
-                    {
-                        float obstacleDistance = Vector2.Distance(transform.position, hit.point);
-                        if (obstacleDistance < obstacleAvoidDistance)
-                        {
-                            CalObstacleAvoidDirection(hit);
-                            isFollowingWall = true;
-                        }
-                        else
-                        {
-                            DoMove(targetDirection);
-                        }
-                    }
+                    DoMove(obstacleAvoidDirection);
                 }
                 else
                 {
-                    isFollowingWall = false;
-                    DoMove(targetDirection);
+                    CalObstacleAvoidDirection(hit);
+                    isFollowingWall = true;
                 }
             }
+            else
+            {
+                isFollowingWall = false;
+                DoMove(targetDirection);
+            }            
         }
         else
         {
             StopMove();
         }
+    }
+    bool CheckObstacle(RaycastHit2D hit, Vector2 currentPosition)
+    {        
+        if (hit.collider != null)
+        {
+            float obstracleDistanc = Vector2.Distance(currentPosition, hit.point);
+            if (obstracleDistanc < obstacleAvoidDistance)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        else
+        {
+            return false;
+        }
+
     }
 
     void DoMove(Vector2 targetDirection)
@@ -194,7 +209,6 @@ public class Char_Control : MonoBehaviour
         if (targetDirection.x > 0)
         {
             transform.localScale = new Vector3(-1, 1, 1);
-
         }
         else
         {
@@ -216,11 +230,11 @@ public class Char_Control : MonoBehaviour
     void CalObstacleAvoidDirection(RaycastHit2D hit)
     {
         Vector2 normal = hit.normal;
-        // ¹ı¼±¿¡ ¼öÁ÷ÀÎ Á¢¼± ¹æÇâ 2°³ °è»ê (½Ã°è¹æÇâ, ¹İ½Ã°è¹æÇâ)
-        Vector2 tangentCW = new Vector2(-normal.y, normal.x);  // ½Ã°è ¹æÇâ Á¢¼±
-        Vector2 tangentCCW = new Vector2(normal.y, -normal.x); // ¹İ½Ã°è ¹æÇâ Á¢¼±
+        // ë²•ì„ ì— ìˆ˜ì§ì¸ ì ‘ì„  ë°©í–¥ 2ê°œ ê³„ì‚° (ì‹œê³„ë°©í–¥, ë°˜ì‹œê³„ë°©í–¥)
+        Vector2 tangentCW = new Vector2(-normal.y, normal.x);  // ì‹œê³„ ë°©í–¥ ì ‘ì„ 
+        Vector2 tangentCCW = new Vector2(normal.y, -normal.x); // ë°˜ì‹œê³„ ë°©í–¥ ì ‘ì„ 
 
-        // ¸ñÇ¥ ¹æÇâ°ú °¢ Á¢¼± ¹æÇâÀÇ ³»Àû °è»êÇØ¼­ °¡±î¿î ÂÊ ¼±ÅÃ
+        // ëª©í‘œ ë°©í–¥ê³¼ ê° ì ‘ì„  ë°©í–¥ì˜ ë‚´ì  ê³„ì‚°í•´ì„œ ê°€ê¹Œìš´ ìª½ ì„ íƒ
         Vector2 fromHitToTarget = ((Vector2)targetPos - hit.point).normalized;
 
         float dotCW = Vector2.Dot(fromHitToTarget, tangentCW);
