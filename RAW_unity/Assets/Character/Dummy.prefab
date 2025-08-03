@@ -1263,6 +1263,12 @@ MonoBehaviour:
     m_Bits: 256
   targetPointer: {fileID: 0}
   pointingDuration: 0.25
+  playerLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  monsterLayer:
+    serializedVersion: 2
+    m_Bits: 0
   obstacleAvoidDistance: 0.1
   isFollowingWall: 0
   characterState: {fileID: 2864591621057478307}
