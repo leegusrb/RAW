@@ -13,7 +13,10 @@ public class Char_Control : MonoBehaviour
     private GameObject targetPointer;
     [SerializeField]
     private float pointingDuration;
-
+    [SerializeField]
+    private LayerMask playerLayer;
+    [SerializeField]
+    private LayerMask monsterLayer;
 
     private Vector2 targetPos;
     [SerializeField]
@@ -42,7 +45,7 @@ public class Char_Control : MonoBehaviour
     private GameObject skillRangeIndicator;
 
     SkillSpec currentCastingSkill;
-    private GameObject currentSkillIndicator;
+    //private GameObject currentSkillIndicator;
 
 
     private bool isIndicatingSkill;
@@ -58,6 +61,10 @@ public class Char_Control : MonoBehaviour
         if (Input.GetMouseButtonDown(1))
         {
             SetTargetPos();
+            if (isIndicatingSkill)
+            {
+                HideIndicator();
+            }
         }
         if (Input.GetKeyDown(KeyCode.Q) || Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.E) || Input.GetKeyDown(KeyCode.R) || Input.GetKeyDown(KeyCode.A))
         {
@@ -95,8 +102,84 @@ public class Char_Control : MonoBehaviour
 
     void IndicateSkill()
     {
-
+        Vector3 mousePos = Input.mousePosition;
+        mousePos = Camera.main.ScreenToWorldPoint(mousePos);
+        mousePos = new Vector3(mousePos.x, mousePos.y, -1);
+        switch (currentCastingSkill.castType)
+        {
+            case "bar":
+                IndicateBarType(mousePos);
+                break;
+            case "target":
+                IndicateTargertingType(mousePos);
+                break;
+            case "area":
+                IndicateAreaType(mousePos);
+                break;
+            default:
+                Debug.LogError("wrong skill cast type");
+                break;
+        }
     }
+
+    void IndicateBarType(Vector3 mousePos)
+    {
+        //Vector2 target = skillRangeAreaBar.transform.position;
+        Vector2 target = transform.position;
+        float angle_pi = Mathf.Atan2(mousePos.y - target.y, mousePos.x - target.x);
+        float angle_rad = angle_pi * Mathf.Rad2Deg;
+
+        if (transform.localScale.x > 0)
+            angle_rad -= 180;
+        skillBarIndicator.transform.rotation = Quaternion.AngleAxis(angle_rad, Vector3.forward);
+
+        //with cosine equation
+        //float ratio = (float)(Mathf.Cos(2 * angle_pi) / 4 + 0.75);
+
+        /*
+         * with two dim equation
+        angle_pi = Mathf.Abs(angle_pi) / Mathf.PI;
+        float ratio = 2 * angle_pi * angle_pi - 2 * angle_pi + 1;
+
+        */
+
+        //with ellipse equation
+        float a = 1f; // long axis
+        float b = 0.5f; //short axis
+        float slope = (mousePos.y - target.y) / (mousePos.x - target.x);
+        float t = Mathf.Atan((slope * a) / b);
+        float x_intersect = target.x + a * Mathf.Cos(t);
+        float y_intersect = target.y + b * Mathf.Sin(t);
+        float ratio = Mathf.Sqrt((x_intersect - target.x) * (x_intersect - target.x) + (y_intersect - target.y) * (y_intersect - target.y));
+
+
+        float scaled_x = currentCastingSkill.range * ratio;
+
+        skillBarIndicator.transform.localScale = new Vector2(scaled_x, currentCastingSkill.size);
+    }
+
+    void IndicateTargertingType(Vector3 mousePos)
+    {
+        skillTargetingIndicator.transform.position = mousePos;
+        Vector2 ray = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        LayerMask mask = 0;
+        if (currentCastingSkill.targetAlly)
+            mask |= playerLayer;
+        if(currentCastingSkill.targetEnemy)
+            mask |= monsterLayer;
+        
+        RaycastHit2D hit_object = Physics2D.Raycast(ray, transform.forward, Mathf.Infinity, mask);
+        if (hit_object.collider != null)
+            skillTargetingIndicator.transform.GetChild(1).gameObject.SetActive(true);
+        else
+            skillTargetingIndicator.transform.GetChild(1).gameObject.SetActive(false);
+    }
+
+    void IndicateAreaType(Vector3 mousePos)
+    {
+        skillAreaIndicator.transform.position = mousePos;
+    }
+
 
     void ShowIndicator(string now_input_key)
     {
@@ -104,18 +187,19 @@ public class Char_Control : MonoBehaviour
         currentCastingSkill = DataBase.Instance.mySkill[now_input_key];
         if (currentCastingSkill.castType == "bar")
         {
-            currentSkillIndicator = skillBarIndicator;
+            skillBarIndicator.transform.localScale = new Vector2(currentCastingSkill.range, currentCastingSkill.size);
+            skillBarIndicator.SetActive(true);
         }
         else if (currentCastingSkill.castType == "target")
         {
-            currentSkillIndicator = skillTargetingIndicator;
+            skillTargetingIndicator.SetActive(true);
         }
         else if (currentCastingSkill.castType == "area")
         {
-            currentSkillIndicator = skillAreaIndicator;
+            skillAreaIndicator.transform.localScale = new Vector2(currentCastingSkill.size, currentCastingSkill.size);
+            skillAreaIndicator.SetActive(true);
         }
-        currentSkillIndicator.transform.localScale = currentCastingSkill.range;        
-        currentSkillIndicator.SetActive(true);
+        skillRangeIndicator.transform.localScale = new Vector2(currentCastingSkill.range, currentCastingSkill.range);
         skillRangeIndicator.SetActive(true);
         isIndicatingSkill = true;         
     }
