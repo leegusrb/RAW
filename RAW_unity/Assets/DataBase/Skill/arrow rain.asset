@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: afcd4b312eca36642bcb6bc70de961e8, type: 3}
+  m_Name: arrow rain
+  m_EditorClassIdentifier: 
+  skillName: 
+  iconDirectory: 
+  description: 
+  castType: area
+  dealType: 
+  maxLevel: 0
+  radius: {x: 0, y: 0}
+  range: {x: 1, y: 1}
+  animType: 
+  consumeMana: 0
+  delay: 0
+  duration: 0
+  coolDown: 0
+  dealSync: 0
+  flatDeal: 0
+  dealIncreasePerSkillLevel: 0
+  dealIncreasePerPower: 0
+  flatHeal: 0
+  healIncreasePerSkillLevel: 0
+  healIncreasePerPower: 0
+  flatShield: 0
+  shieldIncreasePerSkillLevel: 0
+  shieldIncreasePerPower: 0
+  flatPower: 0
+  powerIncreasePerSkillLevel: 0
+  powerIncreasePerPower: 0

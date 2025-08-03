@@ -29,9 +29,25 @@ public class Char_Control : MonoBehaviour
     private Animator animator;
 
     private bool isMoving;
+
+
+    [SerializeField]
+    private GameObject skillAreaIndicator;
+    [SerializeField]
+    private GameObject skillTargetingIndicator;
+    [SerializeField]
+    private GameObject skillBarIndicator;
+    [SerializeField]
+    private GameObject skillRangeIndicator;
+
+    SkillSpec currentCastingSkill;
+    private GameObject currentSkillIndicator;
+
+
+    private bool isIndicatingSkill;
     void Start()
     {
-
+        HideIndicator();
     }
 
     // Update is called once per frame
@@ -42,11 +58,66 @@ public class Char_Control : MonoBehaviour
             SetTargetPos();
         }
         MoveCharacter();
+        if (Input.GetKeyDown(KeyCode.Q) || Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.E) || Input.GetKeyDown(KeyCode.R) || Input.GetKeyDown(KeyCode.A))
+        {
+            string now_input_key = Input.inputString.ToLower();
+            ShowIndicator(now_input_key);
+        }
+        if (Input.GetMouseButtonDown(0))
+        {
+            if (isIndicatingSkill)
+            {
 
+            }
+        }
+        if (Input.GetKeyDown(KeyCode.S))
+        {
+            StopMove();
+            if (isIndicatingSkill)
+            {
+                HideIndicator();
+            }
+        }
+        if (isIndicatingSkill)
+        {
+            IndicateSkill();
+        }
 
+    void IndicateSkill()
+    {
 
     }
 
+    void ShowIndicator(string now_input_key)
+    {
+        HideIndicator();
+        currentCastingSkill = DataBase.Instance.mySkill[now_input_key];
+        if (currentCastingSkill.castType == "bar")
+        {
+            currentSkillIndicator = skillBarIndicator;
+        }
+        else if (currentCastingSkill.castType == "target")
+        {
+            currentSkillIndicator = skillTargetingIndicator;
+        }
+        else if (currentCastingSkill.castType == "area")
+        {
+            currentSkillIndicator = skillAreaIndicator;
+        }
+        currentSkillIndicator.transform.localScale = currentCastingSkill.range;        
+        currentSkillIndicator.SetActive(true);
+        skillRangeIndicator.SetActive(true);
+        isIndicatingSkill = true;         
+    }
+
+    void HideIndicator()
+    {
+        skillAreaIndicator.SetActive(false);
+        skillTargetingIndicator.SetActive(false);
+        skillBarIndicator.SetActive(false);
+        skillRangeIndicator.SetActive(false);
+        isIndicatingSkill = false;
+    }
 
     void SetTargetPos()
     {
