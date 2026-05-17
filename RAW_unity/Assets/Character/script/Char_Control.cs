@@ -104,13 +104,13 @@ public class Char_Control : MonoBehaviour
         mousePos = new Vector3(mousePos.x, mousePos.y, -1);
         switch (currentCastingSkill.castType)
         {
-            case "bar":
+            case CastType.bar:
                 IndicateBarType(mousePos);
                 break;
-            case "target":
+            case CastType.target:
                 IndicateTargertingType(mousePos);
                 break;
-            case "area":
+            case CastType.area:
                 IndicateAreaType(mousePos);
                 break;
             default:
@@ -181,17 +181,17 @@ public class Char_Control : MonoBehaviour
     void ShowIndicator(string now_input_key)
     {
         HideIndicator();
-        currentCastingSkill = DataBase.Instance.mySkill[now_input_key];
-        if (currentCastingSkill.castType == "bar")
+        currentCastingSkill = DataBase.Instance.mySkillKeyMap[now_input_key];
+        if (currentCastingSkill.castType == CastType.bar)
         {
             skillBarIndicator.transform.localScale = new Vector2(currentCastingSkill.range, currentCastingSkill.size);
             skillBarIndicator.SetActive(true);
         }
-        else if (currentCastingSkill.castType == "target")
+        else if (currentCastingSkill.castType == CastType.target)
         {
             skillTargetingIndicator.SetActive(true);
         }
-        else if (currentCastingSkill.castType == "area")
+        else if (currentCastingSkill.castType == CastType.area)
         {
             skillAreaIndicator.transform.localScale = new Vector2(currentCastingSkill.size, currentCastingSkill.size);
             skillAreaIndicator.SetActive(true);

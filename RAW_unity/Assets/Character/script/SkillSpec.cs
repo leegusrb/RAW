@@ -1,5 +1,15 @@
 using UnityEngine;
 
+
+public enum CastType
+{
+    bar,
+    area,
+    target
+}
+
+
+
 [CreateAssetMenu]
 public class SkillSpec : ScriptableObject
 {
@@ -9,7 +19,7 @@ public class SkillSpec : ScriptableObject
     //public string skillName;
     //public string iconDirectory;
     //public string description;
-    public string castType;
+    public CastType castType;
     public bool targetEnemy;
     public bool targetAlly;
     //public string dealType;

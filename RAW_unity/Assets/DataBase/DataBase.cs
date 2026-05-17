@@ -53,12 +53,10 @@ public class DataBase : MonoBehaviour
 {
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     
-    public int EquipmnetSlotSize = Enum.GetValues(typeof(EquipmentSlot)).Length;
-    public EquipmentSlot equipmnetSlot;
-    public string equipmentAddress = "Assets/DataBase/Equipment/";
-    public KeyMapping customKeyMap;
-    public CustomDictKeyMap KeyMap = new CustomDictKeyMap();
-    public CustomDictSkill mySkill = new CustomDictSkill();
+    //public int EquipmnetSlotSize = Enum.GetValues(typeof(EquipmentSlot)).Length;
+    public string equipmentAddress = "Assets/DataBase/Equipment/";    
+    //public CustomDictKeyMap KeyMap = new CustomDictKeyMap();
+    public CustomDictSkill mySkillKeyMap = new CustomDictSkill();
     public static DataBase Instance;
     private void Awake()
     {

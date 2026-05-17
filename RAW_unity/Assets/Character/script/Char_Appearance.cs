@@ -80,7 +80,7 @@ public class Char_Appearance : MonoBehaviour
 
     }
 
-    public void GetCurrentEquipment(EquipmentSlot slot, string itemName)
+    public void SetCurrentEquipment(EquipmentSlot slot, string itemName)
     {
         currentEquipmentDict.Add(slot, itemName);
     }
