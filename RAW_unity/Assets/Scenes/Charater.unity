@@ -241,6 +241,7 @@ Transform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &422850196
 SpriteRenderer:
+  serializedVersion: 2
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -259,6 +260,8 @@ SpriteRenderer:
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -280,9 +283,11 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_Sprite: {fileID: 179552832239992915, guid: e68d14711989d2147970f7b42c10a195, type: 3}
   m_Color: {r: 0.6509804, g: 0, b: 0, a: 1}
   m_FlipX: 0
@@ -291,8 +296,7 @@ SpriteRenderer:
   m_Size: {x: 2.56, y: 2.56}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
-  m_MaskInteraction: 0
+  m_WasSpriteAssigned: 0
   m_SpriteSortPoint: 0
 --- !u!1001 &476010374
 PrefabInstance:
@@ -608,7 +612,6 @@ MonoBehaviour:
   m_ScreenCoordScaleBias: {x: 0, y: 0, z: 0, w: 0}
   m_RequiresDepthTexture: 0
   m_RequiresColorTexture: 0
-  m_Version: 2
   m_TaaSettings:
     m_Quality: 3
     m_FrameInfluence: 0.1
@@ -616,6 +619,7 @@ MonoBehaviour:
     m_MipBias: 0
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
+  m_Version: 2
 --- !u!1001 &961033961
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -927,26 +931,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2409eb09fa451db49a3309663dd0edd9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  EquipmnetSlotSize: 27
-  equipmnetSlot: 0
   equipmentAddress: Assets/DataBase/Equipment/
-  customKeyMap: 0
-  KeyMap:
-    SD_Keys: 
-    SD_Values: 
-  mySkill:
-    SD_Keys:
-    - q
-    - w
-    - e
-    - r
-    - a
-    SD_Values:
-    - {fileID: 11400000, guid: 69031d7d20daf7042af8ec0569706155, type: 2}
-    - {fileID: 11400000, guid: cc938f779cdc76345831284a7c4b0814, type: 2}
-    - {fileID: 11400000, guid: 2b78b5b21b1b3dd428698af3a50ca3ef, type: 2}
-    - {fileID: 11400000, guid: 6b4b4bb14041b5541aea2dc5b10ac615, type: 2}
-    - {fileID: 11400000, guid: b4001a569d293fb47a86590941823cdb, type: 2}
+  mySkillKeyMap:
+    SD_Keys: []
+    SD_Values: []
+  maxInventoryCapacity: 0
 --- !u!4 &1408941476
 Transform:
   m_ObjectHideFlags: 0
@@ -1569,6 +1558,7 @@ Transform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!483693784 &1952261445
 TilemapRenderer:
+  serializedVersion: 2
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -1587,6 +1577,8 @@ TilemapRenderer:
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -1608,9 +1600,11 @@ TilemapRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: -20
+  m_MaskInteraction: 0
   m_ChunkSize: {x: 32, y: 32, z: 32}
   m_ChunkCullingBounds: {x: 0, y: 0, z: 0}
   m_MaxChunkCount: 16
@@ -1618,7 +1612,6 @@ TilemapRenderer:
   m_SortOrder: 0
   m_Mode: 0
   m_DetectChunkCullingBounds: 0
-  m_MaskInteraction: 0
 --- !u!1839735485 &1952261446
 Tilemap:
   m_ObjectHideFlags: 0
@@ -5906,6 +5899,7 @@ MonoBehaviour:
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0

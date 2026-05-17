@@ -12,29 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: afcd4b312eca36642bcb6bc70de961e8, type: 3}
   m_Name: arrow gatling
   m_EditorClassIdentifier: 
-  skillName: 
-  iconDirectory: 
-  description: bar
-  castType: 
-  dealType: 
-  maxLevel: 0
-  radius: {x: 0, y: 0}
-  range: {x: 1, y: 1}
-  animType: 
-  consumeMana: 0
-  delay: 0
-  duration: 0
-  coolDown: 0
-  dealSync: 0
-  flatDeal: 0
-  dealIncreasePerSkillLevel: 0
-  dealIncreasePerPower: 0
-  flatHeal: 0
-  healIncreasePerSkillLevel: 0
-  healIncreasePerPower: 0
-  flatShield: 0
-  shieldIncreasePerSkillLevel: 0
-  shieldIncreasePerPower: 0
-  flatPower: 0
-  powerIncreasePerSkillLevel: 0
-  powerIncreasePerPower: 0
+  castType: 0
+  targetEnemy: 0
+  targetAlly: 0
+  range: 1
+  size: 1
