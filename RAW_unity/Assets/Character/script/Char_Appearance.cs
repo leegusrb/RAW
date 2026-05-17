@@ -1,21 +1,17 @@
 using CustomDict;
 using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Net;
-using UnityEditor.PackageManager.Requests;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
-using static UnityEngine.Rendering.VirtualTexturing.Debugging;
-
 
 public class Char_Appearance : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    [SerializeField]
+    private Char_Inventory inventory;
+
     [SerializeField]
     private SpriteRenderer back;
-    [SerializeField]    
+    [SerializeField]
     private SpriteRenderer body;
     [SerializeField]
     private SpriteRenderer bodyCloth;
@@ -44,7 +40,7 @@ public class Char_Appearance : MonoBehaviour
     [SerializeField]
     private SpriteRenderer leftArmCloth;
     [SerializeField]
-    private SpriteRenderer leftShoulder;    
+    private SpriteRenderer leftShoulder;
     [SerializeField]
     private SpriteRenderer leftWeapon;
     [SerializeField]
@@ -68,52 +64,63 @@ public class Char_Appearance : MonoBehaviour
     [SerializeField]
     private SpriteRenderer rightFootCloth;
 
-    
-    public CustomDictCurrentEquipment currentEquipmentDict;
-    
     public CustomDictEquipmentSpriteRenderer equipmentSpriteRenderer;
-
     public CustomDictBodyColor bodyColor;
+
+    CustomDictCurrentEquipment EquippedItems => inventory != null ? inventory.EquippedItems : null;
+
+
+    void OnEnable()
+    {
+        if (inventory != null)
+            inventory.OnEquipmentChanged += SetAppearance;
+    }
+
+    void OnDisable()
+    {
+        if (inventory != null)
+            inventory.OnEquipmentChanged -= SetAppearance;
+    }
 
     void Start()
     {
-
-    }
-
-    public void SetCurrentEquipment(EquipmentSlot slot, string itemName)
-    {
-        currentEquipmentDict.Add(slot, itemName);
+        //SetAppearance();
     }
 
     public void SetAppearance()
     {
+        if (inventory == null || EquippedItems == null || DataBase.Instance == null)
+            return;
+
+        var equipped = EquippedItems;
         foreach (EquipmentSlot slot in Enum.GetValues(typeof(EquipmentSlot)))
         {
-            if (currentEquipmentDict.ContainsKey(slot))
+            if (!equipped.ContainsKey(slot))
+                continue;
+
+            string itemId = equipped[slot];
+            switch (slot.ToString())
             {
-                switch (slot.ToString())
-                {                    
-                    case "Cloth":
-                        SetCloth(currentEquipmentDict[slot]);
-                        break;
-                    case "Armor":
-                        SetArmor(currentEquipmentDict[slot]);
-                        break;
-                    case "Pant":
-                        SetPant(currentEquipmentDict[slot]);
-                        break;
-                    case "Eye":
-                        SetEye(currentEquipmentDict[slot]);
-                        break;
-                    case "Hair":
-                    case "FaceHair":
-                        SetSprite(equipmentSpriteRenderer[slot], DataBase.Instance.equipmentAddress + currentEquipmentDict[slot]);
-                        SetHairColor(slot, bodyColor[slot]);
-                        break;
-                    default:
-                        SetSprite(equipmentSpriteRenderer[slot], DataBase.Instance.equipmentAddress + currentEquipmentDict[slot]);
-                        break;
-                }
+                case "Cloth":
+                    SetCloth(itemId);
+                    break;
+                case "Armor":
+                    SetArmor(itemId);
+                    break;
+                case "Pant":
+                    SetPant(itemId);
+                    break;
+                case "Eye":
+                    SetEye(itemId);
+                    break;
+                case "Hair":
+                case "FaceHair":
+                    SetSprite(equipmentSpriteRenderer[slot], DataBase.Instance.equipmentAddress + itemId);
+                    SetHairColor(slot, bodyColor[slot]);
+                    break;
+                default:
+                    SetSprite(equipmentSpriteRenderer[slot], DataBase.Instance.equipmentAddress + itemId);
+                    break;
             }
         }
     }
@@ -170,7 +177,7 @@ public class Char_Appearance : MonoBehaviour
     }
     void SetHairColor(EquipmentSlot slot, UnityEngine.Color color)
     {
-        equipmentSpriteRenderer[slot].color = color;        
+        equipmentSpriteRenderer[slot].color = color;
     }
     
 

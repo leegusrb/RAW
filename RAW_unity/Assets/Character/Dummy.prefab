@@ -1108,6 +1108,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3066089152958486121}
   - component: {fileID: 885236408684516780}
+  - component: {fileID: 9123456789012345678}
   - component: {fileID: 8628046648541683639}
   - component: {fileID: 5999739329963740477}
   - component: {fileID: 2864591621057478307}
@@ -1154,6 +1155,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6638fee0cbf2bd84ab36180b00b12f74, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  inventory: {fileID: 9123456789012345678}
   back: {fileID: 3793940357045777164}
   body: {fileID: 5125565873980950013}
   bodyCloth: {fileID: 3260604728548971132}
@@ -1181,17 +1183,6 @@ MonoBehaviour:
   leftFootCloth: {fileID: 915890867369716194}
   rightFoot: {fileID: 149996179048175032}
   rightFootCloth: {fileID: 5357550088218983526}
-  currentEquipmentDict:
-    SD_Keys: 1b0000001d0000001c0000001e00000004000000150000000000000006000000
-    SD_Values:
-    - Cloth_1.png
-    - Foot_1.png
-    - Armor_1.png
-    - Eye.png
-    - Hair_1.png
-    - Sword_1.png
-    - Back_1.png
-    - FaceHair_1.png
   equipmentSpriteRenderer:
     SD_Keys: 000000000100000002000000030000000400000005000000060000000700000008000000090000000a0000000b0000000c0000000d0000000e0000000f000000100000001100000012000000130000001400000015000000160000001700000018000000190000001a000000
     SD_Values:
@@ -1229,6 +1220,31 @@ MonoBehaviour:
     - {r: 0, g: 0, b: 1, a: 1}
     - {r: 1, g: 0.7843937, b: 0.5251572, a: 1}
     - {r: 0.24528301, g: 0, b: 0, a: 1}
+--- !u!114 &9123456789012345678
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2598696420236482373}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: df329d77fb01a7e4a8637718fb008ccc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  currentInventoryCapacity: 10
+  inventorySlots: []
+  equippedItems:
+    SD_Keys: 1b0000001d0000001c0000001e00000004000000150000000000000006000000
+    SD_Values:
+    - Cloth_1.png
+    - Foot_1.png
+    - Armor_1.png
+    - Eye.png
+    - Hair_1.png
+    - Sword_1.png
+    - Back_1.png
+    - FaceHair_1.png
 --- !u!114 &8628046648541683639
 MonoBehaviour:
   m_ObjectHideFlags: 0

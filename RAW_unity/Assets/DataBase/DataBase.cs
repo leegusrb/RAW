@@ -58,6 +58,8 @@ public class DataBase : MonoBehaviour
     //public CustomDictKeyMap KeyMap = new CustomDictKeyMap();
     public CustomDictSkill mySkillKeyMap = new CustomDictSkill();
     public static DataBase Instance;
+
+    public int maxInventoryCapacity = 20;
     private void Awake()
     {
         if (Instance == null)
