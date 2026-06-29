@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
-
+using System;
 namespace CustomDict
 {
-    [System.Serializable]
+    [Serializable]
     //[CanEditMultipleObjects]
     //[ExecuteInEditMode]
     public class SerializableDictionary<TKey, TValue> : Dictionary<TKey, TValue>, ISerializationCallbackReceiver
@@ -92,13 +92,19 @@ namespace CustomDict
     }
 
 
-    [System.Serializable]
-    public class SerializeDictCurrentEquipment : SerializableDictionary<EquipmentSlot, string> { }
+    [Serializable]
+    public class CustomDictCurrentEquipment : SerializableDictionary<EquipmentSlot, string> { }
 
-    [System.Serializable]
-    public class SerializeDictEquipmentSpriteRenderer : SerializableDictionary<EquipmentSlot, SpriteRenderer> { }
+    [Serializable]
+    public class CustomDictEquipmentSpriteRenderer : SerializableDictionary<EquipmentSlot, SpriteRenderer> { }
 
-    [System.Serializable]
-    public class SerializeDictBodyColor : SerializableDictionary<EquipmentSlot, Color> { }
+    [Serializable]
+    public class CustomDictBodyColor : SerializableDictionary<EquipmentSlot, Color> { }
+
+    [Serializable]
+    public class CustomDictKeyMap : SerializableDictionary<KeyMapping, KeyCode> { }
+
+    [Serializable]
+    public class CustomDictSkill : SerializableDictionary<string, SkillSpec> { };
 
 }
