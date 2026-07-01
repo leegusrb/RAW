@@ -10,11 +10,11 @@ public class PlayerObj : MonoBehaviour
 {
     public SPUM_Prefabs _prefabs;
     public float _charMS;
-    private PlayerState _currentState;
+    private PlayerStateTemp _currentState;
 
     public Vector3 _goalPos;
     public bool isAction = false;
-    public Dictionary<PlayerState, int> IndexPair = new ();
+    public Dictionary<PlayerStateTemp, int> IndexPair = new ();
     void Start()
     {
         if(_prefabs == null )
@@ -25,15 +25,15 @@ public class PlayerObj : MonoBehaviour
             }
         }
         _prefabs.OverrideControllerInit();
-        foreach (PlayerState state in Enum.GetValues(typeof(PlayerState)))
+        foreach (PlayerStateTemp state in Enum.GetValues(typeof(PlayerStateTemp)))
         {
             IndexPair[state] = 0;
         }
     }
-    public void SetStateAnimationIndex(PlayerState state, int index = 0){
+    public void SetStateAnimationIndex(PlayerStateTemp state, int index = 0){
         IndexPair[state] = index;
     }
-    public void PlayStateAnimation(PlayerState state){
+    public void PlayStateAnimation(PlayerStateTemp state){
         _prefabs.PlayAnimation(state, IndexPair[state]);
     }
     void Update()
@@ -43,11 +43,11 @@ public class PlayerObj : MonoBehaviour
         transform.position = new Vector3(transform.position.x,transform.position.y,transform.localPosition.y * 0.01f);
         switch(_currentState)
         {
-            case PlayerState.IDLE:
+            case PlayerStateTemp.IDLE:
             
             break;
 
-            case PlayerState.MOVE:
+            case PlayerStateTemp.MOVE:
             DoMove();
             break;
         }
@@ -61,7 +61,7 @@ public class PlayerObj : MonoBehaviour
         Vector3 _disVec = (Vector2)_goalPos - (Vector2)transform.position ;
         if( _disVec.sqrMagnitude < 0.1f )
         {
-            _currentState = PlayerState.IDLE;
+            _currentState = PlayerStateTemp.IDLE;
             return;
         }
         Vector3 _dirMVec = _dirVec.normalized;
@@ -76,6 +76,6 @@ public class PlayerObj : MonoBehaviour
     {
         isAction = false;
         _goalPos = pos;
-        _currentState = PlayerState.MOVE;
+        _currentState = PlayerStateTemp.MOVE;
     }
 }
