@@ -4,7 +4,7 @@ using System;
 using UnityEngine;
 using UnityEngine.Events;
 using System.Linq;
-public enum PlayerStateTemp
+public enum PlayerState
 {
     IDLE,
     MOVE,
@@ -50,7 +50,7 @@ public class SPUM_Prefabs : MonoBehaviour
         }
 
         animator.runtimeAnimatorController= OverrideController;
-        foreach (PlayerStateTemp state in Enum.GetValues(typeof(PlayerStateTemp)))
+        foreach (PlayerState state in Enum.GetValues(typeof(PlayerState)))
         {
             var stateText = state.ToString();
             StateAnimationPairs[stateText] = new List<AnimationClip>();
@@ -154,7 +154,7 @@ public class SPUM_Prefabs : MonoBehaviour
         }
     
     }
-    public void PlayAnimation(PlayerStateTemp PlayState, int index){
+    public void PlayAnimation(PlayerState PlayState, int index){
         Animator animator = _anim;
         //Debug.Log(PlayState.ToString());
         var animations =  StateAnimationPairs[PlayState.ToString()];
