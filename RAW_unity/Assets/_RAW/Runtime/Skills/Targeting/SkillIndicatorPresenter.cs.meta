@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: f6bc0adc5c9b840969d30f20cd3c30c4
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - skillAreaIndicator: {fileID: 402251673003543937, guid: 1dd437fba5ce081448243d7fe2ef2d91, type: 3}
+  - skillTargetingIndicator: {fileID: 5369498112199595179, guid: 67594453f8c1a264c8cc61094085c84e, type: 3}
+  - skillBarIndicator: {fileID: 7917795139652627803, guid: f2d00dd9ff457374590bdfa4a39771fe, type: 3}
+  - skillRangeIndicator: {fileID: 2604506868316468130, guid: a1ea30c0890f1554e84dcfb90b929e49, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

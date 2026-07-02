@@ -4,51 +4,6 @@ using System;
 using UnityEngine;
 
 
-public enum EquipmentSlot
-{
-    Back,
-    Body,
-    BodyCloth,
-    BodyArmor,
-    Hair,
-    Head,
-    FaceHair,
-    RightEyeBack,
-    RightEyeFront,
-    LeftEyeBack,
-    LeftEyeFront,
-    Helmet1,
-    Helmet2,
-    LeftArm,
-    LeftArmCloth,
-    LeftShoulder,
-    LeftWeapon,
-    LeftShield,
-    RightArm,
-    RightArmCloth,
-    RightShoulder,
-    RightWeapon,
-    RightShield,
-    LeftFoot,
-    LeftFootCloth,
-    RightFoot,
-    RightFootCloth,
-    Cloth,
-    Armor,
-    Pant,
-    Eye
-}
-
-
-public enum KeyMapping
-{
-    Q,
-    W,
-    E,
-    R
-}
-
-
 public class DataBase : MonoBehaviour
 {
     // Start is called once before the first execution of Update after the MonoBehaviour is created

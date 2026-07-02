@@ -92,3 +92,5 @@ InitTestScene*.unity*
 
 # Scene dependency cache
 /[Aa]ssets/[Ss]ceneDependencyCache*
+
+/.vscode/

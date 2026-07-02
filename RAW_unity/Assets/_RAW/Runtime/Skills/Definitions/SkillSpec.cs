@@ -1,15 +1,5 @@
 using UnityEngine;
 
-
-public enum CastType
-{
-    bar,
-    area,
-    target
-}
-
-
-
 [CreateAssetMenu]
 public class SkillSpec : ScriptableObject
 {

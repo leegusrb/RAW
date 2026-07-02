@@ -19,7 +19,7 @@ namespace CustomDict
             SyncInspectorFromDictionary();
         }
         /// <summary>
-        /// »õ·Î¿î KeyValuePairÀ» Ãß°¡ÇÏ¸ç, ÀÎ½ºÆåÅÍµµ ¾÷µ¥ÀÌÆ®
+        /// ï¿½ï¿½ï¿½Î¿ï¿½ KeyValuePairï¿½ï¿½ ï¿½ß°ï¿½ï¿½Ï¸ï¿½, ï¿½Î½ï¿½ï¿½ï¿½ï¿½Íµï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®
         /// </summary>
         /// <param name="key"></param>
         /// <param name="value"></param>
@@ -29,7 +29,7 @@ namespace CustomDict
             SyncInspectorFromDictionary();
         }
         /// <summary>
-        /// KeyValuePairÀ» »èÁ¦ÇÏ¸ç, ÀÎ½ºÆåÅÍµµ ¾÷µ¥ÀÌÆ®
+        /// KeyValuePairï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï¸ï¿½, ï¿½Î½ï¿½ï¿½ï¿½ï¿½Íµï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®
         /// </summary>
         /// <param name="key"></param>
         public new void Remove(TKey key)
@@ -42,11 +42,11 @@ namespace CustomDict
         {
         }
         /// <summary>
-        /// ÀÎ½ºÆåÅÍ¸¦ µñ¼Å³Ê¸®·Î ÃÊ±âÈ­
+        /// ï¿½Î½ï¿½ï¿½ï¿½ï¿½Í¸ï¿½ ï¿½ï¿½Å³Ê¸ï¿½ï¿½ï¿½ ï¿½Ê±ï¿½È­
         /// </summary>
         public void SyncInspectorFromDictionary()
         {
-            //ÀÎ½ºÆåÅÍ Å° ¹ë·ù ¸®½ºÆ® ÃÊ±âÈ­
+            //ï¿½Î½ï¿½ï¿½ï¿½ï¿½ï¿½ Å° ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Æ® ï¿½Ê±ï¿½È­
             SD_Keys.Clear();
             SD_Values.Clear();
 
@@ -57,11 +57,11 @@ namespace CustomDict
         }
 
         /// <summary>
-        /// µñ¼Å³Ê¸®¸¦ ÀÎ½ºÆåÅÍ·Î ÃÊ±âÈ­
+        /// ï¿½ï¿½Å³Ê¸ï¿½ï¿½ï¿½ ï¿½Î½ï¿½ï¿½ï¿½ï¿½Í·ï¿½ ï¿½Ê±ï¿½È­
         /// </summary>
         public void SyncDictionaryFromInspector()
         {
-            //µñ¼Å³Ê¸® Å° ¹ë·ù ¸®½ºÆ® ÃÊ±âÈ­
+            //ï¿½ï¿½Å³Ê¸ï¿½ Å° ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Æ® ï¿½Ê±ï¿½È­
             foreach (var key in SD_Keys.ToList())
             {
                 base.Remove(key);
@@ -69,10 +69,10 @@ namespace CustomDict
 
             for (int i = 0; i < SD_Keys.Count; i++)
             {
-                //Áßº¹µÈ Å°°¡ ÀÖ´Ù¸é ¿¡·¯ Ãâ·Â
+                //ï¿½ßºï¿½ï¿½ï¿½ Å°ï¿½ï¿½ ï¿½Ö´Ù¸ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
                 if (this.ContainsKey(SD_Keys[i]))
                 {
-                    Debug.LogError("Áßº¹µÈ Å°°¡ ÀÖ½À´Ï´Ù.");
+                    Debug.LogError("ï¿½ßºï¿½ï¿½ï¿½ Å°ï¿½ï¿½ ï¿½Ö½ï¿½ï¿½Ï´ï¿½.");
                     break;
                 }
                 base.Add(SD_Keys[i], SD_Values[i]);
@@ -81,9 +81,9 @@ namespace CustomDict
 
         public void OnAfterDeserialize()
         {
-            //Debug.Log(this + string.Format("ÀÎ½ºÆåÅÍ Å° ¼ö : {0} °ª ¼ö : {1}", SD_Keys.Count, SD_Values.Count));
+            //Debug.Log(this + string.Format("ï¿½Î½ï¿½ï¿½ï¿½ï¿½ï¿½ Å° ï¿½ï¿½ : {0} ï¿½ï¿½ ï¿½ï¿½ : {1}", SD_Keys.Count, SD_Values.Count));
 
-            //ÀÎ½ºÆåÅÍÀÇ Key Value°¡ KeyValuePair ÇüÅÂ¸¦ ¶é °æ¿ì
+            //ï¿½Î½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Key Valueï¿½ï¿½ KeyValuePair ï¿½ï¿½ï¿½Â¸ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½
             if (SD_Keys.Count == SD_Values.Count)
             {
                 SyncDictionaryFromInspector();
@@ -102,7 +102,7 @@ namespace CustomDict
     public class CustomDictBodyColor : SerializableDictionary<EquipmentSlot, Color> { }
 
     [Serializable]
-    public class CustomDictKeyMap : SerializableDictionary<KeyMapping, KeyCode> { }
+    public class CustomDictKeyMap : SerializableDictionary<SkillSlotKey, KeyCode> { }
 
     [Serializable]
     public class CustomDictSkill : SerializableDictionary<string, SkillSpec> { };
