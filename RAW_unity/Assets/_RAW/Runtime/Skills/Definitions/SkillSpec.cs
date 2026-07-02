@@ -1,10 +1,8 @@
 using UnityEngine;
 
-[CreateAssetMenu]
+[CreateAssetMenu(menuName ="RAW/Skills/Skill Spec")]
 public class SkillSpec : ScriptableObject
 {
-
-
     //public GameObject skillView;
     //public string skillName;
     //public string iconDirectory;

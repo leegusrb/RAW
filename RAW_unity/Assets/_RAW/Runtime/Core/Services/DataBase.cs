@@ -3,9 +3,7 @@ using UnityEngine;
 
 public class DataBase : MonoBehaviour
 {
-    //public int EquipmnetSlotSize = Enum.GetValues(typeof(EquipmentSlot)).Length;
     public string equipmentAddress = "Assets/DataBase/Equipment/";    
-    //public CustomDictKeyMap KeyMap = new CustomDictKeyMap();
     public CustomDictSkill mySkillKeyMap = new CustomDictSkill();
 
     public static DataBase Instance;
@@ -14,10 +12,26 @@ public class DataBase : MonoBehaviour
 
     private void Awake()
     {
-        if (Instance == null)
-        {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
-        }
+		if (Instance != null && Instance != this)
+		{
+			Destroy(gameObject);
+			return;
+		}
+
+		Instance = this;
+
+		if (mySkillKeyMap != null)
+			mySkillKeyMap.SyncDictionaryFromInspector();
+
+		if (transform.parent != null)
+		{
+			Debug.LogError(
+				"DataBase must be placed on a root GameObject. " +
+				"Move this GameObject to the top level of the Hierarchy."
+			);
+			return;
+		}
+
+		DontDestroyOnLoad(gameObject);
     }
 }

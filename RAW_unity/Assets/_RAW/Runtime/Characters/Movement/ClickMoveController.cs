@@ -48,19 +48,14 @@ public class ClickMoveController : MonoBehaviour
 			return;
 		}
 
-		Vector2 ray = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+		Vector2 mouseWorldPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 
-		RaycastHit2D hit = Physics2D.Raycast(
-			ray,
-			transform.forward,
-			Mathf.Infinity,
-			groundLayer
-		);
+		Collider2D ground = Physics2D.OverlapPoint(mouseWorldPosition, groundLayer);
 
-		if (hit.collider == null)
+		if (ground == null)
 			return;
 
-		targetPos = hit.point;
+		targetPos = mouseWorldPosition;
 
 		if (targetPointing != null)
 			StopCoroutine(targetPointing);

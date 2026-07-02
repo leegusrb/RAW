@@ -65,12 +65,11 @@ public class Char_Control : MonoBehaviour
 			BeginSkillIndicator("r");
 		}
 
-		if (Input.GetMouseButton(0))
+		if (Input.GetMouseButtonDown(0))
 		{
 			if (skillTargetingController != null && skillTargetingController.IsIndicatingSkill)
 			{
-				// TODO:
-				// 여기서 실제 스킬 로직 연결
+				// TODO: 실제 스킬 시전 연결
 			}
 		}
 	}

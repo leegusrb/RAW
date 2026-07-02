@@ -178,17 +178,9 @@ public class SkillTargetingController : MonoBehaviour
 		);
 	}
 
-	private void IndicateTargetingType(Vector3 mouseWolrdPosition)
+	private void IndicateTargetingType(Vector3 mouseWorldPosition)
 	{
-		indicatorPresenter.SetTargetingPosition(mouseWolrdPosition);
-
-		if (Camera.main == null)
-		{
-			indicatorPresenter.SetTargetingValid(false);
-			return;
-		}
-
-		Vector2 ray = Camera.main.ScreenToViewportPoint(Input.mousePosition);
+		indicatorPresenter.SetTargetingPosition(mouseWorldPosition);
 
 		LayerMask mask = 0;
 
@@ -198,14 +190,9 @@ public class SkillTargetingController : MonoBehaviour
 		if (currentCastingSkill.targetEnemy)
 			mask |= monsterLayer;
 
-		RaycastHit2D hitObject = Physics2D.Raycast(
-			ray,
-			transform.forward,
-			Mathf.Infinity,
-			mask
-		);
+		Collider2D hitObject = Physics2D.OverlapPoint(mouseWorldPosition, mask);
 
-		indicatorPresenter.SetTargetingValid(hitObject.collider != null);
+		indicatorPresenter.SetTargetingValid(hitObject != null);
 	}
 
 	private void IndicateAreaType(Vector3 mouseWorldPosition)

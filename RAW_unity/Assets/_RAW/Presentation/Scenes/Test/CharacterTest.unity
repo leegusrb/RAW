@@ -6031,6 +6031,46 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 879154694441561859, guid: cade6778d68cd42879de3caa4dab4b8f, type: 3}
+      propertyPath: mySkillKeyMap.SD_Keys.Array.size
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 879154694441561859, guid: cade6778d68cd42879de3caa4dab4b8f, type: 3}
+      propertyPath: mySkillKeyMap.SD_Values.Array.size
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 879154694441561859, guid: cade6778d68cd42879de3caa4dab4b8f, type: 3}
+      propertyPath: 'mySkillKeyMap.SD_Keys.Array.data[0]'
+      value: q
+      objectReference: {fileID: 0}
+    - target: {fileID: 879154694441561859, guid: cade6778d68cd42879de3caa4dab4b8f, type: 3}
+      propertyPath: 'mySkillKeyMap.SD_Keys.Array.data[1]'
+      value: w
+      objectReference: {fileID: 0}
+    - target: {fileID: 879154694441561859, guid: cade6778d68cd42879de3caa4dab4b8f, type: 3}
+      propertyPath: 'mySkillKeyMap.SD_Keys.Array.data[2]'
+      value: e
+      objectReference: {fileID: 0}
+    - target: {fileID: 879154694441561859, guid: cade6778d68cd42879de3caa4dab4b8f, type: 3}
+      propertyPath: 'mySkillKeyMap.SD_Keys.Array.data[3]'
+      value: r
+      objectReference: {fileID: 0}
+    - target: {fileID: 879154694441561859, guid: cade6778d68cd42879de3caa4dab4b8f, type: 3}
+      propertyPath: 'mySkillKeyMap.SD_Values.Array.data[0]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 500f49d23dc934cdd9bfbbec89db107f, type: 2}
+    - target: {fileID: 879154694441561859, guid: cade6778d68cd42879de3caa4dab4b8f, type: 3}
+      propertyPath: 'mySkillKeyMap.SD_Values.Array.data[1]'
+      value: 
+      objectReference: {fileID: 11400000, guid: a40936e1d8b7f4d1ead015ac74a04507, type: 2}
+    - target: {fileID: 879154694441561859, guid: cade6778d68cd42879de3caa4dab4b8f, type: 3}
+      propertyPath: 'mySkillKeyMap.SD_Values.Array.data[2]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 6abd8eff5118e4d898b0f644acd67c3a, type: 2}
+    - target: {fileID: 879154694441561859, guid: cade6778d68cd42879de3caa4dab4b8f, type: 3}
+      propertyPath: 'mySkillKeyMap.SD_Values.Array.data[3]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 3fcda8f2b2bc8442e90072041a6cafc5, type: 2}
     - target: {fileID: 5702742380246880004, guid: cade6778d68cd42879de3caa4dab4b8f, type: 3}
       propertyPath: m_Name
       value: RAW_Services
