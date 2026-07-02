@@ -1,0 +1,18 @@
+{
+    "name": "RAW.Editor",
+    "rootNamespace": "RAW.Editor",
+    "references": [
+        "GUID:6f77fe75448024a078986972a8471ce2"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
