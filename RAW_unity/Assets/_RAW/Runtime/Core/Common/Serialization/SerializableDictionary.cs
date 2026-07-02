@@ -4,6 +4,7 @@ using System.Linq;
 using System;
 namespace CustomDict
 {
+	// 1. Gneric serializable dictionary base
     [Serializable]
     //[CanEditMultipleObjects]
     //[ExecuteInEditMode]
@@ -92,6 +93,7 @@ namespace CustomDict
     }
 
 
+	// 2. RAW equipment dictionaries
     [Serializable]
     public class CustomDictCurrentEquipment : SerializableDictionary<EquipmentSlot, string> { }
 
@@ -101,6 +103,7 @@ namespace CustomDict
     [Serializable]
     public class CustomDictBodyColor : SerializableDictionary<EquipmentSlot, Color> { }
 
+	// 3. RAW input / skill dictionaries
     [Serializable]
     public class CustomDictKeyMap : SerializableDictionary<SkillSlotKey, KeyCode> { }
 
