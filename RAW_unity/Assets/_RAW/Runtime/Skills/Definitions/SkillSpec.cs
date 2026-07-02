@@ -1,3 +1,7 @@
+// TODO:
+// 현재 런타임 SkillTargetingController와 Database.mySkillKeyMap이 사용하는 임시 스킬 정의.
+// SkillDefinition 전환이 끝나면 제거한다.
+
 using UnityEngine;
 
 [CreateAssetMenu(menuName ="RAW/Skills/Skill Spec")]

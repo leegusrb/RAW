@@ -1,3 +1,7 @@
+// TODO:
+// 임시 전역 데이터 컨테이너.
+// 추후 SkillSlotDatabase, EquipmentDatabase, InventoryConfig로 분리한다.
+
 using CustomDict;
 using UnityEngine;
 
