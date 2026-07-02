@@ -29,11 +29,11 @@
 
 ## 3. chore: add asmdef files for RAW runtime/editor/tests
 
-- [ ] `Assets/_RAW/Runtime/RAW.Runtime.asmdef` 추가
-- [ ] `Assets/_RAW/Editor/RAW.Editor.asmdef` 추가
-- [ ] `Assets/_RAW/Tests/EditMode/RAW.Tests.EditMode.asmdef` 추가
-- [ ] `Assets/_RAW/Tests/PlayMode/RAW.Tests.PlayMode.asmdef` 추가
-- [ ] Unity 스크립트 컴파일 성공 확인
+- [x] `Assets/_RAW/Runtime/RAW.Runtime.asmdef` 추가
+- [x] `Assets/_RAW/Editor/RAW.Editor.asmdef` 추가
+- [x] `Assets/_RAW/Tests/EditMode/RAW.Tests.EditMode.asmdef` 추가
+- [x] `Assets/_RAW/Tests/PlayMode/RAW.Tests.PlayMode.asmdef` 추가
+- [x] Unity 스크립트 컴파일 성공 확인
 
 ## 4. refactor: replace SkillSpec with SkillDefinition
 
