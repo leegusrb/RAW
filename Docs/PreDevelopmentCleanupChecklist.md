@@ -12,21 +12,12 @@
 
 ---
 
-## 0. 시작 전 확인
-
-- [ ] `Folder` 브랜치에서 작업 브랜치 생성: `cleanup/pre-dev-base`
-- [ ] Unity 프로젝트 정상 열림 확인
-- [ ] Console Error 확인
-- [ ] 현재 변경사항 없음 확인
-
 ## 1. docs: update README and project documentation
 
-- [ ] README의 Unity 버전을 실제 프로젝트 버전과 맞추기
-- [ ] README의 구 직업 설명을 Q/W/E/R 스킬 조합 구조로 수정
-- [ ] README에 AP/AD/치명타/마나/상태이상 아이템 라인 설명 반영
-- [ ] `Docs/FolderStructure.md` 추가
-- [ ] `Docs/CodingRules.md` 추가
-- [ ] `Docs/UnityVersion.md` 추가
+- [x] README의 Unity 버전을 실제 프로젝트 버전과 맞추기
+- [x] `Docs/FolderStructure.md` 추가
+- [x] `Docs/CodingRules.md` 추가
+- [x] `Docs/UnityVersion.md` 추가
 
 ## 2. chore: normalize gitignore and gitattributes
 
