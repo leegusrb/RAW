@@ -108,6 +108,6 @@ namespace CustomDict
     public class CustomDictKeyMap : SerializableDictionary<SkillSlotKey, KeyCode> { }
 
     [Serializable]
-    public class CustomDictSkill : SerializableDictionary<string, SkillSpec> { };
+    public class CustomDictSkill : SerializableDictionary<string, SkillDefinition> { };
 
 }

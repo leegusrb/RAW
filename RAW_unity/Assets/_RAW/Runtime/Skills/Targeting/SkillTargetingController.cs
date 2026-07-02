@@ -10,7 +10,7 @@ public class SkillTargetingController : MonoBehaviour
 	[Header("Presenter")]
 	[SerializeField] private SkillIndicatorPresenter indicatorPresenter;
 
-	private SkillSpec currentCastingSkill;
+	private SkillDefinition currentCastingSkill;
 	private bool isIndicatingSkill;
 
 	public bool IsIndicatingSkill => isIndicatingSkill;
@@ -55,7 +55,7 @@ public class SkillTargetingController : MonoBehaviour
 
 		if (currentCastingSkill == null)
 		{
-			Debug.LogWarning($"SkillSpec is null. inputKey: {inputKey}");
+			Debug.LogWarning($"SkillDefinition is null. inputKey: {inputKey}");
 			return;
 		}
 

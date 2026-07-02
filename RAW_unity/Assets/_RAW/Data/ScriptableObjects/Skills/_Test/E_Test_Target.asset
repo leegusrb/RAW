@@ -9,11 +9,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: afcd4b312eca36642bcb6bc70de961e8, type: 3}
+  m_Script: {fileID: 11500000, guid: ac284fe11e21f43e2b030a2a0aab227a, type: 3}
   m_Name: E_Test_Target
-  m_EditorClassIdentifier: Assembly-CSharp::SkillSpec
-  castType: 2
-  targetEnemy: 1
+  m_EditorClassIdentifier: RAW.Runtime::SkillDefinition
+  skillId: 
+  displayName: 
+  description: 
+  school: 0
+  castType: 0
+  targetEnemy: 0
   targetAlly: 0
-  range: 5
-  size: 1
+  range: 0
+  size: 0
+  cooldown: 0
+  manaCost: 0
