@@ -1,40 +1,30 @@
+using System;
 using UnityEngine;
 
 public class Char_State : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    private int healthPoint;
-    private int manaPoint;
-    private bool isWalking;
-    private bool isAttacking;
-
-    public bool isMovable;
-
-    public float moveSpeed;
+    [SerializeField] private int healthPoint = 100;
+    [SerializeField] private int manaPoint = 100;
+    [SerializeField] private float moveSpeed = 3f;
+    [SerializeField] private bool isMovable = true;
 
     public int HP
     {
-        get {  return healthPoint; }
-        set { healthPoint = value; }
+        get => healthPoint;
+        set => healthPoint = Mathf.Max(0, value);
     }
 
-    public bool IsWalking
-    {
-        get { return isWalking; }
-        set { isWalking = value; }
+	public int MP
+	{
+		get => manaPoint;
+		set => manaPoint = Mathf.Max(0, value);
+	}
 
-    }
+	public float MoveSpeed => moveSpeed;
+	public bool IsMovable => isMovable;
 
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
-
+	public void SetMovable(bool value)
+	{
+		isMovable = value;
+	}
 }

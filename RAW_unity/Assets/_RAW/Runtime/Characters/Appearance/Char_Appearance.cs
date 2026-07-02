@@ -1,13 +1,16 @@
 using CustomDict;
 using System;
+using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
 
 public class Char_Appearance : MonoBehaviour
 {
     [SerializeField]
     private Char_Inventory inventory;
+	
+	[SerializeField]
+	private AddressableAssetService addressableAssetService;
 
     [SerializeField]
     private SpriteRenderer back;
@@ -67,10 +70,22 @@ public class Char_Appearance : MonoBehaviour
     public CustomDictEquipmentSpriteRenderer equipmentSpriteRenderer;
     public CustomDictBodyColor bodyColor;
 
+	private readonly Dictionary<SpriteRenderer, AsyncOperationHandle<Sprite>> activeSpriteHandles = new Dictionary<SpriteRenderer, AsyncOperationHandle<Sprite>>();
+	private readonly Dictionary<SpriteRenderer, AsyncOperationHandle<Sprite>> pendingSpriteHandles = new Dictionary<SpriteRenderer, AsyncOperationHandle<Sprite>>();
+	private readonly Dictionary<SpriteRenderer, int> spriteLoadVersions = new Dictionary<SpriteRenderer, int>();
+
     CustomDictCurrentEquipment EquippedItems => inventory != null ? inventory.EquippedItems : null;
 
+	private void Awake()
+	{
+		if (addressableAssetService == null)
+			addressableAssetService = AddressableAssetService.Instance;
 
-    void OnEnable()
+		if (addressableAssetService == null)
+			addressableAssetService = FindFirstObjectByType<AddressableAssetService>();
+	}
+
+	void OnEnable()
     {
         if (inventory != null)
             inventory.OnEquipmentChanged += SetAppearance;
@@ -82,10 +97,10 @@ public class Char_Appearance : MonoBehaviour
             inventory.OnEquipmentChanged -= SetAppearance;
     }
 
-    void Start()
-    {
-        //SetAppearance();
-    }
+	private void OnDestroy()
+	{
+		ReleaseAllSpriteHandles();
+	}
 
     public void SetAppearance()
     {
@@ -127,21 +142,56 @@ public class Char_Appearance : MonoBehaviour
 
 
     void SetSprite(SpriteRenderer renderer, string address)
-    {
-        Addressables.LoadAssetAsync<Sprite>(address).Completed += handle =>
-        {
-            if (handle.Status == AsyncOperationStatus.Succeeded)
-            {
-                renderer.sprite = handle.Result;
-            }
-            else
-            {
-                Debug.LogError($"Failed to load sprite at address: {address}");
-            }
-        };
-    }
-    
+	{
+		if (renderer == null)
+		{
+			Debug.LogWarning("SetSprite failed. SpriteRenderer is null.");
+			return;
+		}
 
+		if (string.IsNullOrEmpty(address))
+		{
+			ClearSprite(renderer);
+			return;
+		}
+
+		if (addressableAssetService == null)
+		{
+			Debug.LogError("AddressableAssetService is not assigned.");
+			return;
+		}
+
+		int loadVersion = IncreaseLoadVersion(renderer);
+
+		ReleasePendingSprite(renderer);
+
+		AsyncOperationHandle<Sprite> handle = addressableAssetService.LoadSprite(address);
+		pendingSpriteHandles[renderer] = handle;
+
+		handle.Completed += completedHandle =>
+		{
+			if (!IsLatestLoadRequest(renderer, loadVersion))
+			{
+				ReleaseHandleIfValid(completedHandle);
+				return;
+			}
+
+			pendingSpriteHandles.Remove(renderer);
+
+			if (completedHandle.Status == AsyncOperationStatus.Succeeded)
+			{
+				ReleaseActiveSprite(renderer);
+
+				renderer.sprite = completedHandle.Result;
+				activeSpriteHandles[renderer] = completedHandle;
+			}
+			else
+			{
+				ReleaseHandleIfValid(completedHandle);
+				Debug.LogError($"Failed to load sprite at address: {address}");
+			}
+		};
+	}
     
     void SetCloth(string address)
     {
@@ -180,5 +230,89 @@ public class Char_Appearance : MonoBehaviour
         equipmentSpriteRenderer[slot].color = color;
     }
     
+	private int IncreaseLoadVersion(SpriteRenderer renderer)
+	{
+		if (!spriteLoadVersions.TryGetValue(renderer, out int version))
+			version = 0;
 
+		version++;
+		spriteLoadVersions[renderer] = version;
+
+		return version;
+	}
+
+	private bool IsLatestLoadRequest(SpriteRenderer renderer, int loadVersion)
+	{
+		if (renderer == null)
+			return false;
+
+		if (!spriteLoadVersions.TryGetValue(renderer, out int currentVersion))
+			return false;
+
+		return currentVersion == loadVersion;
+	}
+
+	private void ClearSprite(SpriteRenderer renderer)
+	{
+		if (renderer == null)
+			return;
+
+		IncreaseLoadVersion(renderer);
+
+		ReleasePendingSprite(renderer);
+		ReleaseActiveSprite(renderer);
+
+		renderer.sprite = null;
+	}
+
+	private void ReleasePendingSprite(SpriteRenderer renderer)
+	{
+		if (renderer == null)
+			return;
+
+		if (!pendingSpriteHandles.TryGetValue(renderer, out AsyncOperationHandle<Sprite> handle))
+			return;
+
+		ReleaseHandleIfValid(handle);
+		pendingSpriteHandles.Remove(renderer);
+	}
+
+	private void ReleaseActiveSprite(SpriteRenderer renderer)
+	{
+		if (renderer == null)
+			return;
+
+		if (!activeSpriteHandles.TryGetValue(renderer, out AsyncOperationHandle<Sprite> handle))
+			return;
+
+		ReleaseHandleIfValid(handle);
+		activeSpriteHandles.Remove(renderer);
+	}
+
+	private void ReleaseAllSpriteHandles()
+	{
+		foreach (var pair in pendingSpriteHandles)
+		{
+			ReleaseHandleIfValid(pair.Value);
+		}
+
+		pendingSpriteHandles.Clear();
+
+		foreach (var pair in activeSpriteHandles)
+		{
+			ReleaseHandleIfValid(pair.Value);
+		}
+
+		activeSpriteHandles.Clear();
+
+		spriteLoadVersions.Clear();
+	}
+
+	private void ReleaseHandleIfValid(AsyncOperationHandle<Sprite> handle)
+	{
+		if (addressableAssetService != null)
+		{
+			addressableAssetService.ReleaseSprite(handle);
+		}
+	}
 }

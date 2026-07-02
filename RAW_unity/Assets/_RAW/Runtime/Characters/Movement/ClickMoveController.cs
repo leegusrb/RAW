@@ -1,7 +1,5 @@
 using System.Collections;
-using Unity.Mathematics;
 using UnityEngine;
-using UnityEngine.TextCore.Text;
 
 public class ClickMoveController : MonoBehaviour
 {
@@ -75,7 +73,7 @@ public class ClickMoveController : MonoBehaviour
 		if (characterState == null)
 			return;
 
-		if (characterState.isMovable == true)
+		if (characterState.IsMovable)
 		{
 			MoveCharacter();
 		}
@@ -163,7 +161,7 @@ public class ClickMoveController : MonoBehaviour
 				animator.SetBool("isMoving", true);
 		}
 
-		transform.position += (Vector3) (targetDirection * characterState.moveSpeed * Time.deltaTime);
+		transform.position += (Vector3) (targetDirection * characterState.MoveSpeed * Time.deltaTime);
 
 		if (targetDirection.x > 0)
 		{

@@ -3,20 +3,43 @@ using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
 
+[DisallowMultipleComponent]
 public class AddressableAssetService : MonoBehaviour
 {
-	public void LoadSprite(string address, Action<Sprite> onSucceeded, Action<string> onFailed = null)
+	public static AddressableAssetService Instance {get; private set; }
+
+	private void Awake()
 	{
-		Addressables.LoadAssetAsync<Sprite>(address).Completed += handle =>
+		if (Instance != null && Instance != this)
 		{
-			if (handle.Status == AsyncOperationStatus.Succeeded)
-			{
-				onSucceeded?.Invoke(handle.Result);
-			}
-			else
-			{
-				onFailed?.Invoke(address);
-			}
-		};
+			Destroy(gameObject);
+			return;
+		}
+
+		Instance = this;
+
+		if (transform.parent != null)
+		{
+			Debug.LogError(
+				"AddressableAssetService must be placed on a root GameObject. " +
+				"Move this GameObject to the top level of the Hierarchy."
+			);
+			return;
+		}
+		
+		DontDestroyOnLoad(gameObject);
+	}
+
+	public AsyncOperationHandle<Sprite> LoadSprite(string address)
+	{
+		return Addressables.LoadAssetAsync<Sprite>(address);
+	}
+
+	public void ReleaseSprite(AsyncOperationHandle<Sprite> handle)
+	{
+		if (handle.IsValid())
+		{
+			Addressables.Release(handle);
+		}
 	}
 }
