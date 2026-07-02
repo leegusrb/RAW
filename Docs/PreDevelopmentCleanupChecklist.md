@@ -21,11 +21,11 @@
 
 ## 2. chore: normalize gitignore and gitattributes
 
-- [ ] 루트 `.gitignore`와 `RAW_unity/.gitignore` 중복 확인
-- [ ] ignore 기준 통합 여부 결정
-- [ ] Unity 생성 폴더가 추적되지 않는지 확인
-- [ ] `.gitattributes` 유지 확인
-- [ ] Addressables 빌드 산출물이 추적되지 않는지 확인
+- [x] 루트 `.gitignore`와 `RAW_unity/.gitignore` 중복 확인
+- [x] ignore 기준 통합 여부 결정
+- [x] Unity 생성 폴더가 추적되지 않는지 확인
+- [x] `.gitattributes` 유지 확인
+- [x] Addressables 빌드 산출물이 추적되지 않는지 확인
 
 ## 3. chore: add asmdef files for RAW runtime/editor/tests
 
