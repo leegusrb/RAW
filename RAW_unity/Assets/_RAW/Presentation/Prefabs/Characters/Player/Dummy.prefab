@@ -1224,12 +1224,13 @@ GameObject:
   - component: {fileID: 3066089152958486121}
   - component: {fileID: 885236408684516780}
   - component: {fileID: 9123456789012345678}
+  - component: {fileID: -5344450905761903604}
   - component: {fileID: 5999739329963740477}
-  - component: {fileID: 2864591621057478307}
   - component: {fileID: 4692146595004722489}
-  - component: {fileID: 5995694583251262275}
   - component: {fileID: -7848807949853896505}
+  - component: {fileID: 5995694583251262275}
   - component: {fileID: -9163193407039833494}
+  - component: {fileID: 2864591621057478307}
   m_Layer: 5
   m_Name: Dummy
   m_TagString: Untagged
@@ -1365,6 +1366,18 @@ MonoBehaviour:
     - Sword_1.png
     - Back_1.png
     - FaceHair_1.png
+--- !u!114 &-5344450905761903604
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2598696420236482373}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e82561f9a5ac484db674c4cd6430697, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: RAW.Runtime::PlayerInputReader
 --- !u!114 &5999739329963740477
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1377,25 +1390,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 96ee776fbaede514cbd6726f7d563899, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  inputReader: {fileID: -5344450905761903604}
   clickMoveController: {fileID: 4692146595004722489}
   skillTargetingController: {fileID: -7848807949853896505}
   skillLoadout: {fileID: -9163193407039833494}
---- !u!114 &2864591621057478307
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2598696420236482373}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c33a06031b0ba6041ba31d60746e47a3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  healthPoint: 100
-  manaPoint: 100
-  moveSpeed: 1
-  isMovable: 1
 --- !u!114 &4692146595004722489
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1419,22 +1417,6 @@ MonoBehaviour:
   characterState: {fileID: 2864591621057478307}
   animator: {fileID: 1529180482477143032}
   obstacleAvoidDistance: 0.1
---- !u!114 &5995694583251262275
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2598696420236482373}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f6bc0adc5c9b840969d30f20cd3c30c4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SkillIndicatorPresenter
-  skillAreaIndicator: {fileID: 446575267940115124}
-  skillTargetingIndicator: {fileID: 7726094808036947850}
-  skillBarIndicator: {fileID: 1244564291862486833}
-  skillRangeIndicator: {fileID: 197311793952166838}
 --- !u!114 &-7848807949853896505
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1454,6 +1436,22 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 1
   indicatorPresenter: {fileID: 5995694583251262275}
+--- !u!114 &5995694583251262275
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2598696420236482373}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6bc0adc5c9b840969d30f20cd3c30c4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SkillIndicatorPresenter
+  skillAreaIndicator: {fileID: 446575267940115124}
+  skillTargetingIndicator: {fileID: 7726094808036947850}
+  skillBarIndicator: {fileID: 1244564291862486833}
+  skillRangeIndicator: {fileID: 197311793952166838}
 --- !u!114 &-9163193407039833494
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1475,6 +1473,22 @@ MonoBehaviour:
     skill: {fileID: 11400000, guid: cb0b46616044a4847be2dd96dc3ebfc9, type: 2}
   - slotKey: 3
     skill: {fileID: 11400000, guid: 3fcda8f2b2bc8442e90072041a6cafc5, type: 2}
+--- !u!114 &2864591621057478307
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2598696420236482373}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c33a06031b0ba6041ba31d60746e47a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  healthPoint: 100
+  manaPoint: 100
+  moveSpeed: 1
+  isMovable: 1
 --- !u!1 &2650957420405713173
 GameObject:
   m_ObjectHideFlags: 0
