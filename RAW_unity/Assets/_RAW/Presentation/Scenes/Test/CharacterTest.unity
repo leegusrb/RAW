@@ -548,10 +548,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 885236408684516780, guid: 67dbb23091e48f9418e69cd1c99a178b, type: 3}
-      propertyPath: addressableAssetService
-      value: 
-      objectReference: {fileID: 0}
     - target: {fileID: 2598696420236482373, guid: 67dbb23091e48f9418e69cd1c99a178b, type: 3}
       propertyPath: m_Name
       value: Dummy
@@ -6058,11 +6054,11 @@ PrefabInstance:
     - target: {fileID: 879154694441561859, guid: cade6778d68cd42879de3caa4dab4b8f, type: 3}
       propertyPath: 'mySkillKeyMap.SD_Values.Array.data[0]'
       value: 
-      objectReference: {fileID: 11400000, guid: 500f49d23dc934cdd9bfbbec89db107f, type: 2}
+      objectReference: {fileID: 0}
     - target: {fileID: 879154694441561859, guid: cade6778d68cd42879de3caa4dab4b8f, type: 3}
       propertyPath: 'mySkillKeyMap.SD_Values.Array.data[1]'
       value: 
-      objectReference: {fileID: 11400000, guid: a40936e1d8b7f4d1ead015ac74a04507, type: 2}
+      objectReference: {fileID: 0}
     - target: {fileID: 879154694441561859, guid: cade6778d68cd42879de3caa4dab4b8f, type: 3}
       propertyPath: 'mySkillKeyMap.SD_Values.Array.data[2]'
       value: 
@@ -6070,7 +6066,7 @@ PrefabInstance:
     - target: {fileID: 879154694441561859, guid: cade6778d68cd42879de3caa4dab4b8f, type: 3}
       propertyPath: 'mySkillKeyMap.SD_Values.Array.data[3]'
       value: 
-      objectReference: {fileID: 11400000, guid: 3fcda8f2b2bc8442e90072041a6cafc5, type: 2}
+      objectReference: {fileID: 0}
     - target: {fileID: 5702742380246880004, guid: cade6778d68cd42879de3caa4dab4b8f, type: 3}
       propertyPath: m_Name
       value: RAW_Services

@@ -4,6 +4,7 @@ public class Char_Control : MonoBehaviour
 {
 	[SerializeField] private ClickMoveController clickMoveController;
 	[SerializeField] private SkillTargetingController skillTargetingController;
+	[SerializeField] private SkillLoadout skillLoadout;
 	
 	private void Awake()
 	{
@@ -12,6 +13,9 @@ public class Char_Control : MonoBehaviour
 
 		if (skillTargetingController == null)
 			skillTargetingController = GetComponent<SkillTargetingController>();
+
+		if (skillLoadout == null)
+			skillLoadout = GetComponent<SkillLoadout>();
 	}
 
     void Update()
@@ -50,19 +54,19 @@ public class Char_Control : MonoBehaviour
 	{
 		if (Input.GetKeyDown(KeyCode.Q))
 		{
-			BeginSkillIndicator("q");
+			BeginSkillIndicator(SkillSlotKey.Q);
 		}
 		else if (Input.GetKeyDown(KeyCode.W))
 		{
-			BeginSkillIndicator("w");
+			BeginSkillIndicator(SkillSlotKey.W);
 		}
 		else if (Input.GetKeyDown(KeyCode.E))
 		{
-			BeginSkillIndicator("e");
+			BeginSkillIndicator(SkillSlotKey.E);
 		}
 		else if (Input.GetKeyDown(KeyCode.R))
 		{
-			BeginSkillIndicator("r");
+			BeginSkillIndicator(SkillSlotKey.R);
 		}
 
 		if (Input.GetMouseButtonDown(0))
@@ -74,8 +78,20 @@ public class Char_Control : MonoBehaviour
 		}
 	}
 
-	private void BeginSkillIndicator(string inputKey)
+	private void BeginSkillIndicator(SkillSlotKey slotKey)
 	{
-		skillTargetingController?.BeginIndicate(inputKey);
+		if (skillLoadout == null)
+		{
+			Debug.LogWarning("SkillLoadout is not assigned.", this);
+			return;
+		}
+
+		if (!skillLoadout.TryGetSkill(slotKey, out SkillDefinition skill))
+		{
+			Debug.LogWarning($"Skill is not assigned to slot: {slotKey}", this);
+			return;
+		}
+
+		skillTargetingController?.BeginIndicate(skill);
 	}
 }

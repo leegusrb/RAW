@@ -1229,6 +1229,7 @@ GameObject:
   - component: {fileID: 4692146595004722489}
   - component: {fileID: 5995694583251262275}
   - component: {fileID: -7848807949853896505}
+  - component: {fileID: -9163193407039833494}
   m_Layer: 5
   m_Name: Dummy
   m_TagString: Untagged
@@ -1378,6 +1379,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   clickMoveController: {fileID: 4692146595004722489}
   skillTargetingController: {fileID: -7848807949853896505}
+  skillLoadout: {fileID: -9163193407039833494}
 --- !u!114 &2864591621057478307
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1452,6 +1454,27 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 1
   indicatorPresenter: {fileID: 5995694583251262275}
+--- !u!114 &-9163193407039833494
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2598696420236482373}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 818560a1c9ac744d4a3847e886713a17, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: RAW.Runtime::SkillLoadout
+  slots:
+  - slotKey: 0
+    skill: {fileID: 11400000, guid: 500f49d23dc934cdd9bfbbec89db107f, type: 2}
+  - slotKey: 1
+    skill: {fileID: 11400000, guid: a40936e1d8b7f4d1ead015ac74a04507, type: 2}
+  - slotKey: 2
+    skill: {fileID: 11400000, guid: cb0b46616044a4847be2dd96dc3ebfc9, type: 2}
+  - slotKey: 3
+    skill: {fileID: 11400000, guid: 3fcda8f2b2bc8442e90072041a6cafc5, type: 2}
 --- !u!1 &2650957420405713173
 GameObject:
   m_ObjectHideFlags: 0

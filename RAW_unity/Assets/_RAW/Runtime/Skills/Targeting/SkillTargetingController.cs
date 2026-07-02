@@ -26,38 +26,17 @@ public class SkillTargetingController : MonoBehaviour
 		Cancel();
 	}
 
-	public void BeginIndicate(string inputKey)
+	public void BeginIndicate(SkillDefinition skill)
 	{
 		Cancel();
 
-		if (DataBase.Instance == null)
+		if (skill == null)
 		{
-			Debug.LogError("DataBase.Instance is null.");
+			Debug.LogWarning("SkilLDefinition is null.");
 			return;
 		}
 
-		if (DataBase.Instance.mySkillKeyMap == null)
-		{
-			Debug.LogError("DataBase.Instance.mySkillKeyMap is null.");
-			return;
-		}
-
-		try
-		{
-			currentCastingSkill = DataBase.Instance.mySkillKeyMap[inputKey];
-		}
-		catch (Exception exception)
-		{
-			Debug.LogWarning($"Skill key is not registered: {inputKey}\n{exception.Message}");
-			currentCastingSkill = null;
-			return;
-		}
-
-		if (currentCastingSkill == null)
-		{
-			Debug.LogWarning($"SkillDefinition is null. inputKey: {inputKey}");
-			return;
-		}
+		currentCastingSkill = skill;
 
 		switch (currentCastingSkill.castType)
 		{

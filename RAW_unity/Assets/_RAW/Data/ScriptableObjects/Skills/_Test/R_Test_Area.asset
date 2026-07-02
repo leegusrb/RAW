@@ -12,14 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ac284fe11e21f43e2b030a2a0aab227a, type: 3}
   m_Name: R_Test_Area
   m_EditorClassIdentifier: RAW.Runtime::SkillDefinition
-  skillId: 
-  displayName: 
+  skillId: test_r_area
+  displayName: R Test Area
   description: 
-  school: 0
-  castType: 0
-  targetEnemy: 0
+  school: 3
+  castType: 1
+  targetEnemy: 1
   targetAlly: 0
-  range: 0
-  size: 0
-  cooldown: 0
+  range: 5
+  size: 2
+  cooldown: 1
   manaCost: 0

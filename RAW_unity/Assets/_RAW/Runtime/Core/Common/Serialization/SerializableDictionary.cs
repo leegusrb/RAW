@@ -106,8 +106,4 @@ namespace CustomDict
 	// 3. RAW input / skill dictionaries
     [Serializable]
     public class CustomDictKeyMap : SerializableDictionary<SkillSlotKey, KeyCode> { }
-
-    [Serializable]
-    public class CustomDictSkill : SerializableDictionary<string, SkillDefinition> { };
-
 }
