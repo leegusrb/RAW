@@ -1304,7 +1304,7 @@ MonoBehaviour:
   leftFootCloth: {fileID: 915890867369716194}
   rightFoot: {fileID: 149996179048175032}
   rightFootCloth: {fileID: 5357550088218983526}
-  equipmentSpriteRenderer:
+  appearanceSpriteRenderer:
     SD_Keys: 000000000100000002000000030000000400000005000000060000000700000008000000090000000a0000000b0000000c0000000d0000000e0000000f000000100000001100000012000000130000001400000015000000160000001700000018000000190000001a000000
     SD_Values:
     - {fileID: 3793940357045777164}
@@ -1334,13 +1334,13 @@ MonoBehaviour:
     - {fileID: 915890867369716194}
     - {fileID: 149996179048175032}
     - {fileID: 5357550088218983526}
-  bodyColor:
+  appearanceColor:
     SD_Keys: 09000000070000000400000006000000
     SD_Values:
     - {r: 1, g: 0, b: 0, a: 1}
-    - {r: 0, g: 0, b: 1, a: 1}
-    - {r: 1, g: 0.7843937, b: 0.5251572, a: 1}
-    - {r: 0.24528301, g: 0, b: 0, a: 1}
+    - {r: 0.043137256, g: 0, b: 1, a: 1}
+    - {r: 1, g: 0.78431374, b: 0.52156866, a: 1}
+    - {r: 0.24705882, g: 0, b: 0.003921569, a: 1}
 --- !u!114 &9123456789012345678
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1356,7 +1356,7 @@ MonoBehaviour:
   currentInventoryCapacity: 10
   inventorySlots: []
   equippedItems:
-    SD_Keys: 1b0000001d0000001c0000001e00000004000000150000000000000006000000
+    SD_Keys: 0000000002000000010000000300000004000000070000000900000005000000
     SD_Values:
     - Cloth_1.png
     - Foot_1.png

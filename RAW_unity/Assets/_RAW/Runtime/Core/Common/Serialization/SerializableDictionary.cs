@@ -98,10 +98,10 @@ namespace CustomDict
     public class CustomDictCurrentEquipment : SerializableDictionary<EquipmentSlot, string> { }
 
     [Serializable]
-    public class CustomDictEquipmentSpriteRenderer : SerializableDictionary<EquipmentSlot, SpriteRenderer> { }
+    public class CustomDictAppearanceSpriteRenderer : SerializableDictionary<AppearancePart, SpriteRenderer> { }
 
     [Serializable]
-    public class CustomDictBodyColor : SerializableDictionary<EquipmentSlot, Color> { }
+    public class CustomDictAppearanceColor : SerializableDictionary<AppearancePart, Color> { }
 
 	// 3. RAW input / skill dictionaries
     [Serializable]

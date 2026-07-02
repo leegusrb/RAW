@@ -207,6 +207,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 2577585254963922481, guid: 63ee4b6a40c55fd429759b807832ded1, type: 3}
   m_PrefabInstance: {fileID: 113705130}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &281330806 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6262673730551079362, guid: cade6778d68cd42879de3caa4dab4b8f, type: 3}
+  m_PrefabInstance: {fileID: 4227106801026806663}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa693da1390a24f8e880f795ffa5bd1e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AddressableAssetService
 --- !u!114 &353366915 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 885236408684516780, guid: 67dbb23091e48f9418e69cd1c99a178b, type: 3}
@@ -548,6 +559,26 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 885236408684516780, guid: 67dbb23091e48f9418e69cd1c99a178b, type: 3}
+      propertyPath: addressableAssetService
+      value: 
+      objectReference: {fileID: 281330806}
+    - target: {fileID: 885236408684516780, guid: 67dbb23091e48f9418e69cd1c99a178b, type: 3}
+      propertyPath: appearanceColor.SD_Values.Array.data[0].a
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 885236408684516780, guid: 67dbb23091e48f9418e69cd1c99a178b, type: 3}
+      propertyPath: appearanceColor.SD_Values.Array.data[1].a
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 885236408684516780, guid: 67dbb23091e48f9418e69cd1c99a178b, type: 3}
+      propertyPath: appearanceColor.SD_Values.Array.data[2].a
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 885236408684516780, guid: 67dbb23091e48f9418e69cd1c99a178b, type: 3}
+      propertyPath: appearanceColor.SD_Values.Array.data[3].a
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2598696420236482373, guid: 67dbb23091e48f9418e69cd1c99a178b, type: 3}
       propertyPath: m_Name
       value: Dummy
@@ -631,6 +662,34 @@ PrefabInstance:
     - target: {fileID: 3066089152958486121, guid: 67dbb23091e48f9418e69cd1c99a178b, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9123456789012345678, guid: 67dbb23091e48f9418e69cd1c99a178b, type: 3}
+      propertyPath: 'equippedItems.SD_Keys.Array.data[0]'
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9123456789012345678, guid: 67dbb23091e48f9418e69cd1c99a178b, type: 3}
+      propertyPath: 'equippedItems.SD_Keys.Array.data[1]'
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 9123456789012345678, guid: 67dbb23091e48f9418e69cd1c99a178b, type: 3}
+      propertyPath: 'equippedItems.SD_Keys.Array.data[2]'
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 9123456789012345678, guid: 67dbb23091e48f9418e69cd1c99a178b, type: 3}
+      propertyPath: 'equippedItems.SD_Keys.Array.data[3]'
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 9123456789012345678, guid: 67dbb23091e48f9418e69cd1c99a178b, type: 3}
+      propertyPath: 'equippedItems.SD_Keys.Array.data[5]'
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 9123456789012345678, guid: 67dbb23091e48f9418e69cd1c99a178b, type: 3}
+      propertyPath: 'equippedItems.SD_Keys.Array.data[6]'
+      value: 9
+      objectReference: {fileID: 0}
+    - target: {fileID: 9123456789012345678, guid: 67dbb23091e48f9418e69cd1c99a178b, type: 3}
+      propertyPath: 'equippedItems.SD_Keys.Array.data[7]'
+      value: 5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

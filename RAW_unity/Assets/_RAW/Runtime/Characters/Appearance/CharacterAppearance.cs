@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.ResourceManagement.AsyncOperations;
 
-public class Char_Appearance : MonoBehaviour
+public class CharacterAppearance : MonoBehaviour
 {
     [SerializeField]
     private Char_Inventory inventory;
@@ -67,8 +67,8 @@ public class Char_Appearance : MonoBehaviour
     [SerializeField]
     private SpriteRenderer rightFootCloth;
 
-    public CustomDictEquipmentSpriteRenderer equipmentSpriteRenderer;
-    public CustomDictBodyColor bodyColor;
+    public CustomDictAppearanceSpriteRenderer appearanceSpriteRenderer;
+    public CustomDictAppearanceColor appearanceColor;
 
 	private readonly Dictionary<SpriteRenderer, AsyncOperationHandle<Sprite>> activeSpriteHandles = new Dictionary<SpriteRenderer, AsyncOperationHandle<Sprite>>();
 	private readonly Dictionary<SpriteRenderer, AsyncOperationHandle<Sprite>> pendingSpriteHandles = new Dictionary<SpriteRenderer, AsyncOperationHandle<Sprite>>();
@@ -114,32 +114,86 @@ public class Char_Appearance : MonoBehaviour
                 continue;
 
             string itemId = equipped[slot];
-            switch (slot.ToString())
+            switch (slot)
             {
-                case "Cloth":
+                case EquipmentSlot.Cloth:
                     SetCloth(itemId);
                     break;
-                case "Armor":
+
+                case EquipmentSlot.Armor:
                     SetArmor(itemId);
                     break;
-                case "Pant":
+
+                case EquipmentSlot.Pant:
                     SetPant(itemId);
                     break;
-                case "Eye":
+
+                case EquipmentSlot.Eye:
                     SetEye(itemId);
                     break;
-                case "Hair":
-                case "FaceHair":
-                    SetSprite(equipmentSpriteRenderer[slot], DataBase.Instance.equipmentAddress + itemId);
-                    SetHairColor(slot, bodyColor[slot]);
+
+                case EquipmentSlot.Hair:
+					SetSprite(appearanceSpriteRenderer[AppearancePart.Hair], DataBase.Instance.equipmentAddress + itemId);
+					SetColor(AppearancePart.Hair);
+					break;
+
+                case EquipmentSlot.FaceHair:
+					SetSprite(appearanceSpriteRenderer[AppearancePart.FaceHair], DataBase.Instance.equipmentAddress + itemId);
+					SetColor(AppearancePart.FaceHair);
                     break;
+
+				case EquipmentSlot.Helmet:
+					SetSprite(appearanceSpriteRenderer[AppearancePart.Helmet1], DataBase.Instance.equipmentAddress + itemId);
+					break;
+
+				case EquipmentSlot.Weapon:
+					SetSprite(appearanceSpriteRenderer[AppearancePart.RightWeapon], DataBase.Instance.equipmentAddress + itemId);
+					break;
+
+				case EquipmentSlot.Shield:
+					SetSprite(appearanceSpriteRenderer[AppearancePart.LeftShield], DataBase.Instance.equipmentAddress + itemId);
+					break;
+
+				case EquipmentSlot.Back:
+					SetSprite(appearanceSpriteRenderer[AppearancePart.Back], DataBase.Instance.equipmentAddress + itemId);
+					break;
+
                 default:
-                    SetSprite(equipmentSpriteRenderer[slot], DataBase.Instance.equipmentAddress + itemId);
+					Debug.LogWarning($"Unsupported equipment slot: {slot}", this);
                     break;
             }
         }
     }
 
+	private bool TryGetRenderer(AppearancePart part, out SpriteRenderer renderer)
+	{
+		renderer = null;
+
+		if (appearanceSpriteRenderer == null)
+			return false;
+
+		if (!appearanceSpriteRenderer.TryGetValue(part, out renderer))
+		{
+			Debug.LogWarning($"Appearance renderer is not registered: {part}", this);
+			return false;
+		}
+
+		if (renderer == null)
+		{
+			Debug.LogError($"Appearance renderer is null: {part}", this);
+			return false;
+		}
+
+		return true;
+	}
+
+	private void SetSprite(AppearancePart part, string address)
+	{
+		if (!TryGetRenderer(part, out SpriteRenderer renderer))
+			return;
+
+		SetSprite(renderer, address);
+	}
 
     void SetSprite(SpriteRenderer renderer, string address)
 	{
@@ -200,34 +254,41 @@ public class Char_Appearance : MonoBehaviour
         //_multipleSpriteParts.Add(DataBase.Instance.equipmentAddress + clothAddress + "[Left]");
         //_multipleSpriteParts.Add(DataBase.Instance.equipmentAddress + clothAddress + "[Right]");
 
-        SetSprite(equipmentSpriteRenderer[EquipmentSlot.BodyCloth], DataBase.Instance.equipmentAddress + address + "[Body]");
-        SetSprite(equipmentSpriteRenderer[EquipmentSlot.LeftArmCloth], DataBase.Instance.equipmentAddress + address + "[Left]");
-        SetSprite(equipmentSpriteRenderer[EquipmentSlot.RightArmCloth], DataBase.Instance.equipmentAddress + address + "[Right]");
+        SetSprite(AppearancePart.BodyCloth, DataBase.Instance.equipmentAddress + address + "[Body]");
+        SetSprite(AppearancePart.LeftArmCloth, DataBase.Instance.equipmentAddress + address + "[Left]");
+        SetSprite(AppearancePart.RightArmCloth, DataBase.Instance.equipmentAddress + address + "[Right]");
         
     }
     void SetArmor(string address)
     {
-        SetSprite(equipmentSpriteRenderer[EquipmentSlot.BodyArmor], DataBase.Instance.equipmentAddress + address + "[Body]");
-        SetSprite(equipmentSpriteRenderer[EquipmentSlot.LeftShoulder], DataBase.Instance.equipmentAddress + address + "[Left]");
-        SetSprite(equipmentSpriteRenderer[EquipmentSlot.RightShoulder], DataBase.Instance.equipmentAddress + address + "[Right]");
+        SetSprite(AppearancePart.BodyArmor, DataBase.Instance.equipmentAddress + address + "[Body]");
+        SetSprite(AppearancePart.LeftShoulder, DataBase.Instance.equipmentAddress + address + "[Left]");
+        SetSprite(AppearancePart.RightShoulder, DataBase.Instance.equipmentAddress + address + "[Right]");
     }
     void SetPant(string address)
     {
-        SetSprite(equipmentSpriteRenderer[EquipmentSlot.LeftFootCloth], DataBase.Instance.equipmentAddress + address + "[Left]");
-        SetSprite(equipmentSpriteRenderer[EquipmentSlot.RightFootCloth], DataBase.Instance.equipmentAddress + address + "[Right]");
+        SetSprite(AppearancePart.LeftFootCloth, DataBase.Instance.equipmentAddress + address + "[Left]");
+        SetSprite(AppearancePart.RightFootCloth, DataBase.Instance.equipmentAddress + address + "[Right]");
     }
     void SetEye(string address)
     {
-        SetSprite(equipmentSpriteRenderer[EquipmentSlot.LeftEyeBack], DataBase.Instance.equipmentAddress + address + "[Back]");
-        SetSprite(equipmentSpriteRenderer[EquipmentSlot.LeftEyeFront], DataBase.Instance.equipmentAddress + address + "[Front]");
-        SetSprite(equipmentSpriteRenderer[EquipmentSlot.RightEyeBack], DataBase.Instance.equipmentAddress + address + "[Back]");
-        SetSprite(equipmentSpriteRenderer[EquipmentSlot.RightEyeFront], DataBase.Instance.equipmentAddress + address + "[Front]");
-        equipmentSpriteRenderer[EquipmentSlot.LeftEyeFront].color = bodyColor[EquipmentSlot.LeftEyeBack];
-        equipmentSpriteRenderer[EquipmentSlot.RightEyeFront].color = bodyColor[EquipmentSlot.RightEyeBack];
+        SetSprite(AppearancePart.LeftEyeBack, DataBase.Instance.equipmentAddress + address + "[Back]");
+        SetSprite(AppearancePart.LeftEyeFront, DataBase.Instance.equipmentAddress + address + "[Front]");
+        SetSprite(AppearancePart.RightEyeBack, DataBase.Instance.equipmentAddress + address + "[Back]");
+        SetSprite(AppearancePart.RightEyeFront, DataBase.Instance.equipmentAddress + address + "[Front]");
+
+		SetColor(AppearancePart.LeftEyeFront);
+		SetColor(AppearancePart.RightEyeFront);
     }
-    void SetHairColor(EquipmentSlot slot, UnityEngine.Color color)
+    void SetColor(AppearancePart part)
     {
-        equipmentSpriteRenderer[slot].color = color;
+		if (!appearanceSpriteRenderer.ContainsKey(part))
+			return;
+
+		if (!appearanceColor.ContainsKey(part))
+			return;
+
+		appearanceSpriteRenderer[part].color = appearanceColor[part];
     }
     
 	private int IncreaseLoadVersion(SpriteRenderer renderer)
