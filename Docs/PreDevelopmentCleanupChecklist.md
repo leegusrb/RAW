@@ -37,11 +37,11 @@
 
 ## 4. refactor: replace SkillSpec with SkillDefinition
 
-- [ ] `SkillSpec` 사용처 목록화
-- [ ] 테스트용 `SkillSpec` 에셋을 `SkillDefinition` 에셋으로 변환
-- [ ] `SkillTargetingController`가 `SkillDefinition`을 받도록 수정
-- [ ] `SkillSpec.cs` 삭제
-- [ ] `SkillSpec` 검색 결과 없음 확인
+- [x] `SkillSpec` 사용처 목록화
+- [x] 테스트용 `SkillSpec` 에셋을 `SkillDefinition` 에셋으로 변환
+- [x] `SkillTargetingController`가 `SkillDefinition`을 받도록 수정
+- [x] `SkillSpec.cs` 삭제
+- [x] `SkillSpec` 검색 결과 없음 확인
 
 ## 5. refactor: introduce SkillLoadout and remove database skill key map
 
