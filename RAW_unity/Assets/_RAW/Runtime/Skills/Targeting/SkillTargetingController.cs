@@ -40,15 +40,15 @@ public class SkillTargetingController : MonoBehaviour
 
 		switch (currentCastingSkill.castType)
 		{
-			case CastType.bar:
+			case CastType.Bar:
 				indicatorPresenter.ShowBar(currentCastingSkill.range, currentCastingSkill.size);
 				break;
 
-			case CastType.target:
+			case CastType.Target:
 				indicatorPresenter.ShowTargeting();
 				break;
 
-			case CastType.area:
+			case CastType.Area:
 				indicatorPresenter.ShowArea(currentCastingSkill.size);
 				break;
 
@@ -80,15 +80,15 @@ public class SkillTargetingController : MonoBehaviour
 
 		switch (currentCastingSkill.castType)
 		{
-			case CastType.bar:
+			case CastType.Bar:
 				IndicateBarType(mouseWorldPosition);
 				break;
 
-			case CastType.target:
+			case CastType.Target:
 				IndicateTargetingType(mouseWorldPosition);
 				break;
 
-			case CastType.area:
+			case CastType.Area:
 				IndicateAreaType(mouseWorldPosition);
 				break;
 

@@ -37,7 +37,7 @@ public class CharacterInventory : MonoBehaviour
 			if (inventoryConfig == null)
 				return currentInventoryCapacity;
 
-			return inventoryConfig.MaxInventotyCapacity;
+			return inventoryConfig.MaxInventoryCapacity;
 		}
 	}
 
@@ -72,7 +72,7 @@ public class CharacterInventory : MonoBehaviour
 		currentInventoryCapacity = Mathf.Clamp(
 			currentInventoryCapacity,
 			0,
-			inventoryConfig.MaxInventotyCapacity
+			inventoryConfig.MaxInventoryCapacity
 		);
 	}
 

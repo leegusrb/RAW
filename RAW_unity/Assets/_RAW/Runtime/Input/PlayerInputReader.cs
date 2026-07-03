@@ -18,7 +18,7 @@ public class PlayerInputReader : MonoBehaviour
 
 	private void ReadMovementInput()
 	{
-		if (Input.GetMouseButton(1))
+		if (Input.GetMouseButtonDown(1))
 		{
 			MoveRequested?.Invoke();
 		}

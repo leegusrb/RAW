@@ -21,7 +21,7 @@ public class ItemDefinition : ScriptableObject
 
 	public string ItemId => itemId;
 	public string DisplayName => displayName;
-	public string Description => Description;
+	public string Description => description;
 	public ItemLine ItemLine => itemLine;
 	public ItemRarity Rarity => rarity;
 	public Sprite Icon => icon;
