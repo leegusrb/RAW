@@ -2,14 +2,28 @@ using UnityEngine;
 
 public class ItemDefinition : ScriptableObject
 {
-    public string itemId;
-	public string displayName;
+	[Header("Identity")]
+    [SerializeField] private string itemId;
+	[SerializeField] private string displayName;
+
 	[TextArea]
-	public string description;
+	[SerializeField] private string description;
 
-	public ItemLine itemLine;
-	public ItemRarity rarity;
+	[Header("Classification")]
+	[SerializeField] private ItemLine itemLine;
+	[SerializeField] private ItemRarity rarity;
 
-	public Sprite icon;
-	public int maxStack = 1;
+	[Header("Presentation")]
+	[SerializeField] private Sprite icon;
+
+	[Header("Inventory")]
+	[SerializeField] private int maxStack = 1;
+
+	public string ItemId => itemId;
+	public string DisplayName => displayName;
+	public string Description => Description;
+	public ItemLine ItemLine => itemLine;
+	public ItemRarity Rarity => rarity;
+	public Sprite Icon => icon;
+	public int MaxStack => maxStack;
 }

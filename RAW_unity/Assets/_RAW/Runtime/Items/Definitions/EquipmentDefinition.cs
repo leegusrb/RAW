@@ -1,19 +1,14 @@
 using UnityEngine;
 
 [CreateAssetMenu(menuName = "RAW/Items/Equipment Definition")]
-public class EquipmentDefinition : ScriptableObject
+public class EquipmentDefinition : ItemDefinition
 {
-    public EquipmentSlot equipmentSlot;
+	[Header("Equipment")]
+    [SerializeField] private EquipmentSlot equipmentSlot;
 
-	public int attackPower;
-	public int abilityPower;
-	public float attackSpeed;
-	public float cooldownReduction;
+	[Header("Stats")]
+	[SerializeField] private EquipmentStatBlock stats = new EquipmentStatBlock();
 
-	public float criticalChance;
-	public float criticalDamage;
-
-	public int maxMana;
-	public float manaRegen;
-	public float manaCostReduction;
+	public EquipmentSlot EquipmentSlot => equipmentSlot;
+	public EquipmentStatBlock Stats => stats;
 }
