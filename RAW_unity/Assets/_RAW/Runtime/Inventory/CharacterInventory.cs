@@ -23,11 +23,23 @@ public class InventorySlot
     }
 }
 
-public class Char_Inventory : MonoBehaviour
+public class CharacterInventory : MonoBehaviour
 {
-    [SerializeField]
-    private int currentInventoryCapacity = 10;
+	[SerializeField] private InventoryConfig inventoryConfig;
+    [SerializeField] private int currentInventoryCapacity = 10;
+
     public int CurrentInventoryCapacity => currentInventoryCapacity;
+
+	public int MaxInventotyCapacity
+	{
+		get
+		{
+			if (inventoryConfig == null)
+				return currentInventoryCapacity;
+
+			return inventoryConfig.MaxInventotyCapacity;
+		}
+	}
 
     [SerializeField]
     private InventorySlot[] inventorySlots;    
@@ -40,8 +52,31 @@ public class Char_Inventory : MonoBehaviour
     public event Action OnInventoryChanged;
     public event Action OnEquipmentChanged;
 
+	private void Awake()
+	{
+		ClampInventoryCapacity();
+	}
 
-    public bool IsSlotUsable(int index)
+	#if UNITY_EDITOR
+	private void OnValidate()
+	{
+		ClampInventoryCapacity();
+	}
+	#endif
+
+	private void ClampInventoryCapacity()
+	{
+		if (inventoryConfig == null)
+			return;
+
+		currentInventoryCapacity = Mathf.Clamp(
+			currentInventoryCapacity,
+			0,
+			inventoryConfig.MaxInventotyCapacity
+		);
+	}
+
+	public bool IsSlotUsable(int index)
     {
         return index >= 0 && index < currentInventoryCapacity;
     }

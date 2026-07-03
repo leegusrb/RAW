@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 822254272255977990}
   - component: {fileID: 6262673730551079362}
-  - component: {fileID: 879154694441561859}
   m_Layer: 0
   m_Name: RAW_Services
   m_TagString: Untagged
@@ -45,20 +44,3 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aa693da1390a24f8e880f795ffa5bd1e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AddressableAssetService
---- !u!114 &879154694441561859
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5702742380246880004}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2409eb09fa451db49a3309663dd0edd9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::DataBase
-  equipmentAddress: Assets/DataBase/Equipment/
-  mySkillKeyMap:
-    SD_Keys: []
-    SD_Values: []
-  maxInventoryCapacity: 20

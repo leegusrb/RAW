@@ -6,8 +6,12 @@ using UnityEngine.ResourceManagement.AsyncOperations;
 
 public class CharacterAppearance : MonoBehaviour
 {
+	[Header("Addressables")]
+	[SerializeField] 
+	private string equipmentAddressPrefix = "Assets/DataBase/Equipment/";
+
     [SerializeField]
-    private Char_Inventory inventory;
+    private CharacterInventory inventory;
 	
 	[SerializeField]
 	private AddressableAssetService addressableAssetService;
@@ -104,7 +108,7 @@ public class CharacterAppearance : MonoBehaviour
 
     public void SetAppearance()
     {
-        if (inventory == null || EquippedItems == null || DataBase.Instance == null)
+        if (inventory == null || EquippedItems == null)
             return;
 
         var equipped = EquippedItems;
@@ -133,29 +137,29 @@ public class CharacterAppearance : MonoBehaviour
                     break;
 
                 case EquipmentSlot.Hair:
-					SetSprite(appearanceSpriteRenderer[AppearancePart.Hair], DataBase.Instance.equipmentAddress + itemId);
+					SetSprite(appearanceSpriteRenderer[AppearancePart.Hair], GetEquipmentSpriteAddress(itemId));
 					SetColor(AppearancePart.Hair);
 					break;
 
                 case EquipmentSlot.FaceHair:
-					SetSprite(appearanceSpriteRenderer[AppearancePart.FaceHair], DataBase.Instance.equipmentAddress + itemId);
+					SetSprite(appearanceSpriteRenderer[AppearancePart.FaceHair], GetEquipmentSpriteAddress(itemId));
 					SetColor(AppearancePart.FaceHair);
                     break;
 
 				case EquipmentSlot.Helmet:
-					SetSprite(appearanceSpriteRenderer[AppearancePart.Helmet1], DataBase.Instance.equipmentAddress + itemId);
+					SetSprite(appearanceSpriteRenderer[AppearancePart.Helmet1], GetEquipmentSpriteAddress(itemId));
 					break;
 
 				case EquipmentSlot.Weapon:
-					SetSprite(appearanceSpriteRenderer[AppearancePart.RightWeapon], DataBase.Instance.equipmentAddress + itemId);
+					SetSprite(appearanceSpriteRenderer[AppearancePart.RightWeapon], GetEquipmentSpriteAddress(itemId));
 					break;
 
 				case EquipmentSlot.Shield:
-					SetSprite(appearanceSpriteRenderer[AppearancePart.LeftShield], DataBase.Instance.equipmentAddress + itemId);
+					SetSprite(appearanceSpriteRenderer[AppearancePart.LeftShield], GetEquipmentSpriteAddress(itemId));
 					break;
 
 				case EquipmentSlot.Back:
-					SetSprite(appearanceSpriteRenderer[AppearancePart.Back], DataBase.Instance.equipmentAddress + itemId);
+					SetSprite(appearanceSpriteRenderer[AppearancePart.Back], GetEquipmentSpriteAddress(itemId));
 					break;
 
                 default:
@@ -250,32 +254,32 @@ public class CharacterAppearance : MonoBehaviour
     void SetCloth(string address)
     {
         //List<string> _multipleSpriteParts = new List<string>();
-        //_multipleSpriteParts.Add(DataBase.Instance.equipmentAddress + clothAddress + "[Body]");
-        //_multipleSpriteParts.Add(DataBase.Instance.equipmentAddress + clothAddress + "[Left]");
-        //_multipleSpriteParts.Add(DataBase.Instance.equipmentAddress + clothAddress + "[Right]");
+        //_multipleSpriteParts.Add(GetEquipmentSpriteAddress(clothAddress, "[Body]"));
+        //_multipleSpriteParts.Add(GetEquipmentSpriteAddress(clothAddress, "[Left]"));
+        //_multipleSpriteParts.Add(GetEquipmentSpriteAddress(clothAddress, "[Right]"));
 
-        SetSprite(AppearancePart.BodyCloth, DataBase.Instance.equipmentAddress + address + "[Body]");
-        SetSprite(AppearancePart.LeftArmCloth, DataBase.Instance.equipmentAddress + address + "[Left]");
-        SetSprite(AppearancePart.RightArmCloth, DataBase.Instance.equipmentAddress + address + "[Right]");
+        SetSprite(AppearancePart.BodyCloth, GetEquipmentSpriteAddress(address, "[Body]"));
+        SetSprite(AppearancePart.LeftArmCloth, GetEquipmentSpriteAddress(address, "[Left]"));
+        SetSprite(AppearancePart.RightArmCloth, GetEquipmentSpriteAddress(address, "[Right]"));
         
     }
     void SetArmor(string address)
     {
-        SetSprite(AppearancePart.BodyArmor, DataBase.Instance.equipmentAddress + address + "[Body]");
-        SetSprite(AppearancePart.LeftShoulder, DataBase.Instance.equipmentAddress + address + "[Left]");
-        SetSprite(AppearancePart.RightShoulder, DataBase.Instance.equipmentAddress + address + "[Right]");
+        SetSprite(AppearancePart.BodyArmor, GetEquipmentSpriteAddress(address, "[Body]"));
+        SetSprite(AppearancePart.LeftShoulder, GetEquipmentSpriteAddress(address, "[Left]"));
+        SetSprite(AppearancePart.RightShoulder, GetEquipmentSpriteAddress(address, "[Right]"));
     }
     void SetPant(string address)
     {
-        SetSprite(AppearancePart.LeftFootCloth, DataBase.Instance.equipmentAddress + address + "[Left]");
-        SetSprite(AppearancePart.RightFootCloth, DataBase.Instance.equipmentAddress + address + "[Right]");
+        SetSprite(AppearancePart.LeftFootCloth, GetEquipmentSpriteAddress(address, "[Left]"));
+        SetSprite(AppearancePart.RightFootCloth, GetEquipmentSpriteAddress(address, "[Right]"));
     }
     void SetEye(string address)
     {
-        SetSprite(AppearancePart.LeftEyeBack, DataBase.Instance.equipmentAddress + address + "[Back]");
-        SetSprite(AppearancePart.LeftEyeFront, DataBase.Instance.equipmentAddress + address + "[Front]");
-        SetSprite(AppearancePart.RightEyeBack, DataBase.Instance.equipmentAddress + address + "[Back]");
-        SetSprite(AppearancePart.RightEyeFront, DataBase.Instance.equipmentAddress + address + "[Front]");
+        SetSprite(AppearancePart.LeftEyeBack, GetEquipmentSpriteAddress(address, "[Back]"));
+        SetSprite(AppearancePart.LeftEyeFront, GetEquipmentSpriteAddress(address, "[Front]"));
+        SetSprite(AppearancePart.RightEyeBack, GetEquipmentSpriteAddress(address, "[Back]"));
+        SetSprite(AppearancePart.RightEyeFront, GetEquipmentSpriteAddress(address, "[Front]"));
 
 		SetColor(AppearancePart.LeftEyeFront);
 		SetColor(AppearancePart.RightEyeFront);
@@ -375,5 +379,21 @@ public class CharacterAppearance : MonoBehaviour
 		{
 			addressableAssetService.ReleaseSprite(handle);
 		}
+	}
+
+	private string GetEquipmentSpriteAddress(string itemId)
+	{
+		if (string.IsNullOrEmpty(itemId))
+			return string.Empty;
+
+		return equipmentAddressPrefix + itemId;
+	}
+
+	private string GetEquipmentSpriteAddress(string itemId, string spriteName)
+	{
+		if (string.IsNullOrEmpty(itemId))
+			return string.Empty;
+
+		return equipmentAddressPrefix + itemId + spriteName;
 	}
 }
