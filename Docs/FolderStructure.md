@@ -71,5 +71,8 @@ Data/
 
 외부 에셋 또는 패키지성 리소스를 배치합니다.
 
-현재 SPUM은 참조 안정성을 위해 바로 이동하지 않고,
-별도 브랜치에서 `Assets/ThirdParty/SPUM`으로 이동합니다.
+```text
+Assets/ThirdParty/
+├── Cainos/
+└── SPUM/
+```
