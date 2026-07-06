@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 [DisallowMultipleComponent]
 public class PlayerInputReader : MonoBehaviour
@@ -9,51 +10,58 @@ public class PlayerInputReader : MonoBehaviour
 	public event Action PrimaryActionRequested;
 	public event Action<SkillSlotKey> SkillSlotRequested;
 
-	private void Update()
+	public Vector2 PointerScreenPosition => pointerPositionAction != null ? pointerPositionAction.ReadValue<Vector2>() : Vector2.zero;
+
+	private InputAction moveToPointerAction;
+	private InputAction primaryAction;
+	private InputAction stopAction;
+	private InputAction skillQAction;
+	private InputAction skillWAction;
+	private InputAction skillEAction;
+	private InputAction skillRAction;
+	private InputAction pointerPositionAction;
+
+	private void Awake()
 	{
-		ReadMovementInput();
-		ReadSkillInput();
-		ReadActionInput();
+		InputActionMap playerMap = InputSystem.actions.FindActionMap("Player", true);
+
+		moveToPointerAction = playerMap.FindAction("MoveToPointer", true);
+		primaryAction = playerMap.FindAction("PrimaryAction", true);
+		stopAction = playerMap.FindAction("Stop", true);
+		skillQAction = playerMap.FindAction("SkillQ", true);
+		skillWAction = playerMap.FindAction("SkillW", true);
+		skillEAction = playerMap.FindAction("SkillE", true);
+		skillRAction = playerMap.FindAction("SkillR", true);
+		pointerPositionAction = playerMap.FindAction("PointerPosition", true);
 	}
 
-	private void ReadMovementInput()
+	private void OnEnable()
 	{
-		if (Input.GetMouseButtonDown(1))
-		{
-			MoveRequested?.Invoke();
-		}
-
-		if (Input.GetKeyDown(KeyCode.S))
-		{
-			StopRequested?.Invoke();
-		}
+		moveToPointerAction.performed += OnMoveToPointer;
+		primaryAction.performed += OnPrimaryAction;
+		stopAction.performed += OnStop;
+		skillQAction.performed += OnSkillQ;
+		skillWAction.performed += OnSkillW;
+		skillEAction.performed += OnSkillE;
+		skillRAction.performed += OnSkillR;
 	}
 
-	private void ReadSkillInput()
+	private void OnDisable()
 	{
-		if (Input.GetKeyDown(KeyCode.Q))
-		{
-			SkillSlotRequested?.Invoke(SkillSlotKey.Q);
-		}
-		else if (Input.GetKeyDown(KeyCode.W))
-		{
-			SkillSlotRequested?.Invoke(SkillSlotKey.W);
-		}
-		else if (Input.GetKeyDown(KeyCode.E))
-		{
-			SkillSlotRequested?.Invoke(SkillSlotKey.E);
-		}
-		else if (Input.GetKeyDown(KeyCode.R))
-		{
-			SkillSlotRequested?.Invoke(SkillSlotKey.R);
-		}
+		moveToPointerAction.performed -= OnMoveToPointer;
+		primaryAction.performed -= OnPrimaryAction;
+		stopAction.performed -= OnStop;
+		skillQAction.performed -= OnSkillQ;
+		skillWAction.performed -= OnSkillW;
+		skillEAction.performed -= OnSkillE;
+		skillRAction.performed -= OnSkillR;
 	}
 
-	private void ReadActionInput()
-	{
-		if (Input.GetMouseButtonDown(0))
-		{
-			PrimaryActionRequested?.Invoke();
-		}
-	}
+	private void OnMoveToPointer(InputAction.CallbackContext context) => MoveRequested?.Invoke();
+	private void OnPrimaryAction(InputAction.CallbackContext context) => PrimaryActionRequested?.Invoke();
+	private void OnStop(InputAction.CallbackContext context) => StopRequested?.Invoke();
+	private void OnSkillQ(InputAction.CallbackContext context) => SkillSlotRequested?.Invoke(SkillSlotKey.Q);
+	private void OnSkillW(InputAction.CallbackContext context) => SkillSlotRequested?.Invoke(SkillSlotKey.W);
+	private void OnSkillE(InputAction.CallbackContext context) => SkillSlotRequested?.Invoke(SkillSlotKey.E);
+	private void OnSkillR(InputAction.CallbackContext context) => SkillSlotRequested?.Invoke(SkillSlotKey.R);
 }

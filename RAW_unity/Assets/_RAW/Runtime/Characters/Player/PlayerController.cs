@@ -47,12 +47,12 @@ public class PlayerController : MonoBehaviour
 	void Update()
     {
 		clickMoveController?.TickMove();
-		skillTargetingController?.Tick();
+		skillTargetingController?.Tick(inputReader.PointerScreenPosition);
     }
 
 	private void HandleMoveRequested()
 	{
-		clickMoveController?.SetTargetByMouse();
+		clickMoveController?.SetTargetByScreenPosition(inputReader.PointerScreenPosition);
 
 		if (skillTargetingController != null && skillTargetingController.IsIndicatingSkill)
 		{

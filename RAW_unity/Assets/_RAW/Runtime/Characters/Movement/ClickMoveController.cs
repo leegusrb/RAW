@@ -40,7 +40,7 @@ public class ClickMoveController : MonoBehaviour
 		targetPos = transform.position;
 	}
 
-	public void SetTargetByMouse()
+	public void SetTargetByScreenPosition(Vector2 screenPosition)
 	{
 		if (Camera.main == null)
 		{
@@ -48,7 +48,7 @@ public class ClickMoveController : MonoBehaviour
 			return;
 		}
 
-		Vector2 mouseWorldPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+		Vector2 mouseWorldPosition = Camera.main.ScreenToWorldPoint(screenPosition);
 
 		Collider2D ground = Physics2D.OverlapPoint(mouseWorldPosition, groundLayer);
 

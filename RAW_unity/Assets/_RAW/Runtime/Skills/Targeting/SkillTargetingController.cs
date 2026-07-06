@@ -68,7 +68,7 @@ public class SkillTargetingController : MonoBehaviour
 		currentCastingSkill = null;
 	}
 
-	public void Tick()
+	public void Tick(Vector2 pointerScreenPosition)
 	{
 		if (!isIndicatingSkill)
 			return;
@@ -76,7 +76,7 @@ public class SkillTargetingController : MonoBehaviour
 		if (currentCastingSkill == null)
 			return;
 
-		Vector3 mouseWorldPosition = GetMouseWorldPosition();
+		Vector3 mouseWorldPosition = GetMouseWorldPosition(pointerScreenPosition);
 
 		switch (currentCastingSkill.castType)
 		{
@@ -98,7 +98,7 @@ public class SkillTargetingController : MonoBehaviour
 		}
 	}
 
-	private Vector3 GetMouseWorldPosition()
+	private Vector3 GetMouseWorldPosition(Vector2 pointerScreenPosition)
 	{
 		if (Camera.main == null)
 		{
@@ -106,10 +106,11 @@ public class SkillTargetingController : MonoBehaviour
 			return transform.position;
 		}
 
-		Vector3 mousePosition = Input.mousePosition;
-		mousePosition = Camera.main.ScreenToWorldPoint(mousePosition);
+		Vector3 worldPosition = Camera.main.ScreenToWorldPoint(
+			new Vector3(pointerScreenPosition.x, pointerScreenPosition.y, 0f)
+		);
 
-		return new Vector3(mousePosition.x, mousePosition.y, -1f);
+		return new Vector3(worldPosition.x, worldPosition.y, -1f);
 	}
 
 	private void IndicateBarType(Vector3 mouseWorldPosition)
