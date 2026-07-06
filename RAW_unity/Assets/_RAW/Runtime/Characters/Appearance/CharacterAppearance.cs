@@ -8,7 +8,7 @@ public class CharacterAppearance : MonoBehaviour
 {
 	[Header("Addressables")]
 	[SerializeField] 
-	private string equipmentAddressPrefix = "Assets/DataBase/Equipment/";
+	private string equipmentAddressPrefix = "Assets/_RAW/Presentation/Sprites/Equipment/";
 
     [SerializeField]
     private CharacterInventory inventory;

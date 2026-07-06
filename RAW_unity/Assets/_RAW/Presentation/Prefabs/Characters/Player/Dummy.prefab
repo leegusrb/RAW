@@ -1275,7 +1275,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6638fee0cbf2bd84ab36180b00b12f74, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  equipmentAddressPrefix: Assets/DataBase/Equipment/
+  equipmentAddressPrefix: Assets/_RAW/Presentation/Sprites/Equipment/
   inventory: {fileID: 9123456789012345678}
   addressableAssetService: {fileID: 0}
   back: {fileID: 3793940357045777164}
