@@ -1,10 +1,7 @@
-﻿using CustomDict;
-using System.Collections;
+﻿using System.Collections;
 using UnityEngine;
-using static UnityEngine.GraphicsBuffer;
 
-public class Char_Control : MonoBehaviour
-{
+public class Char_Control : MonoBehaviour{
     [SerializeField]
     private LayerMask groundLayer;
     [SerializeField]
@@ -46,7 +43,7 @@ public class Char_Control : MonoBehaviour
 
     SkillSpec currentCastingSkill;
     private bool isIndicatingSkill;
-
+    private string currentCastingSkillKey;
     void Start()
     {
         HideIndicator();
@@ -72,7 +69,7 @@ public class Char_Control : MonoBehaviour
         {
             if (isIndicatingSkill)
             {
-
+                ActivateSkill();
             }
         }
         if (Input.GetKeyDown(KeyCode.S))
@@ -198,7 +195,8 @@ public class Char_Control : MonoBehaviour
         }
         skillRangeIndicator.transform.localScale = new Vector2(currentCastingSkill.range, currentCastingSkill.range);
         skillRangeIndicator.SetActive(true);
-        isIndicatingSkill = true;         
+        isIndicatingSkill = true;
+        currentCastingSkillKey = now_input_key;
     }
 
     void HideIndicator()
@@ -351,6 +349,50 @@ public class Char_Control : MonoBehaviour
 
         yield return null;
         targetPointer.SetActive(false);
+    }
+
+
+    void ActivateSkill()
+    {
+        GameObject prefab = currentCastingSkill.skillPrefab;
+        animator.SetTrigger(currentCastingSkillKey);
+        SkillCastContext context = BuildCastContext();
+        GameObject skillObject = Instantiate(prefab, context.position, Quaternion.Euler(0f, 0f, context.rotationZ));
+        skillObject.transform.localScale = skillBarIndicator.transform.lossyScale;
+
+        HideIndicator();
+    }
+
+    SkillCastContext BuildCastContext()
+    {
+        SkillCastContext context = new SkillCastContext();
+
+        switch (currentCastingSkill.castType)
+        {
+            case CastType.bar:
+                context.position = transform.position;
+                context.rotationZ = skillBarIndicator.transform.eulerAngles.z;
+                context.direction = skillBarIndicator.transform.right;
+                context.visualScale = GetBarIndicatorVisualScale();
+                break;
+            case CastType.area:
+                context.position = skillAreaIndicator.transform.position;
+                context.rotationZ = 0f;
+                context.direction = Vector2.zero;
+                break;
+            case CastType.target:
+                context.position = skillTargetingIndicator.transform.position;
+                context.rotationZ = 0f;
+                context.direction = Vector2.zero;
+                break;
+        }
+
+        return context;
+    }
+
+    Vector3 GetBarIndicatorVisualScale()
+    {
+        return skillBarIndicator.transform.lossyScale;
     }
 
     //void OnDrawGizmos()

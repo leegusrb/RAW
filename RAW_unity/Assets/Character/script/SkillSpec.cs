@@ -27,6 +27,9 @@ public class SkillSpec : ScriptableObject
     //public Vector2 radius;
     public float range;
     public float size;
+    public GameObject skillPrefab;
+    public float moveSpeed = 5f;
+    public AnimationClip animationClip;
     //public string animType; //attack1,2,3, skill1,2,3
     //public float consumeMana;
     //public float delay;

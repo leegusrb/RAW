@@ -15,5 +15,5 @@ MonoBehaviour:
   castType: 0
   targetEnemy: 0
   targetAlly: 0
-  range: 1
+  range: 2
   size: 1

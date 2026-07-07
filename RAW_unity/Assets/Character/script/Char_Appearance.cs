@@ -67,19 +67,16 @@ public class Char_Appearance : MonoBehaviour
     public CustomDictEquipmentSpriteRenderer equipmentSpriteRenderer;
     public CustomDictBodyColor bodyColor;
 
-    CustomDictCurrentEquipment EquippedItems => inventory != null ? inventory.EquippedItems : null;
-
+    CustomDictCurrentEquipment EquippedItems => inventory.EquippedItems;
 
     void OnEnable()
     {
-        if (inventory != null)
-            inventory.OnEquipmentChanged += SetAppearance;
+        inventory.OnEquipmentChanged += SetAppearance;
     }
 
     void OnDisable()
     {
-        if (inventory != null)
-            inventory.OnEquipmentChanged -= SetAppearance;
+        inventory.OnEquipmentChanged -= SetAppearance;
     }
 
     void Start()
@@ -89,9 +86,6 @@ public class Char_Appearance : MonoBehaviour
 
     public void SetAppearance()
     {
-        if (inventory == null || EquippedItems == null || DataBase.Instance == null)
-            return;
-
         var equipped = EquippedItems;
         foreach (EquipmentSlot slot in Enum.GetValues(typeof(EquipmentSlot)))
         {
