@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ac284fe11e21f43e2b030a2a0aab227a, type: 3}
+  m_Name: Warrior_Q
+  m_EditorClassIdentifier: RAW.Runtime::SkillDefinition
+  skillId: warrior_q
+  displayName: Warrior Q
+  description: 
+  school: 0
+  castType: 0
+  targetEnemy: 0
+  targetAlly: 0
+  range: 1
+  size: 1
+  cooldown: 1
+  manaCost: 0
+  skillPrefab: {fileID: 8850884371554800505, guid: 7d803b75b208bd34ca73cfe52af6e510, type: 3}
+  moveSpeed: 5
+  animationClip: {fileID: 7400000, guid: a99175957e506f94f8ce9e8b24599d61, type: 2}
