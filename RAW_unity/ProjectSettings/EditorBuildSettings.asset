@@ -6,11 +6,11 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/_RAW/Scenes/Tests/SampleScene.unity
-    guid: 8c9cfa26abfee488c85f1582747f6a02
-  - enabled: 1
     path: Assets/_RAW/Scenes/Tests/NetworkCharacterTest.unity
     guid: 5f3cf3bf67ecc9b42a9d3de1d62f3f05
+  - enabled: 1
+    path: Assets/_RAW/Scenes/Tests/SampleScene.unity
+    guid: 8c9cfa26abfee488c85f1582747f6a02
   m_configObjects:
     com.unity.addressableassets: {fileID: 11400000, guid: cbd818771efec2b43920c6b987d7ee30, type: 2}
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
