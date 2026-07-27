@@ -327,6 +327,13 @@ public class Char_Control : MonoBehaviour
 
     IEnumerator PointingTarget()
     {
+        if (targetPointer == null)
+        {
+            Debug.LogWarning("목표 지점 포인터가 연결되지 않았습니다.", this);
+
+            yield break;
+        }
+
         targetPointer.SetActive(true);
         targetPointer.transform.position = targetPos;
 
