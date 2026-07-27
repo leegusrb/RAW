@@ -84,23 +84,16 @@ namespace RAW.Network
             }
 
             // 자신이 소유한 캐릭터만 로컬 입력 처리
-            characterControl.enabled = IsOwner;
+            RefreshOwnershipState();
 
             isFacingLeft.OnValueChanged += HandleFacingChanged;
 
             lastFacingLeft = transform.localScale.x < 0f;
 
             if (IsOwner)
-            {
-                if (IsServer)
-                    isFacingLeft.Value = lastFacingLeft;
-                else
-                    SubmitFacingRPC(lastFacingLeft);
-            }
+                SubmitFacing(lastFacingLeft);
             else
-            {
                 ApplyFacing(isFacingLeft.Value);
-            }
 
             Debug.Log($"네트워크 플레이어 생성: OwnerClientId={OwnerClientId}, IsOwner={IsOwner}", this);
         }
@@ -113,6 +106,16 @@ namespace RAW.Network
             if (characterControl != null)
                 characterControl.enabled = false;
         }
+
+		public override void OnGainedOwnership()
+		{
+			RefreshOwnershipState();
+		}
+
+		public override void OnLostOwnership()
+		{
+			RefreshOwnershipState();
+		}
 
         private void CacheComponents()
         {
@@ -131,5 +134,19 @@ namespace RAW.Network
                     visual.SetActive(false);
             }
         }
+
+		private void RefreshOwnershipState()
+		{
+			if (characterControl != null)
+				characterControl.enabled = IsOwner;
+		}
+
+		private void SubmitFacing(bool facingLeft)
+		{
+			if (IsServer)
+				isFacingLeft.Value = facingLeft;
+			else
+				SubmitFacingRPC(facingLeft);
+		}
     }
 }

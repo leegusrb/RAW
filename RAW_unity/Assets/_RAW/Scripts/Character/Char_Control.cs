@@ -47,6 +47,8 @@ public class Char_Control : MonoBehaviour
     SkillSpec currentCastingSkill;
     private bool isIndicatingSkill;
 
+	private static readonly int IsMovingHash = Animator.StringToHash("isMoving");
+
     void Start()
     {
         HideIndicator();
@@ -284,18 +286,27 @@ public class Char_Control : MonoBehaviour
         if(isMoving == false)
         {
             isMoving = true;
-            animator.SetBool("isMoving", true);
+            animator.SetBool(IsMovingHash, true);
         }
         transform.position += (Vector3)(targetDirection * characterState.moveSpeed * Time.deltaTime);
-        if (targetDirection.x > 0)
-        {
-            transform.localScale = new Vector3(-1, 1, 1);
-        }
-        else
-        {
-            transform.localScale = new Vector3(1, 1, 1);
-        }
+        
+		SetFacingByDirection(targetDirection);
     }
+
+	private void SetFacingByDirection(Vector2 direction)
+	{
+		if (Mathf.Abs(direction.x) < 0.001f)
+			return;
+
+		Vector3 scale = transform.localScale;
+		float xMagnitude = Mathf.Abs(scale.x);
+
+		scale.x = direction.x > 0f
+			? -xMagnitude
+			: xMagnitude;
+
+		transform.localScale = scale;
+	}
 
     void StopMove()
     {
@@ -303,7 +314,7 @@ public class Char_Control : MonoBehaviour
         if (isMoving == true)
         {
             isMoving = false;
-            animator.SetBool("isMoving", false);
+            animator.SetBool(IsMovingHash, false);
         }
         isFollowingWall = false;
     }
