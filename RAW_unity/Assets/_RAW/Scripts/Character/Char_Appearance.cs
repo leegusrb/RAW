@@ -1,5 +1,6 @@
 using CustomDict;
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
@@ -69,6 +70,11 @@ public class Char_Appearance : MonoBehaviour
 
     CustomDictCurrentEquipment EquippedItems => inventory != null ? inventory.EquippedItems : null;
 
+	private readonly Dictionary<SpriteRenderer, AsyncOperationHandle<Sprite>> activeSpriteHandles = new Dictionary<SpriteRenderer, AsyncOperationHandle<Sprite>>();
+	private readonly Dictionary<SpriteRenderer, int> spriteLoadVersions = new Dictionary<SpriteRenderer, int>();
+	private readonly List<AsyncOperationHandle<Sprite>> pendingSpriteHandles = new List<AsyncOperationHandle<Sprite>>();
+	private bool isDestroyed;
+
 
     void OnEnable()
     {
@@ -84,42 +90,72 @@ public class Char_Appearance : MonoBehaviour
 
     void Start()
     {
-        //SetAppearance();
+        // SetAppearance();
     }
 
-    public void SetAppearance()
+	private void OnDestroy()
+	{
+		isDestroyed = true;
+
+		foreach (AsyncOperationHandle<Sprite> handle in activeSpriteHandles.Values)
+		{
+			ReleaseHandle(handle);
+		}
+
+		activeSpriteHandles.Clear();
+
+		List<AsyncOperationHandle<Sprite>> pendingCopy = 
+			new List<AsyncOperationHandle<Sprite>>(pendingSpriteHandles);
+
+		pendingSpriteHandles.Clear();
+
+		foreach (AsyncOperationHandle<Sprite> handle in pendingCopy)
+		{
+			ReleaseHandle(handle);
+		}
+	}
+
+	public void SetAppearance()
     {
         if (inventory == null || EquippedItems == null || DataBase.Instance == null)
             return;
 
-        var equipped = EquippedItems;
-        foreach (EquipmentSlot slot in Enum.GetValues(typeof(EquipmentSlot)))
-        {
-            if (!equipped.ContainsKey(slot))
-                continue;
+		ClearEquipmentAppearance();
 
-            string itemId = equipped[slot];
-            switch (slot.ToString())
+        foreach (KeyValuePair<EquipmentSlot, string> pair in EquippedItems)
+        {
+			EquipmentSlot slot = pair.Key;
+			string itemId = pair.Value;
+
+			if (string.IsNullOrEmpty(itemId))
+				continue;
+
+            switch (slot)
             {
-                case "Cloth":
+                case EquipmentSlot.Cloth:
                     SetCloth(itemId);
                     break;
-                case "Armor":
+
+                case EquipmentSlot.Armor:
                     SetArmor(itemId);
                     break;
-                case "Pant":
+
+                case EquipmentSlot.Pant:
                     SetPant(itemId);
                     break;
-                case "Eye":
+
+                case EquipmentSlot.Eye:
                     SetEye(itemId);
                     break;
-                case "Hair":
-                case "FaceHair":
-                    SetSprite(equipmentSpriteRenderer[slot], DataBase.Instance.equipmentAddress + itemId);
-                    SetHairColor(slot, bodyColor[slot]);
+
+                case EquipmentSlot.Hair:
+                case EquipmentSlot.FaceHair:
+					SetSlotSprite(slot, DataBase.Instance.equipmentAddress + itemId);
+                    SetHairColor(slot);
                     break;
+
                 default:
-                    SetSprite(equipmentSpriteRenderer[slot], DataBase.Instance.equipmentAddress + itemId);
+					SetSlotSprite(slot, DataBase.Instance.equipmentAddress + itemId);
                     break;
             }
         }
@@ -128,57 +164,219 @@ public class Char_Appearance : MonoBehaviour
 
     void SetSprite(SpriteRenderer renderer, string address)
     {
-        Addressables.LoadAssetAsync<Sprite>(address).Completed += handle =>
+		if (renderer == null)
+			return;
+
+			if (string.IsNullOrEmpty(address))
+		{
+			ClearSprite(renderer);
+			return;
+		}
+
+		int requestVersion = IncreaseLoadVersion(renderer);
+
+		AsyncOperationHandle<Sprite> handle = Addressables.LoadAssetAsync<Sprite>(address);
+
+		pendingSpriteHandles.Add(handle);
+
+        handle.Completed += completedHandle =>
         {
-            if (handle.Status == AsyncOperationStatus.Succeeded)
-            {
-                renderer.sprite = handle.Result;
-            }
-            else
-            {
-                Debug.LogError($"Failed to load sprite at address: {address}");
-            }
+			pendingSpriteHandles.Remove(completedHandle);
+
+			if (isDestroyed)
+				return;
+
+			if (renderer == null)
+			{
+				ReleaseHandle(completedHandle);
+				return;
+			}
+
+			if (!IsLatestLoadRequest(renderer, requestVersion))
+			{
+				ReleaseHandle(completedHandle);
+				return;
+			}
+
+			if (completedHandle.Status != AsyncOperationStatus.Succeeded)
+			{
+				ReleaseHandle(completedHandle);
+
+				Debug.LogError($"장비 Sprite 로딩 실패: {address}", this);
+
+				return;
+			}
+
+			ReleaseActiveSprite(renderer);
+
+			renderer.sprite = completedHandle.Result;
+
+			activeSpriteHandles[renderer] = completedHandle;
         };
     }
     
+	private int IncreaseLoadVersion(SpriteRenderer renderer)
+	{
+		if (!spriteLoadVersions.TryGetValue(renderer, out int version))
+			version = 0;
 
+		version++;
+		spriteLoadVersions[renderer] = version;
+
+		return version;
+	}
+	
+	private bool IsLatestLoadRequest(SpriteRenderer renderer, int requestVersion)
+	{
+		return spriteLoadVersions.TryGetValue(renderer, out int currentVersion) && currentVersion == requestVersion;
+	}
+
+	private void ReleaseActiveSprite(SpriteRenderer renderer)
+	{
+		if (!activeSpriteHandles.TryGetValue(renderer, out AsyncOperationHandle<Sprite> handle))
+			return;
+
+		ReleaseHandle(handle);
+		activeSpriteHandles.Remove(renderer);
+	}
+
+	private void ReleaseHandle(AsyncOperationHandle<Sprite> handle)
+	{
+		if (handle.IsValid())
+			Addressables.Release(handle);
+	}
+
+	private void ClearSprite(SpriteRenderer renderer)
+	{
+		if (renderer == null)
+			return;
+
+		IncreaseLoadVersion(renderer);
+		ReleaseActiveSprite(renderer);
+
+		renderer.sprite = null;
+	}
+
+	private void ClearSlotSprite(EquipmentSlot slot)
+	{
+		if (!TryGetRenderer(slot, out SpriteRenderer renderer))
+			return;
+
+		ClearSprite(renderer);
+	}
+
+	private void ClearEquipmentAppearance()
+	{
+		ClearSlotSprite(EquipmentSlot.Back);
+
+		ClearSlotSprite(EquipmentSlot.BodyCloth);
+		ClearSlotSprite(EquipmentSlot.LeftArmCloth);
+		ClearSlotSprite(EquipmentSlot.RightArmCloth);
+
+		ClearSlotSprite(EquipmentSlot.BodyArmor);
+		ClearSlotSprite(EquipmentSlot.LeftShoulder);
+		ClearSlotSprite(EquipmentSlot.RightShoulder);
+
+		ClearSlotSprite(EquipmentSlot.LeftFootCloth);
+		ClearSlotSprite(EquipmentSlot.RightFootCloth);
+
+		ClearSlotSprite(EquipmentSlot.Hair);
+		ClearSlotSprite(EquipmentSlot.FaceHair);
+
+		ClearSlotSprite(EquipmentSlot.LeftEyeBack);
+		ClearSlotSprite(EquipmentSlot.LeftEyeFront);
+		ClearSlotSprite(EquipmentSlot.RightEyeBack);
+		ClearSlotSprite(EquipmentSlot.RightEyeFront);
+
+		ClearSlotSprite(EquipmentSlot.Helmet1);
+		ClearSlotSprite(EquipmentSlot.Helmet2);
+
+		ClearSlotSprite(EquipmentSlot.LeftWeapon);
+		ClearSlotSprite(EquipmentSlot.RightWeapon);
+		ClearSlotSprite(EquipmentSlot.LeftShield);
+		ClearSlotSprite(EquipmentSlot.RightShield);
+	}
     
-    void SetCloth(string address)
+    void SetCloth(string itemId)
     {
         //List<string> _multipleSpriteParts = new List<string>();
         //_multipleSpriteParts.Add(DataBase.Instance.equipmentAddress + clothAddress + "[Body]");
         //_multipleSpriteParts.Add(DataBase.Instance.equipmentAddress + clothAddress + "[Left]");
         //_multipleSpriteParts.Add(DataBase.Instance.equipmentAddress + clothAddress + "[Right]");
 
-        SetSprite(equipmentSpriteRenderer[EquipmentSlot.BodyCloth], DataBase.Instance.equipmentAddress + address + "[Body]");
-        SetSprite(equipmentSpriteRenderer[EquipmentSlot.LeftArmCloth], DataBase.Instance.equipmentAddress + address + "[Left]");
-        SetSprite(equipmentSpriteRenderer[EquipmentSlot.RightArmCloth], DataBase.Instance.equipmentAddress + address + "[Right]");
-        
+		string prefix = DataBase.Instance.equipmentAddress;
+
+		SetSlotSprite(EquipmentSlot.BodyCloth, prefix + itemId + "[Body]");
+		SetSlotSprite(EquipmentSlot.LeftArmCloth, prefix + itemId + "[Left]");
+		SetSlotSprite(EquipmentSlot.RightArmCloth, prefix + itemId + "[Right]");
     }
-    void SetArmor(string address)
+    void SetArmor(string itemId)
     {
-        SetSprite(equipmentSpriteRenderer[EquipmentSlot.BodyArmor], DataBase.Instance.equipmentAddress + address + "[Body]");
-        SetSprite(equipmentSpriteRenderer[EquipmentSlot.LeftShoulder], DataBase.Instance.equipmentAddress + address + "[Left]");
-        SetSprite(equipmentSpriteRenderer[EquipmentSlot.RightShoulder], DataBase.Instance.equipmentAddress + address + "[Right]");
+		string prefix = DataBase.Instance.equipmentAddress;
+
+		SetSlotSprite(EquipmentSlot.BodyArmor, prefix + itemId + "[Body]");
+		SetSlotSprite(EquipmentSlot.LeftShoulder, prefix + itemId + "[Left]");
+		SetSlotSprite(EquipmentSlot.RightShoulder, prefix + itemId + "[Right]");
     }
-    void SetPant(string address)
+    void SetPant(string itemId)
     {
-        SetSprite(equipmentSpriteRenderer[EquipmentSlot.LeftFootCloth], DataBase.Instance.equipmentAddress + address + "[Left]");
-        SetSprite(equipmentSpriteRenderer[EquipmentSlot.RightFootCloth], DataBase.Instance.equipmentAddress + address + "[Right]");
+		string prefix = DataBase.Instance.equipmentAddress;
+
+		SetSlotSprite(EquipmentSlot.LeftFootCloth, prefix + itemId + "[Left]");
+		SetSlotSprite(EquipmentSlot.RightFootCloth, prefix + itemId + "[Right]");
     }
-    void SetEye(string address)
+    void SetEye(string itemId)
     {
-        SetSprite(equipmentSpriteRenderer[EquipmentSlot.LeftEyeBack], DataBase.Instance.equipmentAddress + address + "[Back]");
-        SetSprite(equipmentSpriteRenderer[EquipmentSlot.LeftEyeFront], DataBase.Instance.equipmentAddress + address + "[Front]");
-        SetSprite(equipmentSpriteRenderer[EquipmentSlot.RightEyeBack], DataBase.Instance.equipmentAddress + address + "[Back]");
-        SetSprite(equipmentSpriteRenderer[EquipmentSlot.RightEyeFront], DataBase.Instance.equipmentAddress + address + "[Front]");
+		string prefix = DataBase.Instance.equipmentAddress;
+
+		SetSlotSprite(EquipmentSlot.LeftEyeBack, prefix + itemId + "[Back]");
+		SetSlotSprite(EquipmentSlot.LeftEyeFront, prefix + itemId + "[Front]");
+		SetSlotSprite(EquipmentSlot.RightEyeBack, prefix + itemId + "[Back]");
+		SetSlotSprite(EquipmentSlot.RightEyeFront, prefix + itemId + "[Front]");
+
         equipmentSpriteRenderer[EquipmentSlot.LeftEyeFront].color = bodyColor[EquipmentSlot.LeftEyeBack];
         equipmentSpriteRenderer[EquipmentSlot.RightEyeFront].color = bodyColor[EquipmentSlot.RightEyeBack];
     }
-    void SetHairColor(EquipmentSlot slot, UnityEngine.Color color)
+    void SetHairColor(EquipmentSlot slot)
     {
-        equipmentSpriteRenderer[slot].color = color;
+		if (!TryGetRenderer(slot, out SpriteRenderer renderer))
+			return;
+
+		if (bodyColor == null || !bodyColor.TryGetValue(slot, out Color color))
+			return;
+		
+		renderer.color = color;
     }
     
+	private bool TryGetRenderer(EquipmentSlot slot, out SpriteRenderer renderer)
+	{
+		renderer = null;
 
+		if (equipmentSpriteRenderer == null)
+			return false;
+
+		if (!equipmentSpriteRenderer.TryGetValue(slot, out renderer))
+		{
+			Debug.LogWarning($"장비 SpriteRenderer가 등록되지 않았습니다: {slot}", this);
+
+			return false;
+		}
+
+		if (renderer == null)
+		{
+			Debug.LogWarning($"장비 SpriteRenderer가 null입니다: {slot}", this);
+
+			return false;
+		}
+
+		return true;
+	}
+
+	private void SetSlotSprite(EquipmentSlot slot, string address)
+	{
+		if (!TryGetRenderer(slot, out SpriteRenderer renderer))
+			return;
+
+		SetSprite(renderer, address);
+	}
 }

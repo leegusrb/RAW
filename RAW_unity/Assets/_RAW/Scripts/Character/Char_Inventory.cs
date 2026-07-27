@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using CustomDict;
 using UnityEngine;
 
@@ -101,13 +102,35 @@ public class Char_Inventory : MonoBehaviour
         else
         {
             if (equippedItems.ContainsKey(slot))
+			{
                 equippedItems[slot] = itemId;
+				equippedItems.SyncInspectorFromDictionary();
+			}
             else
                 equippedItems.Add(slot, itemId);
         }
 
         OnEquipmentChanged?.Invoke();
     }
+
+	public void ReplaceEquipment(IReadOnlyDictionary<EquipmentSlot, string> equipment)
+	{
+		equippedItems.Clear();
+		
+		if (equipment != null)
+		{
+			foreach (KeyValuePair<EquipmentSlot, string> pair in equipment)
+			{
+				if (string.IsNullOrEmpty(pair.Value))
+					continue;
+
+				equippedItems[pair.Key] = pair.Value;
+			}
+		}
+
+		equippedItems.SyncInspectorFromDictionary();
+		OnEquipmentChanged?.Invoke();
+	}
 
     public void Unequip(EquipmentSlot slot)
     {
