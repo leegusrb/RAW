@@ -209,12 +209,26 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 2598696420236482373, guid: 67dbb23091e48f9418e69cd1c99a178b, type: 3}
       insertIndex: -1
       addedObject: {fileID: 365905181430154016}
+    - targetCorrespondingSourceObject: {fileID: 2598696420236482373, guid: 67dbb23091e48f9418e69cd1c99a178b, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7775273453424153153}
   m_SourcePrefab: {fileID: 100100000, guid: 67dbb23091e48f9418e69cd1c99a178b, type: 3}
 --- !u!1 &124719763721653724 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 7726094808036947850, guid: 67dbb23091e48f9418e69cd1c99a178b, type: 3}
   m_PrefabInstance: {fileID: 7675134036264729174}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1449748005533337880 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 9123456789012345678, guid: 67dbb23091e48f9418e69cd1c99a178b, type: 3}
+  m_PrefabInstance: {fileID: 7675134036264729174}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5662116675036114195}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: df329d77fb01a7e4a8637718fb008ccc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &4161562022141261675 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 5999739329963740477, guid: 67dbb23091e48f9418e69cd1c99a178b, type: 3}
@@ -259,7 +273,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 3176310867
+  GlobalObjectIdHash: 1154790952
   InScenePlacedSourceGlobalObjectIdHash: 0
   DeferredDespawnTick: 0
   Ownership: 1
@@ -405,6 +419,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RAW.Network.NetworkCharacterState
   ShowTopMostFoldoutHeaderGroup: 1
   characterState: {fileID: 5567187303188743413}
+--- !u!114 &7775273453424153153
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5662116675036114195}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d82c8fc655f734a1ab801806b7bc9a40, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RAW.Network.NetworkEquipmentSync
+  ShowTopMostFoldoutHeaderGroup: 1
+  inventory: {fileID: 1449748005533337880}
 --- !u!1 &7511849947110713824 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 197311793952166838, guid: 67dbb23091e48f9418e69cd1c99a178b, type: 3}
