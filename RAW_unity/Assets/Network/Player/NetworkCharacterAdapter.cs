@@ -1,7 +1,7 @@
 using Unity.Netcode;
 using UnityEngine;
 
-namespace RAW.network
+namespace RAW.Network
 {
     [DisallowMultipleComponent]
     [RequireComponent(typeof(NetworkObject))]
