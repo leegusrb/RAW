@@ -73,6 +73,8 @@ public class Char_Appearance : MonoBehaviour
 	private readonly Dictionary<SpriteRenderer, AsyncOperationHandle<Sprite>> activeSpriteHandles = new Dictionary<SpriteRenderer, AsyncOperationHandle<Sprite>>();
 	private readonly Dictionary<SpriteRenderer, int> spriteLoadVersions = new Dictionary<SpriteRenderer, int>();
 	private readonly List<AsyncOperationHandle<Sprite>> pendingSpriteHandles = new List<AsyncOperationHandle<Sprite>>();
+	private readonly Dictionary<EquipmentSlot, string> appliedEquipment = new Dictionary<EquipmentSlot, string>();
+
 	private bool isDestroyed;
 
 
@@ -90,7 +92,7 @@ public class Char_Appearance : MonoBehaviour
 
     void Start()
     {
-        // SetAppearance();
+        SetAppearance();
     }
 
 	private void OnDestroy()
@@ -120,47 +122,72 @@ public class Char_Appearance : MonoBehaviour
         if (inventory == null || EquippedItems == null || DataBase.Instance == null)
             return;
 
-		ClearEquipmentAppearance();
+		Dictionary<EquipmentSlot, string> currentEquipment = new Dictionary<EquipmentSlot, string>();
 
         foreach (KeyValuePair<EquipmentSlot, string> pair in EquippedItems)
         {
-			EquipmentSlot slot = pair.Key;
-			string itemId = pair.Value;
-
-			if (string.IsNullOrEmpty(itemId))
+			if (string.IsNullOrEmpty(pair.Value))
 				continue;
 
-            switch (slot)
-            {
-                case EquipmentSlot.Cloth:
-                    SetCloth(itemId);
-                    break;
-
-                case EquipmentSlot.Armor:
-                    SetArmor(itemId);
-                    break;
-
-                case EquipmentSlot.Pant:
-                    SetPant(itemId);
-                    break;
-
-                case EquipmentSlot.Eye:
-                    SetEye(itemId);
-                    break;
-
-                case EquipmentSlot.Hair:
-                case EquipmentSlot.FaceHair:
-					SetSlotSprite(slot, DataBase.Instance.equipmentAddress + itemId);
-                    SetHairColor(slot);
-                    break;
-
-                default:
-					SetSlotSprite(slot, DataBase.Instance.equipmentAddress + itemId);
-                    break;
-            }
+			currentEquipment[pair.Key] = pair.Value;
         }
+
+		foreach (KeyValuePair<EquipmentSlot, string> previous in appliedEquipment)
+		{
+			if (!currentEquipment.ContainsKey(previous.Key))
+				ClearEquipmentSlotAppearance(previous.Key);
+		}
+
+		foreach (KeyValuePair<EquipmentSlot, string> current in currentEquipment)
+		{
+			if (appliedEquipment.TryGetValue(current.Key, out string previousItemId) &&
+				string.Equals(previousItemId, current.Value, StringComparison.Ordinal))
+			{
+				continue;
+			}
+
+			ApplyEquipmentSlot(current.Key, current.Value);
+		}
+
+		appliedEquipment.Clear();
+
+		foreach (KeyValuePair<EquipmentSlot, string> current in currentEquipment)
+		{
+			appliedEquipment[current.Key] = current.Value;
+		}
     }
 
+	private void ApplyEquipmentSlot(EquipmentSlot slot, string itemId)
+	{
+		switch (slot)
+		{
+			case EquipmentSlot.Cloth:
+				SetCloth(itemId);
+				break;
+
+			case EquipmentSlot.Armor:
+				SetArmor(itemId);
+				break;
+
+			case EquipmentSlot.Pant:
+				SetPant(itemId);
+				break;
+
+			case EquipmentSlot.Eye:
+				SetEye(itemId);
+				break;
+
+			case EquipmentSlot.Hair:
+			case EquipmentSlot.FaceHair:
+				SetSlotSprite(slot, DataBase.Instance.equipmentAddress + itemId);
+				SetHairColor(slot);
+				break;
+
+			default:
+				SetSlotSprite(slot, DataBase.Instance.equipmentAddress + itemId);
+				break;
+		}
+	}
 
     void SetSprite(SpriteRenderer renderer, string address)
     {
@@ -265,7 +292,42 @@ public class Char_Appearance : MonoBehaviour
 		ClearSprite(renderer);
 	}
 
-	private void ClearEquipmentAppearance()
+	private void ClearEquipmentSlotAppearance(EquipmentSlot slot)
+	{
+		switch (slot)
+		{
+			case EquipmentSlot.Cloth:
+				ClearSlotSprite(EquipmentSlot.BodyCloth);
+				ClearSlotSprite(EquipmentSlot.LeftArmCloth);
+				ClearSlotSprite(EquipmentSlot.RightArmCloth);
+				break;
+
+			case EquipmentSlot.Armor:
+				ClearSlotSprite(EquipmentSlot.BodyArmor);
+				ClearSlotSprite(EquipmentSlot.LeftShoulder);
+				ClearSlotSprite(EquipmentSlot.RightShoulder);
+				break;
+
+			case EquipmentSlot.Pant:
+				ClearSlotSprite(EquipmentSlot.LeftFootCloth);
+				ClearSlotSprite(EquipmentSlot.RightFootCloth);
+				break;
+
+			case EquipmentSlot.Eye:
+				ClearSlotSprite(EquipmentSlot.LeftEyeBack);
+				ClearSlotSprite(EquipmentSlot.LeftEyeFront);
+				ClearSlotSprite(EquipmentSlot.RightEyeBack);
+				ClearSlotSprite(EquipmentSlot.RightEyeFront);
+				break;
+
+			default:
+				ClearSlotSprite(slot);
+				break;
+
+		}
+	}
+
+	private void ClearAllEquipmentAppearance()
 	{
 		ClearSlotSprite(EquipmentSlot.Back);
 
