@@ -41,10 +41,50 @@ public class Char_Inventory : MonoBehaviour
     public event Action OnInventoryChanged;
     public event Action OnEquipmentChanged;
 
+	private void Awake()
+	{
+		EnsureInventoryInitialized();
+	}
+
+	private void OnValidate()
+	{
+		EnsureInventoryInitialized();
+	}
+
+	private void EnsureInventoryInitialized()
+	{
+		currentInventoryCapacity = Mathf.Max(0, currentInventoryCapacity);
+
+		if (inventorySlots == null || inventorySlots.Length != currentInventoryCapacity)
+		{
+			InventorySlot[] resizedSlots = new InventorySlot[currentInventoryCapacity];
+
+			if (inventorySlots != null)
+			{
+				int copyCount = Mathf.Min(inventorySlots.Length, resizedSlots.Length);
+
+				for (int i = 0; i < copyCount; i++)
+				{
+					resizedSlots[i] = inventorySlots[i];
+				}
+			}
+
+			inventorySlots = resizedSlots;
+		}
+
+		for (int i = 0; i < inventorySlots.Length; i++)
+		{
+			if (inventorySlots[i] == null)
+				inventorySlots[i] = new InventorySlot();
+		}
+	}
 
     public bool IsSlotUsable(int index)
     {
-        return index >= 0 && index < currentInventoryCapacity;
+        return index >= 0 && 
+			   index < currentInventoryCapacity &&
+			   inventorySlots != null &&
+			   index < inventorySlots.Length;
     }
 
     public InventorySlot GetInventorySlot(int index)
@@ -62,6 +102,8 @@ public class Char_Inventory : MonoBehaviour
 
     public bool SetInventorySlot(int index, string itemId, int count)
     {
+		EnsureInventoryInitialized();
+
         if (!IsSlotUsable(index))
             return false;
 
@@ -82,6 +124,37 @@ public class Char_Inventory : MonoBehaviour
     {
         SetInventorySlot(index, null, 0);
     }
+
+	public int GetItemCount(string itemId)
+	{
+		if (string.IsNullOrEmpty(itemId))
+			return 0;
+
+		EnsureInventoryInitialized();
+
+		int totalCount = 0;
+
+		for (int i = 0; i < currentInventoryCapacity; i++)
+		{
+			InventorySlot slot = inventorySlots[i];
+
+			if (slot == null || slot.IsEmpty)
+				continue;
+
+			if (string.Equals(slot.itemId, itemId, StringComparison.Ordinal))
+				totalCount += slot.count;
+		}
+
+		return totalCount;
+	}
+
+	public bool HasItem(string itemId, int requiredCount = 1)
+	{
+		if (requiredCount <= 0)
+			return false;
+
+		return GetItemCount(itemId) >= requiredCount;
+	}
 
     public bool TryGetEquippedItemId(EquipmentSlot slot, out string itemId)
     {
