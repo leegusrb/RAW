@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using Unity.Collections;
 using Unity.Netcode;
-using Unity.VisualScripting;
 using UnityEngine;
 
 namespace RAW.Network
@@ -109,6 +108,146 @@ namespace RAW.Network
 				inventory = GetComponent<Char_Inventory>();
 		}
 
+		public void RequestEquip(EquipmentSlot requestedSlot, string itemId)
+		{
+			if (!IsSpawned)
+			{
+				Debug.LogWarning("NetworkObject가 Spawn되지 않아 장비를 요청할 수 없습니다.", this);
+				return;
+			}
+
+			if (!IsOwner)
+			{
+				Debug.LogWarning("자신이 소유한 캐릭터의 장비만 변경할 수 있습니다.", this);
+				return;
+			}
+
+			if (string.IsNullOrEmpty(itemId))
+			{
+				Debug.LogWarning("장비 Item ID가 비어 있습니다.", this);
+				return;
+			}
+
+			// FixedString64Bytes가 안전하게 저장할 수 있도록 제한합니다.
+			// 현재 장비 ID는 영문, 숫자, 기호만 사용합니다.
+			if (itemId.Length > 60)
+			{
+				Debug.LogWarning($"장비 Item ID가 너무 깁니다: {itemId.Length}", this);
+				return;
+			}
+
+			if (IsServer)
+			{
+				TryEquipOnServer(requestedSlot, itemId);
+			}
+			else
+			{
+				RequestEquipRpc(requestedSlot, new FixedString64Bytes(itemId));
+			}
+		}
+
+		public void RequestUnequip(EquipmentSlot requestedSlot)
+		{
+			if (!IsSpawned)
+			{
+				Debug.LogWarning("NetworkObject가 Spawn되지 않아 장비 해제를 요청할 수 없습니다.", this);
+				return;
+			}
+
+			if (!IsOwner)
+			{
+				Debug.LogWarning("자신이 소유한 캐릭터의 장비만 해제할 수 있습니다.", this);
+				return;
+			}
+
+			if (IsServer)
+			{
+				TryUnequipOnServer(requestedSlot);
+			}
+			else
+			{
+				RequestUnequipRpc(requestedSlot);
+			}
+		}
+
+		[Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Owner)]
+		private void RequestEquipRpc(EquipmentSlot requestedSlot, FixedString64Bytes itemId)
+		{
+			TryEquipOnServer(requestedSlot, itemId.ToString());
+		}
+
+		[Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Owner)]
+		private void RequestUnequipRpc(EquipmentSlot requestedSlot)
+		{
+			TryUnequipOnServer(requestedSlot);
+		}
+
+		private bool TryEquipOnServer(EquipmentSlot requestedSlot, string itemId)
+		{
+			if (!IsServer)
+				return false;
+
+			if (inventory == null || equipmentCatalog == null)
+				return false;
+
+			if (string.IsNullOrEmpty(itemId))
+				return false;
+
+			// 서버 카탈로그에 등록된 장비인지,
+			// 해당 슬롯에 들어갈 수 있는 장비인지 확인합니다.
+			if (!equipmentCatalog.IsValidForSlot(itemId, requestedSlot))
+			{
+				Debug.LogWarning($"장비 요청 거절: 등록되지 않았거나 슬롯이 일치하지 않습니다. OwnerClientId={OwnerClientId}, Slot={requestedSlot}, ItemId={itemId}", this);
+				return false;
+			}
+
+			// 이미 같은 장비를 착용 중이면 성공한 것으로 처리하되
+			// 네트워크 목록을 다시 작성하지 않습니다.
+			if (inventory.TryGetEquippedItemId(requestedSlot, out string currentItemId) && string.Equals(currentItemId, itemId, StringComparison.Ordinal))
+			{
+				return true;
+			}
+
+			if (!inventory.HasItem(itemId))
+			{
+				Debug.LogWarning($"장비 요청 거절: 인벤토리에 없는 아이템입니다. OwnerClientId={OwnerClientId}, ItemId={itemId}", this);
+				return false;
+			}
+
+			inventory.SetEquipped(requestedSlot, itemId);
+
+			Debug.Log($"장비 요청 승인: OwnerClientId={OwnerClientId}, Slot={requestedSlot}, ItemId={itemId}", this);
+
+			return true;
+		}
+
+		private bool TryUnequipOnServer(EquipmentSlot requestedSlot)
+		{
+			if (!IsServer)
+				return false;
+
+			if (inventory == null || equipmentCatalog == null)
+				return false;
+
+			if (!inventory.TryGetEquippedItemId(requestedSlot, out string currentItemId))
+			{
+				// 이미 비어있는 슬롯은 성공으로 취급합니다.
+				return true;
+			}
+
+			if (!equipmentCatalog.IsValidForSlot(currentItemId, requestedSlot))
+			{
+				Debug.LogWarning($"장비 해제 요청 거절: 현재 장비와 슬롯 정보가 올바르지 않습니다. OwnerClientId={OwnerClientId}, Slot={requestedSlot}, ItemId={currentItemId}", this);
+				return false;
+			}
+
+			inventory.Unequip(requestedSlot);
+
+			Debug.Log($"장비 해제 승인: OwnerClientId={OwnerClientId}, Slot={requestedSlot}", this);
+
+			return true;
+		}
+
 		private void HandleLocalEquipmentChanged()
 		{
 			if (isApplyingNetworkState)
@@ -197,66 +336,57 @@ namespace RAW.Network
 		
 		#if UNITY_EDITOR
 
-		[ContextMenu("Test - Equip Hair 1")]
-		private void TestEquipHair1()
+		[ContextMenu("Test - Request Equip Hair 2")]
+		private void TestRequestEquipHair2()
 		{
-			if (!CanRunContextTest())
+			if (!CanRunOwnerRequestTest())
 				return;
 
-			inventory.SetEquipped(
-				EquipmentSlot.Hair,
-				"Hair_1.png"
-			);
-		}
-
-		[ContextMenu("Test - Equip Hair 2")]
-		private void TestEquipHair2()
-		{
-			if (!CanRunContextTest())
-				return;
-
-			inventory.SetEquipped(
+			RequestEquip(
 				EquipmentSlot.Hair,
 				"Hair_2.png"
 			);
 		}
 
-		[ContextMenu("Test - Unequip Hair")]
-		private void TestUnequipHair()
+		[ContextMenu("Test - Request Hair 2 As Armor")]
+		private void TestRequestHair2AsArmor()
 		{
-			if (!CanRunContextTest())
+			if (!CanRunOwnerRequestTest())
 				return;
 
-			inventory.Unequip(EquipmentSlot.Hair);
-		}
-
-		[ContextMenu("Test - Equip Armor 1")]
-		private void TestEquipArmor1()
-		{
-			if (!CanRunContextTest())
-				return;
-
-			inventory.SetEquipped(
+			RequestEquip(
 				EquipmentSlot.Armor,
-				"Armor_1.png"
+				"Hair_2.png"
 			);
 		}
 
-		[ContextMenu("Test - Clear Equipment")]
-		private void TestClearEquipment()
+		[ContextMenu("Test - Request Invalid Equipment")]
+		private void TestRequestInvalidEquipment()
 		{
-			if (!CanRunContextTest())
+			if (!CanRunOwnerRequestTest())
 				return;
 
-			inventory.ClearAllEquipment();
+			RequestEquip(
+				EquipmentSlot.Hair,
+				"Invalid_Item.png"
+			);
 		}
 
-		private bool CanRunContextTest()
+		[ContextMenu("Test - Request Unequip Hair")]
+		private void TestRequestUnequipHair()
+		{
+			if (!CanRunOwnerRequestTest())
+				return;
+
+			RequestUnequip(EquipmentSlot.Hair);
+		}
+
+		private bool CanRunOwnerRequestTest()
 		{
 			if (!Application.isPlaying)
 			{
 				Debug.LogWarning(
-					"Play Mode에서만 실행할 수 있습니다.",
+					"Play Mode에서만 테스트할 수 있습니다.",
 					this
 				);
 
@@ -273,17 +403,18 @@ namespace RAW.Network
 				return false;
 			}
 
-			if (!IsServer)
+			if (!IsOwner)
 			{
 				Debug.LogWarning(
-					"서버 또는 Host에서만 실행할 수 있습니다.",
+					"소유 중인 NetworkPlayer에서 실행해야 합니다.",
 					this
 				);
 
 				return false;
 			}
 
-			return inventory != null;
+			return inventory != null &&
+				equipmentCatalog != null;
 		}
 
 		#endif

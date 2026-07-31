@@ -149,8 +149,6 @@ namespace RAW.Network
 
 			applyQueued = false;
 
-			applyQueued = false;
-
 			ApplyNetworkStateToInventory();
 		}
 
