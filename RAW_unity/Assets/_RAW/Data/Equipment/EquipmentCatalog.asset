@@ -15,9 +15,9 @@ MonoBehaviour:
   entries:
   - itemId: Hair_1.png
     slot: 4
-  - itemId: Hair_2,png
+  - itemId: Hair_2.png
     slot: 4
-  - itemId: Hair_3,png
+  - itemId: Hair_3.png
     slot: 4
   - itemId: Armor_1.png
     slot: 28
@@ -43,7 +43,7 @@ MonoBehaviour:
     slot: 30
   - itemId: FaceHair_1.png
     slot: 6
-  - itemId: FaceHair_2png
+  - itemId: FaceHair_2.png
     slot: 6
   - itemId: FaceHair_3.png
     slot: 6
