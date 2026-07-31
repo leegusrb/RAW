@@ -433,6 +433,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RAW.Network.NetworkEquipmentSync
   ShowTopMostFoldoutHeaderGroup: 1
   inventory: {fileID: 1449748005533337880}
+  equipmentCatalog: {fileID: 11400000, guid: 8a71c07115e994c80a486255dfd73e8c, type: 2}
 --- !u!1 &7511849947110713824 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 197311793952166838, guid: 67dbb23091e48f9418e69cd1c99a178b, type: 3}

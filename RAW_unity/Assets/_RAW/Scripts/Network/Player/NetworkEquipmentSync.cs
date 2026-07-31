@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Unity.Collections;
 using Unity.Netcode;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace RAW.Network
@@ -43,6 +44,7 @@ namespace RAW.Network
 	public class NetworkEquipmentSync : NetworkBehaviour
 	{
 		[SerializeField] private Char_Inventory inventory;
+		[SerializeField] private EquipmentCatalog equipmentCatalog;
 
 		private NetworkList<NetworkEquipmentEntry> equipmentList;
 
@@ -76,8 +78,15 @@ namespace RAW.Network
 				return;
 			}
 
-			equipmentList.OnListChanged += HandleNetworkEquipmentChanged;
+			if (equipmentCatalog == null)
+			{
+				Debug.LogError("EquipmentCatalog가 연결되지 않았습니다.", this);
 
+				enabled = false;
+				return;
+			}
+
+			equipmentList.OnListChanged += HandleNetworkEquipmentChanged;
 			inventory.OnEquipmentChanged += HandleLocalEquipmentChanged;
 
 			if (IsServer)
@@ -128,6 +137,13 @@ namespace RAW.Network
 			{
 				if (string.IsNullOrEmpty(pair.Value))
 					continue;
+
+				if (!equipmentCatalog.IsValidForSlot(pair.Value, pair.Key))
+				{
+					Debug.LogWarning($"등록되지 않았거나 슬롯이 잘못된 장비입니다. Slot={pair.Key}. ItemId={pair.Value}", this);
+
+					continue;
+				}
 
 				equipmentList.Add(
 					new NetworkEquipmentEntry(
