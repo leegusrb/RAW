@@ -156,6 +156,40 @@ public class Char_Inventory : MonoBehaviour
 		return GetItemCount(itemId) >= requiredCount;
 	}
 
+	// 클라이언트 인벤토리를 서버 스냅샷으로 한 번에 교체
+	public void ReplaceInventory(int capacity, IReadOnlyDictionary<int, InventorySlot> items)
+	{
+		currentInventoryCapacity = Mathf.Max(0, capacity);
+
+		EnsureInventoryInitialized();
+
+		for (int i = 0; i < inventorySlots.Length; i++)
+		{
+			inventorySlots[i].Clear();
+		}
+
+		if (items != null)
+		{
+			foreach (KeyValuePair<int, InventorySlot> pair in items)
+			{
+				if (!IsSlotUsable(pair.Key))
+					continue;
+
+				InventorySlot sourceSlot = pair.Value;
+
+				if (sourceSlot == null || sourceSlot.IsEmpty)
+					continue;
+
+				inventorySlots[pair.Key].Set(
+					sourceSlot.itemId,
+					sourceSlot.count
+				);
+			}
+		}
+
+		OnInventoryChanged?.Invoke();
+	}
+
     public bool TryGetEquippedItemId(EquipmentSlot slot, out string itemId)
     {
         if (equippedItems.TryGetValue(slot, out itemId) && !string.IsNullOrEmpty(itemId))

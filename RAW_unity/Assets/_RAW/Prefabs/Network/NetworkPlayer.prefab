@@ -212,6 +212,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 2598696420236482373, guid: 67dbb23091e48f9418e69cd1c99a178b, type: 3}
       insertIndex: -1
       addedObject: {fileID: 7775273453424153153}
+    - targetCorrespondingSourceObject: {fileID: 2598696420236482373, guid: 67dbb23091e48f9418e69cd1c99a178b, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6312858080780476418}
   m_SourcePrefab: {fileID: 100100000, guid: 67dbb23091e48f9418e69cd1c99a178b, type: 3}
 --- !u!1 &124719763721653724 stripped
 GameObject:
@@ -434,6 +437,20 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   inventory: {fileID: 1449748005533337880}
   equipmentCatalog: {fileID: 11400000, guid: 8a71c07115e994c80a486255dfd73e8c, type: 2}
+--- !u!114 &6312858080780476418
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5662116675036114195}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 46a8e80e081c0421687aa47553b59591, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RAW.Network.NetworkInventorySync
+  ShowTopMostFoldoutHeaderGroup: 1
+  inventory: {fileID: 1449748005533337880}
 --- !u!1 &7511849947110713824 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 197311793952166838, guid: 67dbb23091e48f9418e69cd1c99a178b, type: 3}
