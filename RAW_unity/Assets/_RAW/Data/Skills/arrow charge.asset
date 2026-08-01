@@ -12,6 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: afcd4b312eca36642bcb6bc70de961e8, type: 3}
   m_Name: arrow charge
   m_EditorClassIdentifier: 
+  skillId: arrow_charge
+  manaCost: 10
+  cooldownSeconds: 2
   castType: 0
   targetEnemy: 0
   targetAlly: 0

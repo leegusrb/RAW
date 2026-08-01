@@ -36,7 +36,7 @@ namespace RAW.Network
 
 			if (!inventory.IsSlotUsable(inventorySlotIndex))
 			{
-				Debug.LogWarning($"사용할 수 없는 인벤토리 슬롯입니다: ${inventorySlotIndex}", this);
+				Debug.LogWarning($"사용할 수 없는 인벤토리 슬롯입니다: {inventorySlotIndex}", this);
 				return false;
 			}
 
