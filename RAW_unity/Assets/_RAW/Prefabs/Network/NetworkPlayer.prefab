@@ -486,6 +486,17 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   characterState: {fileID: 365905181430154016}
   skillCatalog: {fileID: 11400000, guid: ed45a0d6cc6c8439bb708691d7a0b16f, type: 2}
+  defaultSkillLoadout:
+  - slot: 0
+    skill: {fileID: 11400000, guid: 2b78b5b21b1b3dd428698af3a50ca3ef, type: 2}
+  - slot: 1
+    skill: {fileID: 11400000, guid: 69031d7d20daf7042af8ec0569706155, type: 2}
+  - slot: 2
+    skill: {fileID: 11400000, guid: cc938f779cdc76345831284a7c4b0814, type: 2}
+  - slot: 3
+    skill: {fileID: 11400000, guid: 6b4b4bb14041b5541aea2dc5b10ac615, type: 2}
+  - slot: 4
+    skill: {fileID: 11400000, guid: b4001a569d293fb47a86590941823cdb, type: 2}
 --- !u!1 &7511849947110713824 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 197311793952166838, guid: 67dbb23091e48f9418e69cd1c99a178b, type: 3}

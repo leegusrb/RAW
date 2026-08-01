@@ -1,10 +1,21 @@
 using System;
+using System.Collections.Generic;
 using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
 
 namespace RAW.Network
 {
+	[Serializable]
+	public class DefaultSkillLoadoutEntry
+	{
+		[SerializeField] private KeyMapping slot;
+		[SerializeField] private SkillSpec skill;
+
+		public KeyMapping Slot => slot;
+		public SkillSpec Skill => skill;
+	}
+
 	[Serializable]
 	public struct NetworkSkillCooldownEntry :
 		INetworkSerializable,
@@ -33,6 +44,38 @@ namespace RAW.Network
 		}
 	}
 
+	[Serializable]
+	public struct NetworkSkillLoadoutEntry :
+		INetworkSerializable,
+		IEquatable<NetworkSkillLoadoutEntry>
+	{
+		public KeyMapping Slot;
+		public FixedString64Bytes SkillId;
+
+		public NetworkSkillLoadoutEntry(KeyMapping slot, string skillId)
+		{
+			Slot = slot;
+			SkillId = new FixedString64Bytes(skillId);
+		}
+
+		public void NetworkSerialize<T>(BufferSerializer<T> serializer)
+			where T : IReaderWriter
+		{
+			int slotValue = (int)Slot;
+
+			serializer.SerializeValue(ref slotValue);
+			serializer.SerializeValue(ref SkillId);
+
+			if (serializer.IsReader)
+				Slot = (KeyMapping)slotValue;
+		}
+
+		public bool Equals(NetworkSkillLoadoutEntry other)
+		{
+			return Slot == other.Slot && SkillId.Equals(other.SkillId);
+		}
+	}
+
 	[DisallowMultipleComponent]
 	[RequireComponent(typeof(NetworkObject))]
 	[RequireComponent(typeof(NetworkCharacterState))]
@@ -41,9 +84,15 @@ namespace RAW.Network
 		[SerializeField] private NetworkCharacterState characterState;
 		[SerializeField] private SkillCatalog skillCatalog;
 
+		[SerializeField]
+		private List<DefaultSkillLoadoutEntry> defaultSkillLoadout =
+			new List<DefaultSkillLoadoutEntry>();
+
 		private NetworkList<NetworkSkillCooldownEntry> cooldownList;
+		private NetworkList<NetworkSkillLoadoutEntry> skillLoadout;
 
 		public event Action OnCooldownChanged;
+		public event Action OnLoadoutChanged;
 
 		private void Reset()
 		{
@@ -56,6 +105,13 @@ namespace RAW.Network
 
 			cooldownList = 
 				new NetworkList<NetworkSkillCooldownEntry>(
+					null,
+					NetworkVariableReadPermission.Owner,
+					NetworkVariableWritePermission.Server
+				);
+
+			skillLoadout =
+				new NetworkList<NetworkSkillLoadoutEntry>(
 					null,
 					NetworkVariableReadPermission.Owner,
 					NetworkVariableWritePermission.Server
@@ -81,17 +137,91 @@ namespace RAW.Network
 			}
 
 			cooldownList.OnListChanged += HandleCooldownListChanged;
+			skillLoadout.OnListChanged += HandleSkillLoadoutChanged;
+
+			if (IsServer)
+				InitializeDefaultLoadoutOnServer();
 		}
 
 		public override void OnNetworkDespawn()
 		{
 			cooldownList.OnListChanged -= HandleCooldownListChanged;
+			skillLoadout.OnListChanged -= HandleSkillLoadoutChanged;
 		}
 
 		private void CacheComponents()
 		{
 			if (characterState == null)
 				characterState = GetComponent<NetworkCharacterState>();
+		}
+
+		private void InitializeDefaultLoadoutOnServer()
+		{
+			if (!IsServer)
+				return;
+
+			skillLoadout.Clear();
+
+			HashSet<KeyMapping> assignedSlots = new HashSet<KeyMapping>();
+
+			for (int i = 0; i < defaultSkillLoadout.Count; i++)
+			{
+				DefaultSkillLoadoutEntry entry = defaultSkillLoadout[i];
+
+				if (entry == null || entry.Skill == null)
+				{
+					Debug.LogError($"기본 스킬 슬롯의 {i}번 항목이 비어 있습니다.", this);
+					continue;
+				}
+
+				if (!Enum.IsDefined(typeof(KeyMapping), entry.Slot))
+				{
+					Debug.LogError($"유효하지 않은 스킬 슬롯입니다: {entry.Slot}", this);
+					continue;
+				}
+
+				if (!assignedSlots.Add(entry.Slot))
+				{
+					Debug.LogError($"중복된 기본 스킬 슬롯입니다: {entry.Slot}", this);
+					continue;
+				}
+
+				if (!skillCatalog.TryGetSkill(entry.Skill.SkillId, out SkillSpec registeredSkill))
+				{
+					Debug.LogError($"SkillCatalog에 등록되지 않은 기본 스킬입니다. {entry.Skill.name}", this);
+					continue;
+				}
+
+				skillLoadout.Add(new NetworkSkillLoadoutEntry(entry.Slot, registeredSkill.SkillId));
+			}
+		}
+
+		public bool TryGetSkillForSlot(KeyMapping slot, out SkillSpec skill)
+		{
+			if (!TryGetSkillIdForSlot(slot, out string skillId))
+			{
+				skill = null;
+				return false;
+			}
+
+			return skillCatalog.TryGetSkill(skillId, out skill);
+		}
+
+		private bool TryGetSkillIdForSlot(KeyMapping slot, out string skillId)
+		{
+			for (int i = 0; i < skillLoadout.Count; i++)
+			{
+				NetworkSkillLoadoutEntry entry = skillLoadout[i];
+
+				if (entry.Slot != slot)
+					continue;
+
+				skillId = entry.SkillId.ToString();
+				return true;
+			}
+
+			skillId = null;
+			return false;
 		}
 
 		public bool TryGetSkill(string skillId, out SkillSpec skill)
@@ -105,7 +235,7 @@ namespace RAW.Network
 			return skillCatalog.TryGetSkill(skillId, out skill);
 		}
 
-		public void RequestUseSkill(string skillId)
+		public void RequestUseSkill(KeyMapping skillSlot)
 		{
 			if (!IsSpawned)
 			{
@@ -119,42 +249,48 @@ namespace RAW.Network
 				return;
 			}
 
-			if (string.IsNullOrEmpty(skillId))
+			if (!Enum.IsDefined(typeof(KeyMapping), skillSlot))
 			{
-				Debug.LogWarning("Skill ID가 비어 있습니다.", this);
-				return;
-			}
-
-			if (skillId.Length > 60)
-			{
-				Debug.LogWarning($"Skill ID가 너무 깁니다: {skillId.Length}", this);
+				Debug.LogWarning($"유효하지 않은 스킬 슬롯입니다: {skillSlot}", this);
 				return;
 			}
 
 			if (IsServer)
 			{
-				TryStartSkillOnServer(skillId);
+				TryStartSkillOnServer(skillSlot);
 			}
 			else
 			{
-				RequestUseSkillRpc(new FixedString64Bytes(skillId));
+				RequestUseSkillRpc(skillSlot);
 			}
 		}
 
 		[Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Owner)]
-		private void RequestUseSkillRpc(FixedString64Bytes skillId)
+		private void RequestUseSkillRpc(KeyMapping skillSlot)
 		{
-			TryStartSkillOnServer(skillId.ToString());
+			TryStartSkillOnServer(skillSlot);
 		}
 
-		private bool TryStartSkillOnServer(string skillId)
+		private bool TryStartSkillOnServer(KeyMapping skillSlot)
 		{
 			if (!IsServer)
 				return false;
 
+			if (!Enum.IsDefined(typeof(KeyMapping), skillSlot))
+			{
+				Debug.LogWarning($"스킬 요청 거절: 유효하지 않은 슬롯입니다. OwnerClientId={OwnerClientId}, Slot={skillSlot}", this);
+				return false;
+			}
+
+			if (!TryGetSkillIdForSlot(skillSlot, out string skillId))
+			{
+				Debug.LogWarning($"스킬 요청 거절: 비어 있는 스킬 슬롯입니다. OwnerClientId={OwnerClientId}, Slot={skillSlot}", this);
+				return false;
+			}
+
 			if (!skillCatalog.TryGetSkill(skillId, out SkillSpec skill))
 			{
-				Debug.LogWarning($"스킬 요청 거절: 등록되지 않은 스킬입니다. OwnerClientId={OwnerClientId}, SkillId={skillId}", this);
+				Debug.LogWarning($"스킬 요청 거절: 등록되지 않은 스킬입니다. OwnerClientId={OwnerClientId}, Slot={skillSlot}, SkillId={skillId}", this);
 				return false;
 			}
 
@@ -182,7 +318,7 @@ namespace RAW.Network
 
 			SetCooldownOnServer(skillId, skill.CooldownSeconds, serverTime);
 
-			Debug.Log($"스킬 요청 승인: OwnerClientId={OwnerClientId}, SkillId={skillId}, Mana={characterState.MP}, Cooldown={skill.CooldownSeconds:F2}", this);
+			Debug.Log($"스킬 요청 승인: OwnerClientId={OwnerClientId}, Slot={skillSlot}, SkillId={skillId}, Mana={characterState.MP}, Cooldown={skill.CooldownSeconds:F2}", this);
 
 			return true;
 		}
@@ -241,35 +377,47 @@ namespace RAW.Network
 				OnCooldownChanged?.Invoke();
 		}
 
+		private void HandleSkillLoadoutChanged(NetworkListEvent<NetworkSkillLoadoutEntry> changeEvent)
+		{
+			if (IsOwner)
+				OnLoadoutChanged?.Invoke();
+		}
+
 #if UNITY_EDITOR
 
-		[ContextMenu("Test - Request Arrow Charge")]
-		private void TestRequestArrowCharge()
+		[ContextMenu("Test - Request W Skill")]
+		private void TestRequestWSkill()
 		{
 			if (!CanRunOwnerTest())
 				return;
 
-			RequestUseSkill("arrow_charge");
+			RequestUseSkill(KeyMapping.W);
 		}
 
-		[ContextMenu("Test - Request Invalid Skill")]
-		private void TestRequestInvalidSkill()
+		[ContextMenu("Test - Request Invalid Slot")]
+		private void TestRequestInvalidSlot()
 		{
 			if (!CanRunOwnerTest())
 				return;
 
-			RequestUseSkill("invalid_skill");
+			RequestUseSkill((KeyMapping)999);
 		}
 
-		[ContextMenu("Test - Print Arrow Charge Cooldown")]
-		private void TestPrintArrowChargeCooldown()
+		[ContextMenu("Test - Print W Skill Cooldown")]
+		private void TestPrintWSkillCooldown()
 		{
 			if (!CanRunOwnerTest())
 				return;
+
+			if (!TryGetSkillForSlot(KeyMapping.W, out SkillSpec skill))
+			{
+				Debug.LogWarning("W 슬롯에 등록된 스킬이 없습니다.", this);
+				return;
+			}
 
 			Debug.Log(
-				$"Arrow Charge 남은 쿨다운: " +
-				$"{GetRemainingCooldown("arrow_charge"):F2}",
+				$"W 스킬 남은 쿨다운: " +
+				$"{GetRemainingCooldown(skill.SkillId):F2}",
 				this
 			);
 		}

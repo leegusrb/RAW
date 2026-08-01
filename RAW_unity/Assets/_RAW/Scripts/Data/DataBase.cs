@@ -45,7 +45,8 @@ public enum KeyMapping
     Q,
     W,
     E,
-    R
+    R,
+	A
 }
 
 
