@@ -1,7 +1,7 @@
-﻿using CustomDict;
-using System.Collections;
+﻿using System.Collections;
+using RAW.Network;
 using UnityEngine;
-using static UnityEngine.GraphicsBuffer;
+using UnityEngine.InputSystem;
 
 public class Char_Control : MonoBehaviour
 {
@@ -44,10 +44,20 @@ public class Char_Control : MonoBehaviour
     [SerializeField]
     private GameObject skillRangeIndicator;
 
-    SkillSpec currentCastingSkill;
+	[SerializeField]
+	private NetworkSkillController networkSkillController;
+
+    private SkillSpec currentCastingSkill;
+	private KeyMapping currentCastingSlot;
     private bool isIndicatingSkill;
 
 	private static readonly int IsMovingHash = Animator.StringToHash("isMoving");
+
+	private void Awake()
+	{
+		if (networkSkillController == null)
+			networkSkillController = GetComponent<NetworkSkillController>();
+	}
 
     void Start()
     {
@@ -55,49 +65,78 @@ public class Char_Control : MonoBehaviour
         targetPos = transform.position;
     }
 
-    // Update is called once per frame
     void Update()
     {
-
         if (Input.GetMouseButtonDown(1))
         {
             SetTargetPos();
+
             if (isIndicatingSkill)
                 HideIndicator();            
         }
-        if (Input.GetKeyDown(KeyCode.Q) || Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.E) || Input.GetKeyDown(KeyCode.R) || Input.GetKeyDown(KeyCode.A))
-        {
-            string now_input_key = Input.inputString.ToLower();
-            ShowIndicator(now_input_key);            
-        }
-        if (Input.GetMouseButtonDown(0))
-        {
-            if (isIndicatingSkill)
-            {
 
-            }
-        }
+		if (TryGetPressedSkillSlot(out KeyMapping pressedSkillSlot))
+		{
+			ShowIndicator(pressedSkillSlot);
+		}
+
+		if (Input.GetMouseButtonDown(0) && isIndicatingSkill)
+		{
+			RequestCurrentSkill();
+		}
+
         if (Input.GetKeyDown(KeyCode.S))
         {
             StopMove();
+
             if (isIndicatingSkill)
-            {
                 HideIndicator();
-            }
         }
+		
         if (characterState.isMovable == true)
-        {
             MoveCharacter();
-        }
         else
-        {
             StopMove();
-        }
+		
         if (isIndicatingSkill)
-        {
             IndicateSkill();
-        }
     }
+
+	private bool TryGetPressedSkillSlot(out KeyMapping skillSlot)
+	{
+		if (Input.GetKeyDown(KeyCode.Q))
+		{
+			skillSlot = KeyMapping.Q;
+			return true;
+		}
+
+		if (Input.GetKeyDown(KeyCode.W))
+		{
+			skillSlot = KeyMapping.W;
+			return true;
+		}
+
+		if (Input.GetKeyDown(KeyCode.E))
+		{
+			skillSlot = KeyMapping.E;
+			return true;
+		}
+
+		if (Input.GetKeyDown(KeyCode.R))
+		{
+			skillSlot = KeyMapping.R;
+			return true;
+		}
+
+		if (Input.GetKeyDown(KeyCode.A))
+		{
+			skillSlot = KeyMapping.A;
+			return true;
+		}
+
+		skillSlot = default;
+		return false;
+	}
 
     void IndicateSkill()
     {
@@ -179,29 +218,89 @@ public class Char_Control : MonoBehaviour
         skillAreaIndicator.transform.position = mousePos;
     }
 
-
-    void ShowIndicator(string now_input_key)
+    private void ShowIndicator(KeyMapping skillSlot)
     {
         HideIndicator();
-        currentCastingSkill = DataBase.Instance.mySkillKeyMap[now_input_key];
-        if (currentCastingSkill.castType == CastType.bar)
-        {
-            skillBarIndicator.transform.localScale = new Vector2(currentCastingSkill.range, currentCastingSkill.size);
-            skillBarIndicator.SetActive(true);
-        }
-        else if (currentCastingSkill.castType == CastType.target)
-        {
-            skillTargetingIndicator.SetActive(true);
-        }
-        else if (currentCastingSkill.castType == CastType.area)
-        {
-            skillAreaIndicator.transform.localScale = new Vector2(currentCastingSkill.size, currentCastingSkill.size);
-            skillAreaIndicator.SetActive(true);
-        }
+
+		if (networkSkillController == null)
+		{
+			Debug.LogError("NetworkSkllController가 연결되지 않았습니다.", this);
+			return;
+		}
+
+		if (!networkSkillController.TryGetSkillForSlot(skillSlot, out SkillSpec skill))
+		{
+			Debug.LogWarning($"{skillSlot} 슬롯에 등록된 스킬이 없습니다.", this);
+			return;
+		}
+
+		double remainingCooldown = networkSkillController.GetRemainingCooldown(skill.SkillId);
+
+		if (remainingCooldown > 0d)
+		{
+			Debug.LogWarning($"{skillSlot} 스킬은 쿨다운 중입니다. 남은 시간={remainingCooldown:F2}", this);
+			return;
+		}
+
+		currentCastingSlot = skillSlot;
+        currentCastingSkill = skill;
+
+		switch (currentCastingSkill.castType)
+		{
+			case CastType.bar:
+				skillBarIndicator.transform.localScale = new Vector2(currentCastingSkill.range, currentCastingSkill.size);
+				skillBarIndicator.SetActive(true);
+				break;
+
+			case CastType.target:
+            	skillTargetingIndicator.SetActive(true);
+				break;
+
+			case CastType.area:
+				skillAreaIndicator.transform.localScale = new Vector2(currentCastingSkill.size, currentCastingSkill.size);
+				skillAreaIndicator.SetActive(true);
+				break;
+
+			default:
+				Debug.LogError($"지원하지 않는 스킬 CastType입니다: {currentCastingSkill.castType}", this);
+
+				currentCastingSkill = null;
+				return;
+
+		}
+
         skillRangeIndicator.transform.localScale = new Vector2(currentCastingSkill.range, currentCastingSkill.range);
         skillRangeIndicator.SetActive(true);
         isIndicatingSkill = true;         
     }
+
+	private void RequestCurrentSkill()
+	{
+		if (!isIndicatingSkill || currentCastingSkill == null)
+			return;
+
+		if (networkSkillController == null)
+		{
+			Debug.LogError("NetworkSkillController가 연결되지 않았습니다.", this);
+
+			HideIndicator();
+			return;
+		}
+
+		double remainingCooldown = networkSkillController.GetRemainingCooldown(currentCastingSkill.SkillId);
+
+		if (remainingCooldown > 0d)
+		{
+			Debug.LogWarning($"{currentCastingSlot} 스킬은 쿨다운 중입니다. 남은 시간={remainingCooldown:F2}", this);
+
+			HideIndicator();
+			return;
+		}
+
+		networkSkillController.RequestUseSkill(currentCastingSlot);
+
+		HideIndicator();
+	}
 
     void HideIndicator()
     {
@@ -209,7 +308,9 @@ public class Char_Control : MonoBehaviour
         skillTargetingIndicator.SetActive(false);
         skillBarIndicator.SetActive(false);
         skillRangeIndicator.SetActive(false);
+
         isIndicatingSkill = false;
+		currentCastingSkill = null;
     }
 
     void SetTargetPos()

@@ -183,6 +183,10 @@ PrefabInstance:
       propertyPath: targetPointer
       value: 
       objectReference: {fileID: 7313899340338232953}
+    - target: {fileID: 5999739329963740477, guid: 67dbb23091e48f9418e69cd1c99a178b, type: 3}
+      propertyPath: networkSkillController
+      value: 
+      objectReference: {fileID: 7574358915048637377}
     - target: {fileID: 7726094808036947850, guid: 67dbb23091e48f9418e69cd1c99a178b, type: 3}
       propertyPath: m_IsActive
       value: 0
