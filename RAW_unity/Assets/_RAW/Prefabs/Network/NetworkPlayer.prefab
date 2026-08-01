@@ -218,6 +218,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 2598696420236482373, guid: 67dbb23091e48f9418e69cd1c99a178b, type: 3}
       insertIndex: -1
       addedObject: {fileID: -5134112823853750892}
+    - targetCorrespondingSourceObject: {fileID: 2598696420236482373, guid: 67dbb23091e48f9418e69cd1c99a178b, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7574358915048637377}
   m_SourcePrefab: {fileID: 100100000, guid: 67dbb23091e48f9418e69cd1c99a178b, type: 3}
 --- !u!1 &124719763721653724 stripped
 GameObject:
@@ -468,6 +471,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RAW.Network.PlayerEquipmentController
   inventory: {fileID: 1449748005533337880}
   networkEquipmentSync: {fileID: 7775273453424153153}
+--- !u!114 &7574358915048637377
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5662116675036114195}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 72838437ff66e4c4f841f9aca5355da3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RAW.Network.NetworkSkillController
+  ShowTopMostFoldoutHeaderGroup: 1
+  characterState: {fileID: 365905181430154016}
+  skillCatalog: {fileID: 11400000, guid: ed45a0d6cc6c8439bb708691d7a0b16f, type: 2}
 --- !u!1 &7511849947110713824 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 197311793952166838, guid: 67dbb23091e48f9418e69cd1c99a178b, type: 3}
