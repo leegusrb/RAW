@@ -108,6 +108,17 @@ namespace RAW.Network
 				inventory = GetComponent<Char_Inventory>();
 		}
 
+		public bool TryGetRegisteredSlot(string itemId, out EquipmentSlot equipmentSlot)
+		{
+			if (equipmentCatalog == null)
+			{
+				equipmentSlot = default;
+				return false;
+			}
+
+			return equipmentCatalog.TryGetSlot(itemId, out equipmentSlot);
+		}
+
 		public void RequestEquip(EquipmentSlot requestedSlot, string itemId)
 		{
 			if (!IsSpawned)
