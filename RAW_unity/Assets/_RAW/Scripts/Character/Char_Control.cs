@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using RAW.Network;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 public class Char_Control : MonoBehaviour
 {
@@ -224,7 +223,7 @@ public class Char_Control : MonoBehaviour
 
 		if (networkSkillController == null)
 		{
-			Debug.LogError("NetworkSkllController가 연결되지 않았습니다.", this);
+			Debug.LogError("NetworkSkillController가 연결되지 않았습니다.", this);
 			return;
 		}
 

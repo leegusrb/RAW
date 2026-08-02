@@ -844,6 +844,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RAW.Network.NetworkBootstrap
   networkManager: {fileID: 1081013316}
   unityTransport: {fileID: 1081013315}
+  developmentUserId: dev-player
 --- !u!114 &1081013315
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -897,7 +898,7 @@ MonoBehaviour:
       - {fileID: 11400000, guid: bae54d931d7d99042910e703893c36d3, type: 2}
     TickRate: 30
     ClientConnectionBufferTimeout: 10
-    ConnectionApproval: 0
+    ConnectionApproval: 1
     ConnectionData: 
     EnableTimeResync: 0
     TimeResyncInterval: 30
@@ -964,6 +965,7 @@ MonoBehaviour:
   networkBootstrap: {fileID: 1081013314}
   address: 127.0.0.1
   port: 7777
+  developmentUserId: dev-player
 --- !u!4 &1160799274
 Transform:
   m_ObjectHideFlags: 0

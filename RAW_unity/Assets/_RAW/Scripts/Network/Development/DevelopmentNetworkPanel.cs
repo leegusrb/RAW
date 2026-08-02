@@ -7,6 +7,7 @@ namespace RAW.Network
         [SerializeField] private NetworkBootstrap networkBootstrap;
         [SerializeField] private string address = "127.0.0.1";
         [SerializeField] private ushort port = 7777;
+		[SerializeField] private string developmentUserId = "dev-player";
 
         private void OnGUI()
         {
@@ -16,8 +17,11 @@ namespace RAW.Network
             );
 
             GUILayout.Label($"상태: {networkBootstrap.CurrentMode}");
-            GUILayout.Label("주소");
 
+			GUILayout.Label("사용자 ID");
+			developmentUserId = GUILayout.TextField(developmentUserId);
+
+            GUILayout.Label("주소");
             address = GUILayout.TextField(address);
 
             GUILayout.Label($"포트: {port}");
@@ -26,10 +30,11 @@ namespace RAW.Network
             {
                 if (GUILayout.Button("Host 시작"))
                 {
-                    if (networkBootstrap.ConfigureEndpoint(
-                        address,
-                        port,
-                        "0.0.0.0"))
+                    if (networkBootstrap.ConfigureIdentity(developmentUserId) &&
+						networkBootstrap.ConfigureEndpoint(
+							address,
+							port,
+							"0.0.0.0"))
                     {
                         networkBootstrap.StartHost();
                     }
@@ -37,7 +42,8 @@ namespace RAW.Network
 
                 if (GUILayout.Button("Client 시작"))
                 {
-                    if (networkBootstrap.ConfigureEndpoint(address, port))
+                    if (networkBootstrap.ConfigureIdentity(developmentUserId) &&
+						networkBootstrap.ConfigureEndpoint(address, port))
                     {
                         networkBootstrap.StartClient();
                     }
