@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Text;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
@@ -17,11 +18,22 @@ namespace RAW.Network
         public event Action<ulong> ClientConnected;
         public event Action<ulong> ClientDisconnected;
 
+		public event Action<ulong, string> UserConnected;
+		public event Action<ulong, string> UserDisconnected;
+
         public bool IsListening => networkManager != null && networkManager.IsListening;
 
 		private const int CurrentProtocolVersion = 1;
 		private const int MaxUserIdLength = 64;
 		private const int MaxPayloadBytes = 1024;
+
+		private readonly Dictionary<ulong, string> userIdByClientId =
+			new Dictionary<ulong, string>();
+		
+		private readonly Dictionary<string, ulong> clientIdByUserId =
+			new Dictionary<string, ulong>(
+				StringComparer.Ordinal
+			);
 
 		[SerializeField]
 		private string developmentUserId = "dev-player";
@@ -87,6 +99,8 @@ namespace RAW.Network
 
             networkManager.OnClientConnectedCallback -= HandleClientConnected;
             networkManager.OnClientDisconnectCallback -= HandleClientDisconnected;
+
+			ClearUserIdentities();
         }
 
         public bool ConfigureEndpoint(string address, ushort port, string listenAddress = null)
@@ -190,6 +204,8 @@ namespace RAW.Network
         {
 			if (!CanStart() || !TryConfigureConnectionPayload())
 				return false;
+
+			ClearUserIdentities();
 			
             return networkManager.StartHost();
         }
@@ -198,6 +214,8 @@ namespace RAW.Network
         {
 			if (!CanStart() || !TryConfigureConnectionPayload())
 				return false;
+
+			ClearUserIdentities();
 
             return networkManager.StartClient();
         }
@@ -214,6 +232,32 @@ namespace RAW.Network
 
             networkManager.Shutdown();
         }
+
+		public bool TryGetUserId(ulong clientId, out string userId)
+		{
+			return userIdByClientId.TryGetValue(
+				clientId,
+				out userId
+			);
+		}
+
+		public bool TryGetClientId(string userId, out ulong clientId)
+		{
+			clientId = default;
+
+			if (!TryNormalizeUserId(userId, out string normalizeUserId))
+				return false;
+
+			return clientIdByUserId.TryGetValue(
+				normalizeUserId,
+				out clientId
+			);
+		}
+
+		public bool IsUserConnected(string userId)
+		{
+			return TryGetClientId(userId, out _);
+		}
 
         private bool CanStart()
         {
@@ -233,12 +277,53 @@ namespace RAW.Network
         private void HandleClientConnected(ulong clientId)
         {
             Debug.Log($"클라이언트 연결: {clientId}", this);
+
             ClientConnected?.Invoke(clientId);
+
+			if (!networkManager.IsServer)
+				return;
+
+			if (!TryGetUserId(clientId, out string userId))
+			{
+				Debug.LogError($"승인된 사용자의 ID 매핑을 찾을 수 없습니다. ClientId={clientId}", this);
+				return;
+			}
+
+			Debug.Log(
+				$"사용자 연결 완료: " +
+				$"ClientId={clientId}, " +
+				$"UserId={userId}",
+				this
+			);
+
+			UserConnected?.Invoke(clientId, userId);
         }
 
         private void HandleClientDisconnected(ulong clientId)
         {
             Debug.Log($"클라이언트 연결 종료: {clientId}", this);
+
+			if (networkManager.IsServer && userIdByClientId.TryGetValue(clientId, out string userId))
+			{
+				Debug.Log(
+					$"사용자 연결 종료: " +
+					$"ClientId={clientId}, " +
+					$"UserId={userId}",
+					this
+				);
+
+				UserDisconnected?.Invoke(clientId, userId);
+
+				RemoveUserIdentity(clientId, out _);
+			}
+
+			if (!networkManager.IsServer &&
+				clientId == networkManager.LocalClientId &&
+				!string.IsNullOrWhiteSpace(networkManager.DisconnectReason))
+			{
+				Debug.LogWarning($"서버 연결 종료 사유: {networkManager.DisconnectReason}", this);
+			}
+
             ClientDisconnected?.Invoke(clientId);
         }
 
@@ -302,6 +387,12 @@ namespace RAW.Network
 				return;
 			}
 
+			if (!TryReserveUserIdentity(request.ClientNetworkId, normalizeUserId, out string rejectionReason))
+			{
+				RejectConnection(response, rejectionReason);
+				return;
+			}
+
 			response.Approved = true;
 			response.CreatePlayerObject = true;
 
@@ -335,5 +426,63 @@ namespace RAW.Network
             if (unityTransport == null)
                 unityTransport = GetComponent<UnityTransport>();
         }
+
+		private bool TryReserveUserIdentity(
+			ulong clientId,
+			string userId,
+			out string rejectionReason
+		)
+		{
+			rejectionReason = null;
+
+			if (userIdByClientId.TryGetValue(clientId, out string existingUserId))
+			{
+				if (string.Equals(existingUserId, userId, StringComparison.Ordinal))
+					return true;
+
+				rejectionReason = "하나의 연결에서 여러 사용자의 ID를 사용할 수 없습니다.";
+
+				return false;
+			}
+
+			if (clientIdByUserId.TryGetValue(userId, out ulong existingClientId))
+			{
+				rejectionReason = $"이미 접속중인 사용자입니다. UserId={userId}";
+
+				Debug.LogWarning(
+					$"중복 사용자 접속 거절: " +
+					$"UserId={userId}, " +
+					$"ExistingClientId={existingClientId}, " +
+					$"RequestClientId={clientId}",
+					this
+				);
+
+				return false;
+			}
+
+			userIdByClientId[clientId] = userId;
+			clientIdByUserId[userId] = clientId;
+
+			return true;
+		}
+
+		private bool RemoveUserIdentity(ulong clientId, out string userId)
+		{
+			if (!userIdByClientId.TryGetValue(clientId, out userId))
+				return false;
+
+			userIdByClientId.Remove(clientId);
+
+			if (clientIdByUserId.TryGetValue(userId, out ulong mappedClientId))
+				clientIdByUserId.Remove(userId);
+
+			return true;
+		}
+
+		private void ClearUserIdentities()
+		{
+			userIdByClientId.Clear();
+			clientIdByUserId.Clear();
+		}
     }
 }
