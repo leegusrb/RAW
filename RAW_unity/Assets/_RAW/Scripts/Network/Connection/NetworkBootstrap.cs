@@ -215,14 +215,17 @@ namespace RAW.Network
 			if (!CanStart() || !TryConfigureConnectionPayload())
 				return false;
 
-			ClearUserIdentities();
-
             return networkManager.StartClient();
         }
 
         public bool StartServer()
         {
-            return CanStart() && networkManager.StartServer();
+            if (!CanStart())
+				return false;
+
+			ClearUserIdentities();
+			
+			return networkManager.StartServer();
         }
 
         public void Shutdown()
@@ -473,8 +476,11 @@ namespace RAW.Network
 
 			userIdByClientId.Remove(clientId);
 
-			if (clientIdByUserId.TryGetValue(userId, out ulong mappedClientId))
+			if (clientIdByUserId.TryGetValue(userId, out ulong mappedClientId) &&
+				mappedClientId == clientId)
+			{
 				clientIdByUserId.Remove(userId);
+			}
 
 			return true;
 		}
