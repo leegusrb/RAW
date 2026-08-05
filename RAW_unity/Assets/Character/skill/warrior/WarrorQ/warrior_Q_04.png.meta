@@ -5,6 +5,9 @@ TextureImporter:
   - first:
       213: 5378841578114886656
     second: warrior_Q_04_0
+  - first:
+      213: -3404950649059664050
+    second: warrior_Q_04_1
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -103,10 +106,10 @@ TextureImporter:
       name: warrior_Q_04_0
       rect:
         serializedVersion: 2
-        x: 16
-        y: 50
-        width: 195
-        height: 78
+        x: 38
+        y: 38
+        width: 187
+        height: 118
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -117,6 +120,28 @@ TextureImporter:
       bones: []
       spriteID: 00ca3aebaeb75aa40800000000000000
       internalID: 5378841578114886656
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: warrior_Q_04_1
+      rect:
+        serializedVersion: 2
+        x: 174
+        y: 37
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e4f1015cc6f2fb0d0800000000000000
+      internalID: -3404950649059664050
       vertices: []
       indices: 
       edges: []
@@ -136,6 +161,7 @@ TextureImporter:
       entries: []
     nameFileIdTable:
       warrior_Q_04_0: 5378841578114886656
+      warrior_Q_04_1: -3404950649059664050
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
