@@ -1,16 +1,9 @@
-using UnityEditor.Animations;
 using UnityEngine;
 
 public class Char_Animation : MonoBehaviour
 {
 
-    public Animator animator;
-    public Char_State state;
-
-    [SerializeField] private AnimationClip skillQClip;
-    [SerializeField] private AnimationClip skillWClip;
-    [SerializeField] private AnimationClip skillEClip;
-    [SerializeField] private AnimationClip skillRClip;
+    [SerializeField] private Animator animator;
     private AnimatorOverrideController overrideController;
     void Awake()
     {
@@ -31,10 +24,10 @@ public class Char_Animation : MonoBehaviour
     }
     void SetSkillAnimationClip()
     {
-        overrideController[skillQClip] = DataBase.Instance.mySkillKeyMap["q"].animationClip;
-        overrideController[skillWClip] = DataBase.Instance.mySkillKeyMap["w"].animationClip;
-        overrideController[skillEClip] = DataBase.Instance.mySkillKeyMap["e"].animationClip;
-        overrideController[skillRClip] = DataBase.Instance.mySkillKeyMap["r"].animationClip;
+        overrideController["skill_Q"] = DataBase.Instance.mySkillKeyMap["q"].animationClip;
+        overrideController["skill_W"] = DataBase.Instance.mySkillKeyMap["w"].animationClip;
+        overrideController["skill_E"] = DataBase.Instance.mySkillKeyMap["e"].animationClip;
+        overrideController["skill_R"] = DataBase.Instance.mySkillKeyMap["r"].animationClip;
     }
     public void SetAnim(string anim)
     {
