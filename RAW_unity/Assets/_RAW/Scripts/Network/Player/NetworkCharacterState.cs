@@ -125,6 +125,38 @@ namespace RAW.Network
 			isMovable.Value = movable;
 		}
 
+		public bool InitializePersistentStateOnServer(int loadedHeathPoint, int loadedManaPoint)
+		{
+			if (!IsSpawned || !IsServer)
+			{
+				Debug.LogWarning("Spawn된 서버 NetworkPlayer에서만 초기 상태를 적용할 수 있습니다.", this);
+				return false;
+			}
+
+			if (characterState == null)
+			{
+				Debug.LogError("초기 상태를 적용할 Char_State가 연결되지 않았습니다.", this);
+				return false;
+			}
+
+			healthPoint.Value = Mathf.Max(0, loadedHeathPoint);
+			manaPoint.Value = Mathf.Max(0, loadedManaPoint);
+
+			isMovable.Value = healthPoint.Value > 0;
+
+			ApplyCurrentState();
+
+			Debug.Log(
+				$"플레이어 영구 상태 적용 완료: " +
+				$"OwnerClientId={OwnerClientId}, " +
+				$"HP={healthPoint.Value}, " +
+				$"MP={manaPoint.Value}",
+				this
+			);
+
+			return true;
+		}
+
 		#if UNITY_EDITOR
 
 		[ContextMenu("Test - Apply 10 Damage")]

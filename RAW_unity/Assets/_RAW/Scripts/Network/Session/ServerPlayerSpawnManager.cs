@@ -37,6 +37,15 @@ namespace RAW.Network{
 			sessionManager.PlayerDataLoadFailed += HandlePlayerDataLoadFailed;
 		}
 
+		private void OnDisable()
+		{
+			if (sessionManager == null)
+				return;
+
+			sessionManager.PlayerDataLoaded -= HandlePlayerDataLoaded;
+			sessionManager.PlayerDataLoadFailed -= HandlePlayerDataLoadFailed;
+		}
+
 		private void HandlePlayerDataLoaded(ulong clientId, PlayerPersistentData playerData)
 		{
 			if (networkManager == null || !networkManager.IsServer)
@@ -124,11 +133,41 @@ namespace RAW.Network{
 				return;
 			}
 
+			if (!playerInstance.TryGetComponent(out NetworkCharacterState networkCharacterState))
+			{
+				if (playerNetworkObject.IsSpawned)
+					playerNetworkObject.Despawn(true);
+				else
+					Destroy(playerInstance);
+
+				FailPlayerSpawn(clientId, "생성된 플레이어에 NetworkCharacterState가 없습니다.");
+				return;
+			}
+
+			bool stateApplied =
+				networkCharacterState.InitializePersistentStateOnServer(
+					playerData.healthPoint,
+					playerData.manaPoint
+				);
+
+			if (!stateApplied)
+			{
+				if (playerNetworkObject.IsSpawned)
+					playerNetworkObject.Despawn(true);
+				else
+					Destroy(playerInstance);
+
+				FailPlayerSpawn(clientId, "플레이어 초기 상태 적용에 실패했습니다.");
+				return;
+			}
+
 			Debug.Log(
 				$"데이터 로드 후 PlayerObject 생성 완료: " +
 				$"ClientId={clientId}, " +
 				$"UserId={playerData.userId}, " +
-				$"NetworkObjectId={playerNetworkObject.NetworkObjectId}",
+				$"NetworkObjectId={playerNetworkObject.NetworkObjectId}, " +
+				$"HP={networkCharacterState.HP}, " +
+				$"MP={networkCharacterState.MP}",
 				this
 			);
 
