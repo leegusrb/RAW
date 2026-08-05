@@ -1,5 +1,7 @@
 ﻿using System.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class Char_Control : MonoBehaviour{
     [SerializeField]
@@ -27,9 +29,7 @@ public class Char_Control : MonoBehaviour{
     private Char_State characterState;
 
     [SerializeField]
-    private Animator animator;
-
-    private bool isMoving;
+    private Animator animator;    
 
 
     [SerializeField]
@@ -44,6 +44,11 @@ public class Char_Control : MonoBehaviour{
     SkillSpec currentCastingSkill;
     private bool isIndicatingSkill;
     private string currentCastingSkillKey;
+    private Coroutine currentActivatingSkillCoroutine;
+    Vector2 currentActivatingSkillTargetPosition;
+    GameObject currentActivatingSKillTarget;
+    float currentCastingSkillRangeRadius;
+    
     void Start()
     {
         HideIndicator();
@@ -56,9 +61,11 @@ public class Char_Control : MonoBehaviour{
 
         if (Input.GetMouseButtonDown(1))
         {
+            StopActivatingSkill();
             SetTargetPos();
             if (isIndicatingSkill)
-                HideIndicator();            
+                HideIndicator();
+            
         }
         if (Input.GetKeyDown(KeyCode.Q) || Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.E) || Input.GetKeyDown(KeyCode.R) || Input.GetKeyDown(KeyCode.A))
         {
@@ -67,20 +74,23 @@ public class Char_Control : MonoBehaviour{
         }
         if (Input.GetMouseButtonDown(0))
         {
-            if (isIndicatingSkill)
-            {
+            if (isIndicatingSkill && IsPossibleToActivateSkill())
+            {                
+                SetSkillTarget(Camera.main.ScreenToWorldPoint(Input.mousePosition));
                 ActivateSkill();
             }
         }
         if (Input.GetKeyDown(KeyCode.S))
         {
+            StopActivatingSkill();
             StopMove();
             if (isIndicatingSkill)
             {
                 HideIndicator();
             }
+            
         }
-        if (characterState.isMovable == true)
+        if (characterState.IsMovable == true)
         {
             MoveCharacter();
         }
@@ -154,19 +164,7 @@ public class Char_Control : MonoBehaviour{
 
     void IndicateTargertingType(Vector3 mousePos)
     {
-        skillTargetingIndicator.transform.position = mousePos;
-        Vector2 ray = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        LayerMask mask = 0;
-        if (currentCastingSkill.targetAlly)
-            mask |= playerLayer;
-        if(currentCastingSkill.targetEnemy)
-            mask |= monsterLayer;
-        
-        RaycastHit2D hit_object = Physics2D.Raycast(ray, transform.forward, Mathf.Infinity, mask);
-        if (hit_object.collider != null)
-            skillTargetingIndicator.transform.GetChild(1).gameObject.SetActive(true);
-        else
-            skillTargetingIndicator.transform.GetChild(1).gameObject.SetActive(false);
+        skillTargetingIndicator.transform.position = mousePos;       
     }
 
     void IndicateAreaType(Vector3 mousePos)
@@ -187,6 +185,7 @@ public class Char_Control : MonoBehaviour{
         else if (currentCastingSkill.castType == CastType.target)
         {
             skillTargetingIndicator.SetActive(true);
+            skillTargetingIndicator.GetComponent<TargettingSkillIndicator>().target = currentCastingSkill.targettingSkillTarget;            
         }
         else if (currentCastingSkill.castType == CastType.area)
         {
@@ -195,6 +194,7 @@ public class Char_Control : MonoBehaviour{
         }
         skillRangeIndicator.transform.localScale = new Vector2(currentCastingSkill.range, currentCastingSkill.range);
         skillRangeIndicator.SetActive(true);
+        currentCastingSkillRangeRadius = Vector2.Distance(skillRangeIndicator.transform.GetChild(0).position, skillRangeIndicator.transform.GetChild(1).position);
         isIndicatingSkill = true;
         currentCastingSkillKey = now_input_key;
     }
@@ -249,7 +249,8 @@ public class Char_Control : MonoBehaviour{
             {
                 isFollowingWall = false;
                 DoMove(targetDirection);
-            }            
+            }
+            FlipTowards(targetPos);
         }
         else
         {
@@ -279,28 +280,20 @@ public class Char_Control : MonoBehaviour{
 
     void DoMove(Vector2 targetDirection)
     {        
-        if(isMoving == false)
+        if(characterState.IsMoving == false)
         {
-            isMoving = true;
+            characterState.IsMoving = true;
             animator.SetBool("isMoving", true);
         }
-        transform.position += (Vector3)(targetDirection * characterState.moveSpeed * Time.deltaTime);
-        if (targetDirection.x > 0)
-        {
-            transform.localScale = new Vector3(-1, 1, 1);
-        }
-        else
-        {
-            transform.localScale = new Vector3(1, 1, 1);
-        }
+        transform.position += (Vector3)(targetDirection * characterState.moveSpeed * Time.deltaTime);        
     }
 
     void StopMove()
     {
         targetPos = transform.position;
-        if (isMoving == true)
+        if (characterState.IsMoving == true)
         {
-            isMoving = false;
+            characterState.IsMoving = false;
             animator.SetBool("isMoving", false);
         }
         isFollowingWall = false;
@@ -354,41 +347,159 @@ public class Char_Control : MonoBehaviour{
 
     void ActivateSkill()
     {
-        GameObject prefab = currentCastingSkill.skillPrefab;
-        animator.SetTrigger(currentCastingSkillKey);
-        SkillCastContext context = BuildCastContext();
-        GameObject skillObject = Instantiate(prefab, context.position, Quaternion.Euler(0f, 0f, context.rotationZ));
-        skillObject.transform.localScale = skillBarIndicator.transform.lossyScale;
+        StopActivatingSkill();
 
+        Enemy currentActivatingSkillTarget = null;
+        if (currentActivatingSKillTarget != null)
+            currentActivatingSkillTarget = currentActivatingSKillTarget.GetComponent<Enemy>();
+
+        currentActivatingSkillCoroutine = StartCoroutine(CoroutineActivateSkill(currentCastingSkill, currentCastingSkillRangeRadius, currentCastingSkillKey, currentActivatingSkillTarget));
         HideIndicator();
     }
-
-    SkillCastContext BuildCastContext()
+    bool IsPossibleToActivateSkill()
     {
-        SkillCastContext context = new SkillCastContext();
+        // check mana << todo
 
+        // check target
+        bool isPossilbe = false;
         switch (currentCastingSkill.castType)
         {
-            case CastType.bar:
-                context.position = transform.position;
-                context.rotationZ = skillBarIndicator.transform.eulerAngles.z;
-                context.direction = skillBarIndicator.transform.right;
-                context.visualScale = GetBarIndicatorVisualScale();
+            case CastType.target:
+                if (skillTargetingIndicator.GetComponent<TargettingSkillIndicator>().targetableIndicator.activeSelf)                                    
+                    isPossilbe = true;                
+                else
+                    isPossilbe = false;
                 break;
             case CastType.area:
-                context.position = skillAreaIndicator.transform.position;
-                context.rotationZ = 0f;
-                context.direction = Vector2.zero;
-                break;
-            case CastType.target:
-                context.position = skillTargetingIndicator.transform.position;
-                context.rotationZ = 0f;
-                context.direction = Vector2.zero;
+            case CastType.bar:
+                isPossilbe = true;
                 break;
         }
 
-        return context;
+        return isPossilbe;
     }
+    private void SetSkillTarget(Vector2 mousePos)
+    {
+        currentActivatingSkillTargetPosition = transform.position;
+        currentActivatingSKillTarget = null;
+        switch (currentCastingSkill.castType)
+        {
+            case CastType.target:
+                currentActivatingSKillTarget = skillTargetingIndicator.GetComponent<TargettingSkillIndicator>().targettingTarget;
+                currentActivatingSkillTargetPosition = currentActivatingSKillTarget.GetComponent<Enemy>().hitPoint;
+                break;
+            case CastType.area:
+                currentActivatingSkillTargetPosition = mousePos;
+                break;
+            case CastType.bar:
+                currentActivatingSkillTargetPosition = transform.position;
+                break;
+        }
+    }
+    private IEnumerator CoroutineActivateSkill(SkillSpec currentActivatingSkill, float skillRangeRadius, string skillInputKey, Enemy currentActivatingSkillTarget)
+    {
+        
+        if (currentActivatingSkill.castType == CastType.target || currentActivatingSkill.castType == CastType.area)
+        {
+            while (IsInsideRange(transform.position, currentActivatingSkillTargetPosition, skillRangeRadius) == false)
+            {
+                targetPos = currentActivatingSkillTargetPosition;
+                yield return null;
+            }
+        }
+
+        characterState.IsActivatingSkill = true;
+        FlipTowards(currentActivatingSkillTargetPosition);
+        animator.SetTrigger(skillInputKey);
+
+        // 선딜
+        yield return new WaitForSeconds(currentActivatingSkill.preDelay);
+
+        // 발동: 스킬 오브젝트 생성
+        GameObject skillObject = Instantiate(
+            currentActivatingSkill.skillPrefab,
+            GetSkillGeneratePosition(currentActivatingSkill.castType, currentActivatingSkillTargetPosition),
+            Quaternion.identity
+        );
+        skillObject.transform.localScale = new Vector3(transform.localScale.x < 0 ? -1 : 1, 1, 1);
+
+        SkillObject skillObjectComponent = skillObject.GetComponent<SkillObject>();
+        if (skillObjectComponent != null)
+            skillObjectComponent.Initialize(currentActivatingSkill, currentActivatingSkillTarget);
+
+        // 후딜
+        yield return new WaitForSeconds(currentActivatingSkill.postDelay);
+
+        characterState.IsActivatingSkill = false;
+        currentActivatingSkillCoroutine = null;
+    }
+
+    private Vector3 GetSkillGeneratePosition(CastType currentActivatingSkillCastType, Vector2 activatingMousePosition)
+    {
+        Vector3 position = transform.position;
+        switch (currentActivatingSkillCastType)
+        {
+            case CastType.area:
+            case CastType.target:
+                position = activatingMousePosition;
+                break;
+            case CastType.bar:
+                position = transform.position;
+                break;           
+        }
+        return position;
+    }
+
+    private bool IsInsideRange(Vector2 center, Vector2 target, float SemiMajorAxisLength)
+    {
+        float SemiMinorAxisLength = SemiMajorAxisLength * 0.5f;
+
+        Vector2 p = target - center;
+
+        float value =
+            (p.x * p.x) / (SemiMajorAxisLength * SemiMajorAxisLength) +
+            (p.y * p.y) / (SemiMinorAxisLength * SemiMinorAxisLength);
+
+        return value <= 1f;
+    }
+
+    private void StopActivatingSkill()
+    {
+        if (currentActivatingSkillCoroutine == null)
+            return;
+
+        StopCoroutine(currentActivatingSkillCoroutine);
+        currentActivatingSkillCoroutine = null;
+        characterState.IsActivatingSkill = false;
+        targetPos = transform.position;
+    }
+
+
+    public static Vector2 GetEllipseIntersection(Vector2 center, Vector2 target, float a)
+    {
+        float b = a * 0.5f;
+
+        Vector2 dir = target - center;
+        dir.Normalize();
+
+        float scale = 1.0f /
+            Mathf.Sqrt(
+                (dir.x * dir.x) / (a * a) +
+                (dir.y * dir.y) / (b * b)
+            );
+
+        return center + dir * scale;
+    }
+
+    /// <summary>
+    /// A와 C 사이 거리
+    /// </summary>
+    public static float GetDistanceToEllipse(Vector2 center, Vector2 target, float a)
+    {
+        Vector2 c = GetEllipseIntersection(center, target, a);
+        return Vector2.Distance(target, c);
+    }
+
 
     Vector3 GetBarIndicatorVisualScale()
     {
@@ -402,4 +513,18 @@ public class Char_Control : MonoBehaviour{
     //    Vector2 dir = ((Vector2)targetPos - (Vector2)transform.position).normalized;
     //    Gizmos.DrawRay(transform.position, dir * Vector2.Distance(transform.position, targetPos));
     //}
+
+    void FlipTowards(Vector3 position)
+    {
+        Vector3 scale = transform.localScale;
+
+        if (position.x > transform.position.x)
+            scale.x = -Mathf.Abs(scale.x);
+        else if (position.x < transform.position.x)
+            scale.x = Mathf.Abs(scale.x);
+
+        transform.localScale = scale;
+    }
+
+
 }

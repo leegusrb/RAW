@@ -1,44 +1,43 @@
 using UnityEngine;
 
-public struct SkillCastContext
-{
-    public Vector3 position;
-    public Vector2 direction;
-    public float rotationZ;
-    public Vector3 visualScale;
-}
-
 public class SkillObject : MonoBehaviour
 {
-    SkillSpec skill;
-    Transform caster;
-    Vector2 moveDirection;
-    float traveled;
+    private SkillSpec spec;
+    private Enemy targetEnemy;
+    private bool hasAppliedDamage;
 
-    public void Init(SkillSpec skillSpec, Transform casterTransform, SkillCastContext context)
+    public void Initialize(SkillSpec skillSpec, Enemy skillTargetEnemy)
     {
-        skill = skillSpec;
-        caster = casterTransform;
-        transform.position = context.position;
-        transform.rotation = Quaternion.Euler(0f, 0f, context.rotationZ);
-        moveDirection = context.direction;
+        spec = skillSpec;
+        targetEnemy = skillTargetEnemy;
+        Destroy(gameObject, spec.remainTime);
 
-        if (skill.castType == CastType.bar)
-            transform.localScale = context.visualScale;
-        else if (skill.castType == CastType.area)
-            transform.localScale = Vector3.one * skill.size;
+        if (spec.castType == CastType.target)
+            ApplyDamageToTarget();
     }
 
-    void Update()
+    private void OnTriggerEnter2D(Collider2D other)
     {
-        if (skill == null || skill.castType != CastType.bar)
+        if (spec == null || spec.castType == CastType.target || hasAppliedDamage)
             return;
 
-        float step = skill.moveSpeed * Time.deltaTime;
-        transform.position += (Vector3)(moveDirection * step);
-        traveled += step;
+        Enemy enemy = other.GetComponentInParent<Enemy>();
+        if (enemy == null)
+            return;
 
-        if (traveled >= skill.range)
-            Destroy(gameObject);
+        enemy.TakeDamage(spec.damage);
+        hasAppliedDamage = true;
+    }
+
+    private void ApplyDamageToTarget()
+    {
+        if (targetEnemy == null)
+        {
+            Debug.LogError("타겟형 스킬에 대상 적이 없습니다.", this);
+            return;
+        }
+
+        targetEnemy.TakeDamage(spec.damage);
+        hasAppliedDamage = true;
     }
 }

@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: afcd4b312eca36642bcb6bc70de961e8, type: 3}
-  m_Name: Warrior_Q
+  m_Name: Warrior_A
   m_EditorClassIdentifier: Assembly-CSharp::SkillSpec
-  castType: 2
+  castType: 0
   targettingSkillTarget: 1
   range: 1
   size: 1
@@ -21,5 +21,5 @@ MonoBehaviour:
   animationClip: {fileID: 7400000, guid: a99175957e506f94f8ce9e8b24599d61, type: 2}
   preDelay: 0
   postDelay: 0
-  remainTime: 1
-  damage: 10
+  remainTime: 0
+  damage: 0

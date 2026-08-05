@@ -48,6 +48,12 @@ public enum KeyMapping
     R
 }
 
+public enum TargettingSkillTarget
+{
+    None,
+    Enemy,
+    Ally
+}
 
 public class DataBase : MonoBehaviour
 {
