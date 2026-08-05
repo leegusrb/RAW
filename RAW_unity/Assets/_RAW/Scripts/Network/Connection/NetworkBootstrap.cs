@@ -397,7 +397,7 @@ namespace RAW.Network
 			}
 
 			response.Approved = true;
-			response.CreatePlayerObject = true;
+			response.CreatePlayerObject = false;
 
 			Debug.Log(
 				$"접속 승인: " +

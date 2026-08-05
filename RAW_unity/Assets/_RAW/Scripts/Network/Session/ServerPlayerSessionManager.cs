@@ -35,7 +35,7 @@ namespace RAW.Network
 		private readonly Dictionary<ulong, LoadingSession> sessionsByClientId =
 			new Dictionary<ulong, LoadingSession>();
 
-		public event Action<ulong, PlayerPersistentData> playerDataLoaded;
+		public event Action<ulong, PlayerPersistentData> PlayerDataLoaded;
 		public event Action<ulong, string> PlayerDataLoadFailed;
 
 		private void Awake()
@@ -161,7 +161,7 @@ namespace RAW.Network
 					this
 				);
 
-				playerDataLoaded?.Invoke(session.clientId, playerData);
+				PlayerDataLoaded?.Invoke(session.clientId, playerData);
 			}
 			catch (OperationCanceledException)
 			{
