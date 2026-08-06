@@ -1,0 +1,73 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b25321662a7184827a744563f9257e23, type: 3}
+  m_Name: EquipmentCatalog
+  m_EditorClassIdentifier: Assembly-CSharp::EquipmentCatalog
+  entries:
+  - itemId: Hair_1.png
+    slot: 4
+  - itemId: Hair_2.png
+    slot: 4
+  - itemId: Hair_3.png
+    slot: 4
+  - itemId: Armor_1.png
+    slot: 28
+  - itemId: Armor_3.png
+    slot: 28
+  - itemId: Armor_5.png
+    slot: 28
+  - itemId: Armor_8.png
+    slot: 28
+  - itemId: Back_1.png
+    slot: 0
+  - itemId: Eye.png
+    slot: 30
+  - itemId: Eye0.png
+    slot: 30
+  - itemId: Eye1.png
+    slot: 30
+  - itemId: Eye2.png
+    slot: 30
+  - itemId: Eye3.png
+    slot: 30
+  - itemId: Eye4.png
+    slot: 30
+  - itemId: FaceHair_1.png
+    slot: 6
+  - itemId: FaceHair_2.png
+    slot: 6
+  - itemId: FaceHair_3.png
+    slot: 6
+  - itemId: FaceHair_4.png
+    slot: 6
+  - itemId: FaceHair_5.png
+    slot: 6
+  - itemId: Foot_1.png
+    slot: 29
+  - itemId: Foot_2.png
+    slot: 29
+  - itemId: Cloth_1.png
+    slot: 27
+  - itemId: Cloth_2.png
+    slot: 27
+  - itemId: Cloth_3.png
+    slot: 27
+  - itemId: Cloth_4.png
+    slot: 27
+  - itemId: Sword_1.png
+    slot: 21
+  - itemId: Axe_1.png
+    slot: 21
+  - itemId: Bow_1.png
+    slot: 21
+  - itemId: Ward_1.png
+    slot: 21
