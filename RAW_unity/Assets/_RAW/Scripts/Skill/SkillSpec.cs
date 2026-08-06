@@ -28,8 +28,7 @@ public class SkillSpec : ScriptableObject
     //public string iconDirectory;
     //public string description;
     public CastType castType;
-    public bool targetEnemy;
-    public bool targetAlly;
+    public TargettingSkillTarget targettingSkillTarget;
     //public string dealType;
     //public int maxLevel;
     //public Vector2 radius;
@@ -37,6 +36,13 @@ public class SkillSpec : ScriptableObject
     public float range;
 	[Min(0f)]
     public float size;
+    public GameObject skillPrefab;
+    public float moveSpeed = 5f;
+    public AnimationClip animationClip;
+    public float preDelay;
+    public float postDelay;
+    public float remainTime;
+    public float damage;
     //public string animType; //attack1,2,3, skill1,2,3
     //public float consumeMana;
     //public float delay;

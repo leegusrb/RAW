@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: afcd4b312eca36642bcb6bc70de961e8, type: 3}
+  m_Name: Warrior_E
+  m_EditorClassIdentifier: Assembly-CSharp::SkillSpec
+  castType: 0
+  targettingSkillTarget: 0
+  range: 1
+  size: 1
+  skillPrefab: {fileID: 8850884371554800505, guid: 7d803b75b208bd34ca73cfe52af6e510, type: 3}
+  moveSpeed: 5
+  animationClip: {fileID: 7400000, guid: a99175957e506f94f8ce9e8b24599d61, type: 2}
+  preDelay: 0
+  postDelay: 0
+  remainTime: 0
+  damage: 0

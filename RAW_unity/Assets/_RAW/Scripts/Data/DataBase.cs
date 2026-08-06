@@ -49,6 +49,12 @@ public enum KeyMapping
 	A
 }
 
+public enum TargettingSkillTarget
+{
+    None,
+    Enemy,
+    Ally
+}
 
 public class DataBase : MonoBehaviour
 {

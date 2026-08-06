@@ -2,32 +2,90 @@ using UnityEngine;
 
 public class Char_State : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+	[Header("Status")]
+	
     [SerializeField] private int healthPoint = 100;
     [SerializeField] private int manaPoint = 100;
-    private bool isWalking;
-    private bool isAttacking;
+    [SerializeField] private int maxHealthPoint = 100;
+    [SerializeField] private int maxManaPoint = 100;
 
-    public bool isMovable;
-
+	[Header("Movement")]
     public float moveSpeed;
+    public bool isMovable = true;
 
-    public int HP
-    {
-        get {  return healthPoint; }
-        set { healthPoint = value; }
-    }
+	[Header("UI")]    
+	
+	[SerializeField]
+    private HealthManager healthBar;
+
+    private bool isMoving;
+    private bool isActivatingSkill;
+
+	public int HP
+	{
+		get => healthPoint;
+		set
+		{
+			healthPoint = Mathf.Max(0, value);
+			UpdateHealthBar();
+		}
+	}
 
 	public int MP
 	{
-		get { return manaPoint; }
-		set { manaPoint = value; }
+		get => manaPoint;
+		set => manaPoint = Mathf.Max(0, value);
 	}
 
-    public bool IsWalking
+    public int MaxHealth
     {
-        get { return isWalking; }
-        set { isWalking = value; }
+        get => maxHealthPoint;
+        private set => maxHealthPoint = Mathf.Max(0, value);
+    }
+
+    public int CurrentHealth => healthPoint;
+
+    public bool IsMoving
+    {
+        get => isMoving;
+        set => isMoving = value;
+    }
+
+    public bool IsActivatingSkill
+    {
+        get => isActivatingSkill;
+        set => isActivatingSkill = value;
+    }
+
+    public bool IsMovable => isMovable && !isActivatingSkill;
+
+    public void TakeDamage(float damage)
+    {
+        if (damage <= 0f)
+			return;
+		
+		int damageAmount = Mathf.CeilToInt(damage);
+
+		HP = Mathf.Max(0, HP - damageAmount);
+
+		if (HP == 0)
+			Death();
+    }
+
+    public void InitializeHealth(float maxHealth)
+    {
+        MaxHealth = Mathf.RoundToInt(maxHealth);
+        HP = MaxHealth;
+    }
+
+    private void UpdateHealthBar()
+    {
+        if (healthBar != null)
+            healthBar.SetHealth(CurrentHealth, MaxHealth);
+    }
+
+    private void Death()
+    {
 
     }
 }
