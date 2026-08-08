@@ -26,6 +26,7 @@
 ```text
 RAW_unity/Assets/_RAW/Scripts/Character/
 RAW_unity/Assets/_RAW/Scripts/Skill/
+RAW_unity/Assets/_RAW/Scripts/GameplayData/
 RAW_unity/Assets/_RAW/Art/Character/
 RAW_unity/Assets/_RAW/Data/Skills/
 RAW_unity/Assets/_RAW/Prefabs/Character/
@@ -45,6 +46,7 @@ RAW_unity/Assets/_RAW/Prefabs/Indicators/
 - `SkillCatalog`와 스킬 ScriptableObject
 - 공용 캐릭터 프리팹인 `Dummy.prefab`
 - 캐릭터·스킬 전용 테스트 Scene
+- `EnemySpec`, `EquipmentCatalog` 등 게임플레이 데이터 구조와 카탈로그
 
 ### 직접 추가하지 않는 항목
 
@@ -67,7 +69,7 @@ RAW_unity/Assets/_RAW/Scripts/Network/
 RAW_unity/Assets/_RAW/Prefabs/Network/
 ```
 
-향후 DB 코드가 분리되면 다음 경로도 멀티·DB 담당자가 소유한다.
+다음 영속 데이터 경로도 멀티·DB 담당자가 소유한다.
 
 ```text
 RAW_unity/Assets/_RAW/Scripts/Persistence/
