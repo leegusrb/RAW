@@ -1,12 +1,5 @@
 using UnityEngine;
 
-public enum CastType
-{
-    bar,
-    area,
-    target
-}
-
 [CreateAssetMenu(fileName = "NewSkill", menuName = "RAW/Data/Skill")]
 public class SkillSpec : ScriptableObject
 {
