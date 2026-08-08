@@ -1016,6 +1016,11 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 2577585254963922481, guid: f3cc2373308c11848977b28d974a9de0, type: 3}
   m_PrefabInstance: {fileID: 1078556197}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1150635982 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2598696420236482373, guid: 67dbb23091e48f9418e69cd1c99a178b, type: 3}
+  m_PrefabInstance: {fileID: 6384901998301933019}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1268022731 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1532218796454169711, guid: ec58634b610c94022b27f39f0cee941e, type: 3}
@@ -1091,7 +1096,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c33a06031b0ba6041ba31d60746e47a3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Char_State
+  healthPoint: 100
+  manaPoint: 100
+  maxHealthPoint: 100
+  maxManaPoint: 100
   moveSpeed: 0
+  isMovable: 1
   healthBar: {fileID: 202335833}
 --- !u!1 &1277544656
 GameObject:
@@ -6939,19 +6949,34 @@ PrefabInstance:
     m_RemovedGameObjects:
     - {fileID: 397496622094931884, guid: 67dbb23091e48f9418e69cd1c99a178b, type: 3}
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2598696420236482373, guid: 67dbb23091e48f9418e69cd1c99a178b, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6384901998301933026}
   m_SourcePrefab: {fileID: 100100000, guid: 67dbb23091e48f9418e69cd1c99a178b, type: 3}
 --- !u!114 &6384901998301933020 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 885236408684516780, guid: 67dbb23091e48f9418e69cd1c99a178b, type: 3}
   m_PrefabInstance: {fileID: 6384901998301933019}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 1150635982}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6638fee0cbf2bd84ab36180b00b12f74, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &6384901998301933026
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1150635982}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a6d40a86ae08c4c14a89679af08c56f0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalSkillRuntime
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

@@ -2,7 +2,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace RAW.Network
+namespace RAW.Persistence
 {
 	public abstract class PlayerDataRepository : MonoBehaviour
 	{
