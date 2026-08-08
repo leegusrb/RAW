@@ -2,363 +2,266 @@
 
 ## 1. 목적
 
-이 문서는 캐릭터·스킬 개발과 멀티플레이·DB 개발의 책임을 분리해 다음 문제를 방지하는 것을 목적으로 한다.
+이 문서는 두 개발자가 같은 기능을 중복 구현하거나 같은 Unity 파일을 동시에 수정하지 않도록 책임과 작업 경계를 정한다.
 
-- 같은 코드와 Unity 에셋을 동시에 수정하면서 발생하는 Git 충돌
-- 로컬용 코드와 멀티플레이용 코드의 중복 구현
-- 스킬 규칙이 네트워크 코드에 복사되는 문제
-- 네트워크 코드가 캐릭터·스킬 구현에 직접 섞이는 문제
-- 담당자 승인 없이 공용 계약이나 다른 담당 영역이 변경되는 문제
+소유권은 해당 영역의 설계, 구현, 수정과 최종 리뷰 책임을 의미한다.
 
-이 문서에서 말하는 소유권은 해당 영역의 최종 설계·수정·리뷰 책임을 의미한다. 다른 담당자의 영역을 변경해야 할 때는 작업 전에 담당자의 동의를 받고 Pull Request에서 승인을 받아야 한다.
+## 2. 핵심 원칙
 
-## 2. 담당자
+> 게임플레이 담당자는 **무슨 일이 일어나는지** 구현하고, 멀티·DB 담당자는 **그 일이 서버에서 확정되어 모든 사용자에게 동기화되고 저장되도록** 구현한다.
+
+담당자가 헷갈릴 때는 다음 기준을 사용한다.
+
+- 네트워크를 제거해도 필요한 기능은 게임플레이 담당 영역이다.
+- 여러 사용자, 서버 권한, 재접속 또는 저장 때문에 필요한 기능은 멀티·DB 담당 영역이다.
+- 양쪽 모두 필요한 기능은 공용 요청·결과 계약을 경계로 나눈다.
+- 게임 규칙을 Client용과 서버용으로 각각 구현하지 않는다.
+
+## 3. 담당자
 
 | 담당자 | 담당 영역 |
 | --- | --- |
-| 이진수 | 캐릭터, 스킬, 애니메이션, 이펙트, 게임플레이 데이터 |
-| 이현규 | 멀티플레이, 서버 권한, 네트워크 동기화, DB 및 영속 데이터 |
+| 이진수 | 캐릭터, 전투, 스킬, 적, 아이템 규칙, UI, 애니메이션, 이펙트와 전체 게임플레이 |
+| 이현규 | 멀티플레이, 서버 권한, 인증, 네트워크 동기화, DB와 영속 데이터 |
 
-## 3. 캐릭터·스킬 담당 영역
+## 4. 기능별 책임
 
-### 소유 경로
+| 기능 | 게임플레이 담당자 | 멀티·DB 담당자 |
+| --- | --- | --- |
+| 입력·이동 | 입력, 이동 알고리즘, 충돌, 이동 규칙과 애니메이션 | 소유 캐릭터의 입력 활성화, 위치 전송, 검증과 보정 |
+| 캐릭터 상태 | 기본 스탯, 성장, 버프·디버프와 사망 규칙 | 서버 권한 HP·MP 상태, 동기화와 저장·복원 |
+| 스킬 | 타겟, 사거리, 시전, 타격 시점·횟수와 효과 계산 | 요청 전송, 소유권·중복 검사, 서버 실행과 결과 동기화 |
+| 데미지·회복 | 공격력, 방어력, 치명타, 회복과 상태 효과 계산 | 계산 결과를 서버 상태에 한 번만 적용 |
+| 애니메이션·이펙트 | Animator, Animation Clip, VFX와 사운드 | 실행 이벤트 전송과 NetworkAnimator 설정 |
+| 적·보스 | AI, 패턴, 전투, 사망과 드롭 규칙 | 서버 실행, Spawn·Despawn과 상태 동기화 |
+| 아이템·인벤토리 | 아이템 정의, 슬롯, 용량, 스택 규칙과 UI | 서버 권한 변경 요청, snapshot 동기화와 저장 |
+| 장비 | 착용 규칙, 스탯 효과, 외형과 UI | 소유 여부 검증, 장착 상태 동기화와 저장 |
+| 상점·제작 | 가격, 레시피, 성공 확률과 UI | 서버 거래, 재화 변조 방지와 DB 트랜잭션 |
+| 교환·파티·채팅 | 관련 UI와 상태 표시 | 요청, 참여자 상태, 승인 절차와 네트워크 처리 |
+| 던전 | 맵, 몬스터 배치, 전투와 클리어 규칙 | 파티 입장, 네트워크 Scene 전환과 인스턴스 관리 |
+| 로그인·캐릭터 선택 | 화면, 연출과 입력 | 인증, 세션, 계정과 캐릭터 데이터 |
+| 테스트 | 로컬 게임플레이와 규칙 테스트 | Host·Client, 권한, 재접속과 DB 통합 테스트 |
+
+오른쪽 담당자는 왼쪽의 게임 규칙을 다시 구현하지 않고, 왼쪽 담당자는 오른쪽의 네트워크·DB 처리를 구현하지 않는다.
+
+## 5. 파일 소유권
+
+### 5.1 게임플레이 담당자
 
 ```text
 RAW_unity/Assets/_RAW/Scripts/Character/
 RAW_unity/Assets/_RAW/Scripts/Skill/
 RAW_unity/Assets/_RAW/Scripts/GameplayData/
-RAW_unity/Assets/_RAW/Art/Character/
-RAW_unity/Assets/_RAW/Data/Skills/
+RAW_unity/Assets/_RAW/Art/
+RAW_unity/Assets/_RAW/Data/
 RAW_unity/Assets/_RAW/Prefabs/Character/
 RAW_unity/Assets/_RAW/Prefabs/Indicators/
+RAW_unity/Assets/_RAW/Scenes/Tests/CharacterTest.unity
 ```
 
-### 담당 책임
+게임플레이 영역에는 다음 항목을 추가하지 않는다.
 
-- 캐릭터 입력, 이동, 방향 전환 및 행동 제어
-- 스킬 타겟 선택과 사거리 접근
-- 스킬 시전, 취소, 선딜 및 후딜 규칙
-- `SkillSpec` 코드와 Inspector 항목
-- 스킬 데미지 계산식과 타격 규칙
-- 단일 타격, 다단 타격, 투사체, 범위 판정 등 게임플레이 동작
-- Animation Clip, Animator Controller, State 및 Transition
-- 캐릭터와 스킬 이펙트 프리팹
-- `SkillCatalog`와 스킬 ScriptableObject
-- 공용 캐릭터 프리팹인 `Dummy.prefab`
-- 캐릭터·스킬 전용 테스트 Scene
-- `EnemySpec`, `EquipmentCatalog` 등 게임플레이 데이터 구조와 카탈로그
+- `NetworkBehaviour`, RPC, `NetworkVariable`, `NetworkObjectReference`
+- ClientId, OwnerClientId 또는 연결 상태를 이용한 분기
+- 실제 DB 연결, SQL, schema 또는 migration
+- 네트워크 전용 Prefab과 설정
 
-### 직접 추가하지 않는 항목
-
-- `NetworkBehaviour`
-- RPC
-- `NetworkVariable`
-- `NetworkObjectReference`
-- Client ID 또는 Owner ID를 사용한 분기
-- DB 연결 및 저장 형식
-- `NetworkPlayer.prefab`과 `NetworkRuntime.prefab` 변경
-
-스킬 개발자는 스킬이 누구에게, 언제, 몇 번, 얼마의 영향을 주는지를 결정한다. 해당 결과를 서버에서 실행하고 동기화하는 방식은 멀티·DB 담당자가 연결한다.
-
-## 4. 멀티·DB 담당 영역
-
-### 소유 경로
+### 5.2 멀티·DB 담당자
 
 ```text
 RAW_unity/Assets/_RAW/Scripts/Network/
-RAW_unity/Assets/_RAW/Prefabs/Network/
-```
-
-다음 영속 데이터 경로도 멀티·DB 담당자가 소유한다.
-
-```text
 RAW_unity/Assets/_RAW/Scripts/Persistence/
+RAW_unity/Assets/_RAW/Prefabs/Network/
+RAW_unity/Assets/_RAW/Settings/Network/
+RAW_unity/Assets/_RAW/Scenes/Tests/NetworkCharacterTest.unity
+RAW_unity/Assets/_RAW/Scenes/Tests/NetworkTest.unity
+supabase/migrations/
+supabase/seed.sql
 ```
 
-### 담당 책임
+멀티·DB 영역에서는 다음 항목을 별도로 구현하지 않는다.
 
-- 네트워크 연결, 승인, 세션 및 Spawn
-- 서버 권한 스킬 요청과 검증
-- HP, MP, 쿨다운 및 상태 동기화
-- `NetworkCharacterState`와 `NetworkEnemyState`
-- `NetworkSkillController`와 네트워크 요청 데이터
-- NetworkAnimator와 NetworkTransform 설정
-- 장비와 인벤토리의 네트워크 동기화
-- DB 저장, 불러오기 및 플레이어 영속 데이터
-- `NetworkPlayer.prefab`, `NetworkEnemy.prefab`, `NetworkRuntime.prefab`
-- Host/Client 네트워크 테스트 Scene
+- 데미지, 방어력, 치명타와 회복 공식
+- 스킬 타격 횟수, 간격과 충돌 규칙
+- 캐릭터 이동 알고리즘과 적 AI
+- 아이템 효과, 가격, 장비 효과와 제작 확률
+- Animation Clip, Animator State와 VFX 동작
 
-### 직접 변경하지 않는 항목
+에셋의 `.meta` 파일은 원본 에셋과 같은 담당자가 소유한다.
 
-- 스킬 데미지 공식
-- 스킬 타격 횟수와 판정 시점
-- 캐릭터 입력과 이동 방식
-- Animation Clip과 Animator State
-- 스킬 이펙트의 시각적 동작
-- `SkillSpec`의 게임플레이 수치
-- `Dummy.prefab`의 캐릭터·스킬 구성
+## 6. 검증 책임
 
-멀티·DB 담당자는 스킬 규칙을 네트워크 코드에 복사해 별도로 구현하지 않는다. 캐릭터·스킬 담당자가 정의한 결과가 서버에서만 적용되고 모든 Client에 동기화되도록 연결한다.
+“서버 검증”은 게임 규칙 검증과 네트워크·보안 검증으로 구분한다.
 
-## 5. 공용 계약 영역
+### 게임플레이 담당자
 
-두 영역이 함께 사용하는 순수 타입은 다음 경로로 분리한다.
+- 대상이 사거리 안에 있는가
+- 공격할 수 있는 대상인가
+- 장애물 너머를 공격할 수 있는가
+- 해당 아이템을 요청한 슬롯에 장착할 수 있는가
+- 행동 결과로 몇 번, 언제, 얼마의 효과가 발생하는가
+
+### 멀티·DB 담당자
+
+- 인증된 사용자의 요청인가
+- 요청자가 해당 NetworkObject의 소유자인가
+- 요청한 ID와 대상이 실제로 존재하는가
+- 서버가 가진 MP, 쿨다운, 재화와 아이템 수량이 충분한가
+- 요청 값과 빈도가 허용 범위인가
+- 이미 처리한 요청이 아닌가
+- DB 변경이 원자적으로 처리되는가
+
+멀티·DB 담당자는 서버에서 게임플레이 담당자가 만든 규칙 검증과 계산 함수를 호출한다.
+
+## 7. 공용 계약
+
+두 영역이 공유하는 ID, enum, 요청과 결과 타입은 다음 경로에 둔다.
 
 ```text
 RAW_unity/Assets/_RAW/Scripts/Contracts/
 ```
 
-현재 항목:
+공용 계약의 작업 규칙은 다음과 같다.
+
+- 실제 파일 작성자는 멀티·DB 담당자로 고정한다.
+- 게임플레이 담당자는 필요한 입력, 결과와 변경 이유를 전달한다.
+- 변경 전 두 담당자가 구조에 합의한다.
+- 변경 Pull Request는 두 담당자가 리뷰한다.
+- 두 담당자가 같은 계약 파일을 동시에 수정하지 않는다.
+- 계약에는 Netcode, 구체적인 DB 구현, UI, 애니메이션과 VFX를 넣지 않는다.
+- enum 값은 기존 순서를 바꾸지 않고 명시적인 숫자를 유지한다.
+
+## 8. 주요 기능의 연결 방식
+
+### 8.1 스킬과 전투
 
 ```text
-KeyMapping.cs
-CastType.cs
-TargettingSkillTarget.cs
-EquipmentSlot.cs
-ISkillRuntime.cs
+게임플레이 담당
+입력 → 대상 선택 → 스킬 요청 데이터 생성
+                       ↓
+멀티·DB 담당
+네트워크 전송 → 서버 권한·중복·상태 검사
+                       ↓
+게임플레이 담당
+사거리·대상·데미지와 타격 결과 계산
+                       ↓
+멀티·DB 담당
+서버 상태 적용 → 결과 동기화
+                       ↓
+게임플레이 담당
+애니메이션·이펙트·사운드 표시
 ```
 
-향후 네트워크 스킬 실행을 확장할 때 필요한 경우 다음 계약을 추가한다.
+Client에서 생성한 스킬 이펙트와 충돌 오브젝트는 HP를 직접 변경하지 않는다.
 
-```text
-SkillCastIntent.cs
-ISkillDamageReceiver.cs
-```
+### 8.2 인벤토리·장비·거래
 
-공용 계약에는 다음 의존성을 넣지 않는다.
+- 게임플레이 담당자는 아이템, 슬롯, 장착, 가격과 제작 규칙을 구현한다.
+- 멀티·DB 담당자는 변경 요청, 보유 수량 검증, 원자적 처리, 동기화와 저장을 구현한다.
+- 게임플레이 UI는 NetworkBehaviour를 직접 호출하지 않고 제공된 명령 인터페이스 또는 Adapter를 사용한다.
 
-- Unity Netcode
-- 구체적인 DB 구현
-- 구체적인 캐릭터 또는 네트워크 컴포넌트
+## 9. ID와 저장 규칙
 
-공용 계약을 추가·삭제·변경할 때는 두 담당자의 사전 합의와 리뷰가 필요하다. enum 값은 Unity 직렬화와 네트워크 직렬화에 사용될 수 있으므로 기존 순서를 변경하지 않고 명시적인 숫자 값을 유지한다.
+- 멀티·DB 담당자가 `SkillId`, `ItemId`, `CharacterId`의 형식과 최종 값을 관리한다.
+- 게임플레이 담당자는 확정된 ID를 자신이 소유한 ScriptableObject에 입력한다.
+- 멀티·DB 담당자는 ID 입력을 위해 게임플레이 ScriptableObject를 직접 수정하지 않는다.
+- DB에는 Unity 에셋 경로나 표시 이름 대신 안정적인 ID를 저장한다.
+- 저장에 사용되기 시작한 ID를 변경하려면 먼저 migration을 작성한다.
 
-## 6. 적용된 스킬 런타임 경계
-
-`Char_Control`은 네트워크 구현체를 직접 참조하지 않고 `ISkillRuntime`을 통해 스킬 런타임을 사용한다.
-
-```text
-Char_Control
-입력, 스킬 선택 및 요청
-        ↓ ISkillRuntime
-NetworkSkillAdapter
-게임플레이 요청을 네트워크 구현으로 전달
-        ↓
-NetworkSkillController
-서버 요청, 검증 및 네트워크 상태 관리
-```
-
-각 구성 요소의 책임은 다음과 같다.
-
-### Char_Control
-
-- 캐릭터 입력
-- 스킬 슬롯 선택
-- 타겟 선택
-- 사거리 접근
-- `ISkillRuntime`을 통한 스킬 조회와 요청
-
-### ISkillRuntime
-
-- 슬롯에 장착된 `SkillSpec` 조회
-- 쿨다운 조회
-- 스킬 사용 요청
-- 구체적인 네트워크 구현은 포함하지 않음
-
-### NetworkSkillAdapter
-
-- `ISkillRuntime` 구현
-- `Char_Control`과 `NetworkSkillController` 연결
-- 스킬 규칙 또는 네트워크 검증을 직접 구현하지 않음
-
-### NetworkSkillController
-
-- 소유권 검사
-- 서버 RPC
-- 스킬 로드아웃
-- 마나 및 쿨다운 검증
-- 서버 권한 상태 변경
-
-`Character`, `Skill`, `GameplayData`, `Contracts` 경로에서는 다음 namespace를 직접 참조하지 않는다.
-
-```csharp
-using Unity.Netcode;
-using RAW.Network;
-```
-
-향후 타겟 위치, 대상 오브젝트 또는 방향 정보가 필요하면 `Char_Control`에 Netcode 타입을 추가하지 않고 `SkillCastIntent` 공용 계약을 정의한 뒤 `NetworkSkillAdapter`에서 네트워크 요청 데이터로 변환한다.
-
-## 7. 스킬 데미지 책임
-
-### 캐릭터·스킬 담당자
-
-- 타격 대상 선정
-- 데미지 계산식
-- 공격력과 방어력 계수
-- 치명타 및 상태 효과
-- 타격 횟수와 간격
-- 충돌 모양과 범위
-- 판정 발생 시점
-
-### 멀티·DB 담당자
-
-- 서버에서만 판정 결과 적용
-- 조작되거나 잘못된 Client 요청 거절
-- `NetworkEnemyState` 또는 `NetworkCharacterState`에 결과 반영
-- NetworkVariable을 통한 결과 동기화
-- 동일 판정의 중복 적용 방지
-
-Client에서 생성되는 애니메이션과 이펙트 오브젝트는 HP를 직접 변경하지 않는다.
-
-## 8. 프리팹과 Unity 에셋 소유권
-
-| 에셋 | 담당자 |
-| --- | --- |
-| `Dummy.prefab` | 캐릭터·스킬 담당자 |
-| 스킬 이펙트 프리팹 | 캐릭터·스킬 담당자 |
-| 인디케이터 프리팹 | 캐릭터·스킬 담당자 |
-| Animator Controller 및 Animation Clip | 캐릭터·스킬 담당자 |
-| `NetworkPlayer.prefab` | 멀티·DB 담당자 |
-| `NetworkEnemy.prefab` | 멀티·DB 담당자 |
-| `NetworkRuntime.prefab` | 멀티·DB 담당자 |
-| NetworkAnimator 동기화 설정 | 멀티·DB 담당자 |
-
-Unity 에셋의 `.meta` 파일은 원본 에셋과 같은 담당자가 소유한다. 파일 이동은 Unity Editor의 Project 창에서 수행해 GUID를 유지한다.
-
-## 9. Scene 소유권
-
-| Scene | 담당자 |
-| --- | --- |
-| `CharacterTest.unity` | 캐릭터·스킬 담당자 |
-| `NetworkCharacterTest.unity` | 멀티·DB 담당자 |
-| `NetworkTest.unity` | 멀티·DB 담당자 |
-| 통합 또는 실제 게임 Scene | 작업 전 담당자 지정 |
-
-같은 Scene을 두 담당자가 동시에 수정하지 않는다. 통합 Scene 변경이 필요하면 한 명만 편집하고 다른 담당자는 Prefab 단위로 변경 사항을 전달한다.
-
-## 10. 스킬 ID와 DB 규칙
-
-- 멀티·DB 담당자가 영속 데이터에 사용할 `SkillId`를 확정한다.
-- 캐릭터·스킬 담당자는 확정된 `SkillId`를 `SkillSpec`에 입력한다.
-- DB에는 Unity 에셋 경로나 표시 이름 대신 `SkillId`를 저장한다.
-- DB에 저장되기 시작한 `SkillId`는 변경하지 않는다.
-- `SkillId` 변경이 반드시 필요하면 데이터 마이그레이션 계획을 먼저 작성한다.
-
-권장 형식:
+스킬 ID 형식:
 
 ```text
 {character}_{skill_name}
 ```
 
-예:
+## 10. Prefab과 Scene
+
+| 파일 | 담당자 |
+| --- | --- |
+| `Dummy.prefab`과 게임플레이 Prefab | 게임플레이 담당자 |
+| 스킬 이펙트, 인디케이터와 Animator | 게임플레이 담당자 |
+| `NetworkPlayer.prefab`과 네트워크 Prefab | 멀티·DB 담당자 |
+| NetworkAnimator와 NetworkTransform 설정 | 멀티·DB 담당자 |
+| `CharacterTest.unity` | 게임플레이 담당자 |
+| `NetworkCharacterTest.unity`, `NetworkTest.unity` | 멀티·DB 담당자 |
+| 실제 게임 Scene의 맵과 게임플레이 구성 | 게임플레이 담당자 |
+| 통합 Scene의 최종 편집 | 작업 전에 지정한 한 명 |
+
+`NetworkPlayer.prefab`은 `Dummy.prefab`의 Prefab Variant 관계를 유지한다. 게임플레이 구성은 `Dummy.prefab`에서 변경하고 Network Prefab에는 네트워크 전용 컴포넌트와 override만 추가한다.
+
+같은 Scene을 두 담당자가 동시에 수정하지 않는다. 파일 이동과 이름 변경은 Unity Editor에서 수행해 GUID를 유지한다.
+
+## 11. 공용 프로젝트 파일
+
+다음 경로의 실제 작성자는 멀티·DB 담당자로 고정하고 두 담당자가 리뷰한다.
 
 ```text
-warrior_sword_smash
-archer_arrow_rain
-mage_magic_heal
+RAW_unity/Packages/manifest.json
+RAW_unity/Packages/packages-lock.json
+RAW_unity/ProjectSettings/
+RAW_unity/Assets/AddressableAssetsData/
 ```
 
-## 11. 새 스킬 개발 및 통합 절차
+게임플레이 담당자가 Package, Layer, Tag, Input 또는 Addressable 설정 변경이 필요하면 요구사항을 전달한다. 공용 설정은 기능 변경과 분리된 Pull Request로 반영한다.
 
-1. 멀티·DB 담당자가 `SkillId`를 확정한다.
-2. 캐릭터·스킬 담당자가 스킬 동작, 데이터, 애니메이션, 이펙트와 로컬 게임플레이 테스트를 완료한다.
-3. 캐릭터·스킬 담당자가 스킬을 `SkillCatalog`에 등록한다.
-4. 아래 네트워크 요구사항을 멀티·DB 담당자에게 전달한다.
-5. 멀티·DB 담당자가 기존 네트워크 계약으로 지원 가능한지 확인한다.
-6. 새 계약이 필요하면 공용 계약을 먼저 별도 Pull Request로 변경한다.
-7. 멀티·DB 담당자가 서버 검증, 상태 적용, 동기화와 DB 연결을 구현한다.
-8. Host와 Client에서 공동 통합 테스트를 수행한다.
+## 12. 기능 인계 절차
 
-전달 정보:
+1. 게임플레이 담당자가 로컬 규칙, 데이터와 시각적 표현을 구현한다.
+2. 네트워크 없이 게임플레이 테스트를 완료한다.
+3. 필요한 입력, 결과와 동기화 요구사항을 멀티·DB 담당자에게 전달한다.
+4. 공용 계약 변경이 필요하면 먼저 계약을 합의하고 별도 Pull Request로 반영한다.
+5. 멀티·DB 담당자가 서버 실행, 동기화와 저장을 연결한다.
+6. Host와 Client에서 함께 통합 테스트한다.
+
+기능을 전달할 때 최소한 다음 내용을 작성한다.
 
 ```text
-SkillId:
-사용 슬롯:
-CastType:
-대상 타입:
-사거리:
-판정 시점:
-타격 횟수:
-데미지 계산 방식:
-이펙트 생성 위치:
-투사체 또는 캐릭터 이동 여부:
-추가 동기화가 필요한 상태:
+기능 ID:
+입력:
+실행 가능 조건:
+게임플레이 결과:
+실행 시점과 횟수:
+동기화할 상태:
+저장할 상태:
+시각적 표현:
 ```
 
-## 12. Git 작업 규칙
+## 13. 완료 기준
 
-- `main` 브랜치에 직접 Push하지 않는다.
-- 기능별 브랜치와 Pull Request를 사용한다.
-- 가능하면 자신의 소유 경로만 변경한다.
-- 다른 담당자 경로 변경이 포함되면 해당 담당자의 승인을 받는다.
-- 공용 계약 변경은 구현 변경과 분리된 작은 Pull Request로 먼저 처리한다.
-- Unity Scene, Prefab, Animator Controller는 동시에 편집하지 않는다.
-- 자동 생성된 `.meta` 파일을 누락하거나 임의로 다른 에셋에 재사용하지 않는다.
-- 하나의 커밋에 담당 영역이 다른 변경을 섞지 않는다.
+### 게임플레이 담당자
 
-권장 브랜치 예시:
+- 네트워크 없이 로컬 테스트에서 정상 동작한다.
+- Netcode와 DB 구현을 참조하지 않는다.
+- 규칙과 계산을 외부에서 호출할 수 있다.
+- 필요한 입력과 결과가 정의되어 있다.
+- 게임플레이 테스트 또는 재현 절차가 있다.
 
-```text
-feature/skill-warrior-whirlwind
-fix/skill-targeting
-feature/network-skill-damage
-feature/db-skill-loadout
-refactor/code-ownership-boundaries
-```
+### 멀티·DB 담당자
 
-## 13. 다른 담당자 영역 변경 절차
+- Host와 Client에서 동일한 결과를 확인할 수 있다.
+- Client가 서버 권한 상태를 임의 변경할 수 없다.
+- 중복 요청이 결과를 중복 적용하지 않는다.
+- 늦게 입장한 Client가 현재 상태를 받는다.
+- 종료와 재접속 후 저장 상태가 복원된다.
+- 네트워크·저장 통합 테스트 또는 재현 절차가 있다.
 
-다른 담당자의 파일을 변경해야 할 때는 다음 순서를 따른다.
+## 14. Git과 리뷰 규칙
 
-1. 변경 목적과 필요한 공용 데이터 설명
-2. 파일 소유자와 구현 위치 합의
-3. 가능하면 소유자가 자신의 영역을 직접 수정
-4. 불가피하게 대신 수정하면 별도 커밋으로 분리
-5. Pull Request에서 파일 소유자의 승인 후 병합
+- `main`에 직접 Push하지 않고 기능별 브랜치와 Pull Request를 사용한다.
+- 자신의 소유 경로만 수정하는 것을 원칙으로 한다.
+- 다른 담당자의 변경이 필요하면 파일 소유자에게 요청한다.
+- 공용 계약과 프로젝트 설정은 별도 Pull Request로 먼저 변경한다.
+- Scene, Prefab, Animator와 공용 설정은 동시에 편집하지 않는다.
+- 하나의 커밋에 서로 다른 담당 영역의 변경을 섞지 않는다.
+- 다른 담당자 영역이 포함된 Pull Request는 해당 담당자의 승인을 받아야 한다.
 
-긴급 수정도 이 절차를 생략하지 않는다. 긴급 상황에서는 담당자가 빠르게 리뷰하고 후속 정리 작업을 별도 Issue로 등록한다.
+## 15. 예외 처리
 
-## 14. 현재 경계 검사 결과
+다른 담당자의 파일을 직접 수정해야 한다면 다음 순서를 따른다.
 
-현재 코드의 의존성 방향은 다음과 같다.
+1. 변경 목적과 필요한 결과를 설명한다.
+2. 파일 소유자와 수정 위치를 합의한다.
+3. 사전 동의를 받은 후 별도 커밋으로 수정한다.
+4. 파일 소유자의 리뷰와 승인을 받은 뒤 병합한다.
 
-```text
-Character ─┐
-Skill ─────┼─→ Contracts
-GameplayData ┘
-
-Network ─→ Character
-Network ─→ Skill
-Network ─→ GameplayData
-Network ─→ Contracts
-Network ─→ Persistence
-```
-
-네트워크 영역이 게임플레이 영역을 참조하는 것은 허용한다. 게임플레이 영역이 네트워크 영역을 참조하는 역방향 의존성은 허용하지 않는다.
-
-현재 검사 결과:
-
-- `Character`에 Unity Netcode 참조 없음
-- `Skill`에 Unity Netcode 참조 없음
-- `GameplayData`에 Unity Netcode 참조 없음
-- `Contracts`에 Unity Netcode 참조 없음
-- `Char_Control`에 `NetworkSkillController` 직접 참조 없음
-- `Char_Control`은 `ISkillRuntime`만 사용
-- 영속 데이터는 `RAW.Persistence` namespace로 분리됨
-
-## 15. 경계 분리 완료 기준
-
-- `Character`와 `Skill` 코드가 Unity Netcode를 직접 참조하지 않는다.
-- `Char_Control`이 `NetworkSkillController`를 직접 참조하지 않는다.
-- 네트워크 코드는 캐릭터 입력을 직접 읽지 않는다.
-- 네트워크 코드는 스킬 공식과 애니메이션을 다시 구현하지 않는다.
-- `Dummy.prefab`에는 네트워크 전용 컴포넌트가 없다.
-- 네트워크 컴포넌트는 `NetworkPlayer.prefab`과 네트워크 프리팹에만 존재한다.
-- 공용 enum과 스킬 런타임 인터페이스가 `Contracts`에 분리되어 있다.
-- DB는 `SkillId`를 기준으로 저장하고 복원한다.
-- 기존 형태의 일반 스킬은 네트워크 코드를 수정하지 않고 추가할 수 있다.
-- 특수 스킬은 공용 계약 합의 후 각 담당자가 자신의 영역에서 구현한다.
-
-## 16. 문서 변경
-
-담당 영역이나 협업 방식이 변경되면 코드 변경 전에 이 문서를 먼저 수정한다. 이 문서의 변경은 두 담당자가 모두 확인한 뒤 병합한다.
+담당 영역이나 협업 방식이 바뀌면 코드 변경 전에 이 문서를 먼저 수정한다.
