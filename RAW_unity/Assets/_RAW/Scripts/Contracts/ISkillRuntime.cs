@@ -4,5 +4,5 @@ public interface ISkillRuntime
 
 	double GetRemainingCooldown(string skillId);
 
-	void RequestUseSkill(KeyMapping slot);
+	SkillUseRequestResult RequestUseSkill(KeyMapping slot);
 }

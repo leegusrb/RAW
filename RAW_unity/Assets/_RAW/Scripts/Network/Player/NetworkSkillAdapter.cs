@@ -50,15 +50,17 @@ namespace RAW.Network
 			return networkSkillController.GetRemainingCooldown(skillId);
 		}
 
-		public void RequestUseSkill(KeyMapping slot)
+		public SkillUseRequestResult RequestUseSkill(KeyMapping slot)
 		{
 			if (networkSkillController == null)
 			{
 				Debug.LogError("스킬을 요청할 NetworkSkillController가 없습니다.", this);
-				return;
+				return SkillUseRequestResult.Rejected;
 			}
 
 			networkSkillController.RequestUseSkill(slot);
+
+			return SkillUseRequestResult.HandleByRuntime;
 		}
 	}
 	

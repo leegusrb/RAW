@@ -299,9 +299,25 @@ public class Char_Control : MonoBehaviour{
 			return;
 		}
 
-		skillRuntime.RequestUseSkill(currentCastingSlot);
+		SkillUseRequestResult requestResult = skillRuntime.RequestUseSkill(currentCastingSlot);
 
-		HideIndicator();
+		switch (requestResult)
+		{
+			case SkillUseRequestResult.ExecuteLocally:
+				ActivateSkill();
+				return;
+
+			case SkillUseRequestResult.HandleByRuntime:
+				HideIndicator();
+				return;
+
+			case SkillUseRequestResult.Rejected:
+			default:
+				Debug.LogWarning($"{currentCastingSlot} 스킬 요청이 거절되었습니다.", this);
+
+				HideIndicator();
+				return;
+		}
 	}
 
     void HideIndicator()
