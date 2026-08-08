@@ -108,12 +108,19 @@ RAW_unity/Assets/_RAW/Scripts/Persistence/
 RAW_unity/Assets/_RAW/Scripts/Contracts/
 ```
 
-예상 항목:
+현재 항목:
 
 ```text
 KeyMapping.cs
 CastType.cs
 TargettingSkillTarget.cs
+EquipmentSlot.cs
+ISkillRuntime.cs
+```
+
+향후 네트워크 스킬 실행을 확장할 때 필요한 경우 다음 계약을 추가한다.
+
+```text
 SkillCastIntent.cs
 ISkillDamageReceiver.cs
 ```
@@ -126,29 +133,60 @@ ISkillDamageReceiver.cs
 
 공용 계약을 추가·삭제·변경할 때는 두 담당자의 사전 합의와 리뷰가 필요하다. enum 값은 Unity 직렬화와 네트워크 직렬화에 사용될 수 있으므로 기존 순서를 변경하지 않고 명시적인 숫자 값을 유지한다.
 
-## 6. 현재 경계가 섞인 코드
+## 6. 적용된 스킬 런타임 경계
 
-현재 `Char_Control.cs`는 캐릭터 동작과 네트워크 요청 생성이 함께 들어 있는 임시 상태다.
-
-최종 책임은 다음과 같이 분리한다.
+`Char_Control`은 네트워크 구현체를 직접 참조하지 않고 `ISkillRuntime`을 통해 스킬 런타임을 사용한다.
 
 ```text
 Char_Control
-입력, 타겟 선택, 사거리 접근
-        ↓ SkillCastIntent
+입력, 스킬 선택 및 요청
+        ↓ ISkillRuntime
 NetworkSkillAdapter
-NetworkSkillCastRequest 생성
+게임플레이 요청을 네트워크 구현으로 전달
         ↓
 NetworkSkillController
-서버 요청, 검증 및 동기화
+서버 요청, 검증 및 네트워크 상태 관리
 ```
 
-분리 완료 후 `Character`와 `Skill` 경로에서는 다음 namespace를 직접 참조하지 않는다.
+각 구성 요소의 책임은 다음과 같다.
+
+### Char_Control
+
+- 캐릭터 입력
+- 스킬 슬롯 선택
+- 타겟 선택
+- 사거리 접근
+- `ISkillRuntime`을 통한 스킬 조회와 요청
+
+### ISkillRuntime
+
+- 슬롯에 장착된 `SkillSpec` 조회
+- 쿨다운 조회
+- 스킬 사용 요청
+- 구체적인 네트워크 구현은 포함하지 않음
+
+### NetworkSkillAdapter
+
+- `ISkillRuntime` 구현
+- `Char_Control`과 `NetworkSkillController` 연결
+- 스킬 규칙 또는 네트워크 검증을 직접 구현하지 않음
+
+### NetworkSkillController
+
+- 소유권 검사
+- 서버 RPC
+- 스킬 로드아웃
+- 마나 및 쿨다운 검증
+- 서버 권한 상태 변경
+
+`Character`, `Skill`, `GameplayData`, `Contracts` 경로에서는 다음 namespace를 직접 참조하지 않는다.
 
 ```csharp
 using Unity.Netcode;
 using RAW.Network;
 ```
+
+향후 타겟 위치, 대상 오브젝트 또는 방향 정보가 필요하면 `Char_Control`에 Netcode 타입을 추가하지 않고 `SkillCastIntent` 공용 계약을 정의한 뒤 `NetworkSkillAdapter`에서 네트워크 요청 데이터로 변환한다.
 
 ## 7. 스킬 데미지 책임
 
@@ -280,7 +318,35 @@ refactor/code-ownership-boundaries
 
 긴급 수정도 이 절차를 생략하지 않는다. 긴급 상황에서는 담당자가 빠르게 리뷰하고 후속 정리 작업을 별도 Issue로 등록한다.
 
-## 14. 경계 분리 완료 기준
+## 14. 현재 경계 검사 결과
+
+현재 코드의 의존성 방향은 다음과 같다.
+
+```text
+Character ─┐
+Skill ─────┼─→ Contracts
+GameplayData ┘
+
+Network ─→ Character
+Network ─→ Skill
+Network ─→ GameplayData
+Network ─→ Contracts
+Network ─→ Persistence
+```
+
+네트워크 영역이 게임플레이 영역을 참조하는 것은 허용한다. 게임플레이 영역이 네트워크 영역을 참조하는 역방향 의존성은 허용하지 않는다.
+
+현재 검사 결과:
+
+- `Character`에 Unity Netcode 참조 없음
+- `Skill`에 Unity Netcode 참조 없음
+- `GameplayData`에 Unity Netcode 참조 없음
+- `Contracts`에 Unity Netcode 참조 없음
+- `Char_Control`에 `NetworkSkillController` 직접 참조 없음
+- `Char_Control`은 `ISkillRuntime`만 사용
+- 영속 데이터는 `RAW.Persistence` namespace로 분리됨
+
+## 15. 경계 분리 완료 기준
 
 - `Character`와 `Skill` 코드가 Unity Netcode를 직접 참조하지 않는다.
 - `Char_Control`이 `NetworkSkillController`를 직접 참조하지 않는다.
@@ -288,11 +354,11 @@ refactor/code-ownership-boundaries
 - 네트워크 코드는 스킬 공식과 애니메이션을 다시 구현하지 않는다.
 - `Dummy.prefab`에는 네트워크 전용 컴포넌트가 없다.
 - 네트워크 컴포넌트는 `NetworkPlayer.prefab`과 네트워크 프리팹에만 존재한다.
-- 공용 enum과 스킬 요청 정보가 `Contracts`에 분리되어 있다.
+- 공용 enum과 스킬 런타임 인터페이스가 `Contracts`에 분리되어 있다.
 - DB는 `SkillId`를 기준으로 저장하고 복원한다.
 - 기존 형태의 일반 스킬은 네트워크 코드를 수정하지 않고 추가할 수 있다.
 - 특수 스킬은 공용 계약 합의 후 각 담당자가 자신의 영역에서 구현한다.
 
-## 15. 문서 변경
+## 16. 문서 변경
 
 담당 영역이나 협업 방식이 변경되면 코드 변경 전에 이 문서를 먼저 수정한다. 이 문서의 변경은 두 담당자가 모두 확인한 뒤 병합한다.
