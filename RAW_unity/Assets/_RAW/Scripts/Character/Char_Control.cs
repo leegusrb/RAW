@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using RAW.Network;
 using UnityEngine;
 
 public class Char_Control : MonoBehaviour{
@@ -40,8 +39,7 @@ public class Char_Control : MonoBehaviour{
     [SerializeField]
     private GameObject skillRangeIndicator;
 
-	[SerializeField]
-	private NetworkSkillController networkSkillController;
+	private ISkillRuntime skillRuntime;
 
     private SkillSpec currentCastingSkill;
 	private KeyMapping currentCastingSlot;
@@ -57,8 +55,10 @@ public class Char_Control : MonoBehaviour{
 
 	private void Awake()
 	{
-		if (networkSkillController == null)
-			networkSkillController = GetComponent<NetworkSkillController>();
+		skillRuntime = GetComponent<ISkillRuntime>();
+
+		if (skillRuntime == null)
+			Debug.LogError("ISkillRuntime 구현체를 찾을 수 없습니다.", this);
 	}
     
     void Start()
@@ -216,19 +216,19 @@ public class Char_Control : MonoBehaviour{
     {
         HideIndicator();
 
-		if (networkSkillController == null)
+		if (skillRuntime == null)
 		{
-			Debug.LogError("NetworkSkillController가 연결되지 않았습니다.", this);
+			Debug.LogError("스킬 런타임이 연결되지 않았습니다.", this);
 			return;
 		}
 
-		if (!networkSkillController.TryGetSkillForSlot(skillSlot, out SkillSpec skill))
+		if (!skillRuntime.TryGetSkillForSlot(skillSlot, out SkillSpec skill))
 		{
 			Debug.LogWarning($"{skillSlot} 슬롯에 등록된 스킬이 없습니다.", this);
 			return;
 		}
 
-		double remainingCooldown = networkSkillController.GetRemainingCooldown(skill.SkillId);
+		double remainingCooldown = skillRuntime.GetRemainingCooldown(skill.SkillId);
 
 		if (remainingCooldown > 0d)
 		{
@@ -281,15 +281,15 @@ public class Char_Control : MonoBehaviour{
 		if (!isIndicatingSkill || currentCastingSkill == null)
 			return;
 
-		if (networkSkillController == null)
+		if (skillRuntime == null)
 		{
-			Debug.LogError("NetworkSkillController가 연결되지 않았습니다.", this);
+			Debug.LogError("스킬 런타임이 연결되지 않았습니다.", this);
 
 			HideIndicator();
 			return;
 		}
 
-		double remainingCooldown = networkSkillController.GetRemainingCooldown(currentCastingSkill.SkillId);
+		double remainingCooldown = skillRuntime.GetRemainingCooldown(currentCastingSkill.SkillId);
 
 		if (remainingCooldown > 0d)
 		{
@@ -299,7 +299,7 @@ public class Char_Control : MonoBehaviour{
 			return;
 		}
 
-		networkSkillController.RequestUseSkill(currentCastingSlot);
+		skillRuntime.RequestUseSkill(currentCastingSlot);
 
 		HideIndicator();
 	}
