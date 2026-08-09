@@ -1,8 +1,7 @@
 using System;
 using System.Collections.Generic;
-using UnityEngine;
 
-namespace RAW.Network
+namespace RAW.Persistence
 {
 	[Serializable]
 	public sealed class PlayerInventorySlotData

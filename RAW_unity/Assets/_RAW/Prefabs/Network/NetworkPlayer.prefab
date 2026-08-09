@@ -225,6 +225,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 2598696420236482373, guid: 67dbb23091e48f9418e69cd1c99a178b, type: 3}
       insertIndex: -1
       addedObject: {fileID: 7574358915048637377}
+    - targetCorrespondingSourceObject: {fileID: 2598696420236482373, guid: 67dbb23091e48f9418e69cd1c99a178b, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3312777262975726096}
   m_SourcePrefab: {fileID: 100100000, guid: 67dbb23091e48f9418e69cd1c99a178b, type: 3}
 --- !u!1 &124719763721653724 stripped
 GameObject:
@@ -417,6 +420,22 @@ MonoBehaviour:
       NameHash: -1905186013
       Synchronize: 1
       ParameterType: 4
+    - name: q
+      NameHash: -184504793
+      Synchronize: 1
+      ParameterType: 9
+    - name: w
+      NameHash: 476252946
+      Synchronize: 1
+      ParameterType: 9
+    - name: e
+      NameHash: -270894502
+      Synchronize: 1
+      ParameterType: 9
+    - name: r
+      NameHash: 1812594589
+      Synchronize: 1
+      ParameterType: 9
   AnimatorParametersExpanded: 0
 --- !u!114 &365905181430154016
 MonoBehaviour:
@@ -501,6 +520,19 @@ MonoBehaviour:
     skill: {fileID: 11400000, guid: 6b4b4bb14041b5541aea2dc5b10ac615, type: 2}
   - slot: 4
     skill: {fileID: 11400000, guid: b4001a569d293fb47a86590941823cdb, type: 2}
+--- !u!114 &3312777262975726096
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5662116675036114195}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e6906cf252d0d4d51a6323e86c2a5522, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RAW.Network.NetworkSkillAdapter
+  networkSkillController: {fileID: 7574358915048637377}
 --- !u!1 &7511849947110713824 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 197311793952166838, guid: 67dbb23091e48f9418e69cd1c99a178b, type: 3}
