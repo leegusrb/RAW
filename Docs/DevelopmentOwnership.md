@@ -131,6 +131,109 @@ RAW_unity/Assets/_RAW/Scripts/Contracts/
 - 계약에는 Netcode, 구체적인 DB 구현, UI, 애니메이션과 VFX를 넣지 않는다.
 - enum 값은 기존 순서를 바꾸지 않고 명시적인 숫자를 유지한다.
 
+### 7.1 스킬 요청·실행 결과 계약
+
+초기 서버 권한 스킬 실행에는 다음 공용 계약을 사용한다.
+
+```text
+RAW_unity/Assets/_RAW/Scripts/Contracts/Skills/SkillUseRequest.cs
+RAW_unity/Assets/_RAW/Scripts/Contracts/Skills/SkillExecutionResult.cs
+RAW_unity/Assets/_RAW/Scripts/Contracts/Skills/SkillFailureReason.cs
+RAW_unity/Assets/_RAW/Scripts/Contracts/Skills/SkillEffectType.cs
+```
+
+계약 타입의 namespace는 `RAW.Contracts.Skills`를 사용한다. 계약에는 `NetworkObject`, `NetworkObjectReference`, RPC와 같은 Netcode 타입이나 `SkillSpec`과 같은 게임플레이 구현 타입을 넣지 않는다. Network와 Gameplay은 계약의 원시 값과 enum만 공유하고 각 영역에서 필요한 런타임 객체로 변환한다.
+
+#### 스킬 요청
+
+`SkillUseRequest`는 확정된 게임 결과가 아니라 Client의 스킬 사용 의도를 나타낸다.
+
+| 필드 | 의미 | 신뢰 및 검증 규칙 |
+| --- | --- | --- |
+| `RequestId` | Client가 생성한 요청 식별자 | `0`은 사용하지 않는다. 동일 요청을 재전송할 때는 같은 값을 사용하며 서버는 이미 처리한 값을 중복 적용하지 않는다. |
+| `Slot` | 사용하려는 `Q`, `W`, `E`, `R`, `A` 스킬 슬롯 | 서버가 해당 플레이어의 서버 권한 스킬 로드아웃에서 실제 스킬을 조회한다. |
+| `TargetEntityId` | Client가 선택한 대상 식별자 | 멀티플레이에서는 Network가 서버의 NetworkObject와 연결한다. 지정 대상이 없는 스킬은 `0`을 사용한다. |
+| `TargetPosition` | Client가 지정한 목표 월드 좌표 | Unity World Unit을 사용한다. 서버가 실제 시전자 위치, 사거리와 허용 가능한 위치인지 검증한다. |
+| `AimDirection` | Client가 지정한 조준 방향 | 방향형 스킬에서 사용한다. 서버가 값의 유효성을 검사하고 필요하면 정규화한다. |
+
+Client는 스킬 데미지, 사거리, 현재 MP, 쿨다운 종료 시각과 성공 여부를 요청에 포함하지 않는다. 요청에 포함된 대상, 위치와 방향도 검증된 사실로 취급하지 않는다.
+
+초기 계약에는 `ClientTick`을 포함하지 않는다. 현재 서버가 요청을 받은 시점의 서버 상태로 판정하며, 추후 지연 보정과 과거 위치 판정이 필요해질 때 허용 범위와 검증 규칙을 먼저 합의한 후 추가한다.
+
+#### 스킬 실행 결과
+
+`SkillExecutionResult`는 서버가 게임플레이 규칙을 호출한 뒤 확정하는 단일 스킬 효과 결과를 나타낸다.
+
+| 필드 | 의미 | 생성 및 적용 책임 |
+| --- | --- | --- |
+| `RequestId` | 결과와 원래 요청을 연결하는 식별자 | Network가 요청 값을 결과에 유지한다. |
+| `FailureReason` | 성공 또는 실패 이유 | Network와 Gameplay이 각자의 검증 책임에 맞는 값을 생성한다. `None`일 때만 성공이다. |
+| `TargetEntityId` | 효과를 적용할 대상 식별자 | Gameplay이 검증한 대상을 결과에 담고 Network가 서버의 실제 상태 객체로 연결한다. |
+| `EffectType` | `Damage`, `Heal` 또는 `None` | Gameplay이 스킬 규칙에 따라 결정한다. |
+| `Amount` | 적용할 데미지 또는 회복량 | Gameplay이 계산하며 0 이상의 정수를 사용한다. |
+| `ManaCost` | 성공 시 소모할 MP | Gameplay이 규칙에 따라 결정하고 Network가 서버 MP에 적용한다. |
+| `CooldownSeconds` | 성공 시 시작할 쿨다운 | 초 단위를 사용한다. Gameplay이 값을 결정하고 Network가 서버 시간으로 관리한다. |
+| `Succeeded` | 실행 성공 여부 | `FailureReason == None`으로 계산하며 별도 상태로 저장하거나 전송하지 않는다. |
+
+실패 결과에는 효과와 비용을 적용하지 않는다.
+
+```text
+FailureReason != None
+EffectType = None
+Amount = 0
+ManaCost = 0
+CooldownSeconds = 0
+```
+
+초기 계약은 한 번의 스킬 요청당 단일 `Damage` 또는 `Heal` 효과만 지원한다. 다단 히트, 타격 예약 시간, 버프·디버프, 넉백, 소환과 투사체 실행 ID는 실제 기능을 개발할 때 별도 계약 변경으로 추가한다.
+
+#### 실패 이유의 생성 책임
+
+| 실패 이유 | 담당 영역 |
+| --- | --- |
+| `InvalidRequest`, `DuplicateRequest`, `NotOwner` | 멀티·DB 담당 |
+| `SkillNotFound` | 멀티·DB 담당이 서버 스킬 로드아웃과 카탈로그를 기준으로 검사 |
+| `InvalidState`, `InsufficientMana`, `CooldownActive` | 멀티·DB 담당이 서버 상태를 제공하고 게임플레이 규칙이 사용 가능 여부를 판단 |
+| `InvalidTarget`, `TargetDead`, `OutOfRange`, `Blocked` | 게임플레이 담당의 규칙 검증 |
+
+실패 이유 enum은 기존 숫자를 변경하거나 다른 의미로 재사용하지 않는다. 표시 문구와 다국어 처리는 계약 enum이 아니라 UI 영역에서 담당한다.
+
+#### 호출과 상태 적용 순서
+
+```text
+게임플레이 담당
+입력·대상 선택 → SkillUseRequest에 필요한 의도 제공
+                         ↓
+멀티·DB 담당
+RequestId 생성 → 서버 전송 → 소유권·중복·대상 존재 검사
+                         ↓
+멀티·DB 담당
+서버의 실제 위치·HP·MP·쿨다운과 대상 상태 조회
+                         ↓
+게임플레이 담당 코드
+사거리·대상·장애물 검증 → 효과·MP 비용·쿨다운 계산
+                         ↓
+멀티·DB 담당
+SkillExecutionResult 확정 → 서버 상태에 한 번 적용 → 결과 동기화
+                         ↓
+게임플레이 담당 코드
+애니메이션·이펙트·사운드 표시
+```
+
+멀티플레이에서는 Network가 서버 상태 변경의 유일한 적용 지점이다. 게임플레이 규칙은 결과를 계산해 반환하고 Network가 HP, MP와 쿨다운에 결과를 한 번만 적용한다. Client의 스킬 이펙트와 충돌 오브젝트는 상태를 직접 변경하지 않는다.
+
+오프라인에서는 Local Runtime이 같은 게임플레이 규칙을 호출한 뒤 결과를 로컬 상태에 적용한다. 게임플레이 규칙을 오프라인용과 서버용으로 복사해 구현하지 않는다.
+
+#### 계약 검증
+
+계약의 성공·실패 생성 규칙과 enum 숫자는 다음 EditMode 테스트에서 검증한다.
+
+```text
+RAW_unity/Assets/_RAW/Tests/EditMode/Contracts/SkillExecutionContractTests.cs
+```
+
+계약을 변경하는 Pull Request에서는 `RAW.Contracts.Tests.EditMode` 테스트를 실행하고 두 담당자가 변경 의미와 하위 호환성을 함께 리뷰한다.
+
 ## 8. 주요 기능의 연결 방식
 
 ### 8.1 스킬과 전투
