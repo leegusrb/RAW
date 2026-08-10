@@ -8,7 +8,7 @@ namespace RAW.Contracts.Skills
 		DuplicateRequest = 2,
 		NotOwner = 3,
 
-		SkillNotFount = 10,
+		SkillNotFound = 10,
 		InvalidState = 11,
 		InsufficientMana = 12,
 		CooldownActive = 13,

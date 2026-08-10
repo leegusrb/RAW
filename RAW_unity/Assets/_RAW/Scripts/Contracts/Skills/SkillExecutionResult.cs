@@ -5,7 +5,7 @@ namespace RAW.Contracts.Skills
 	[Serializable]
 	public struct SkillExecutionResult
 	{
-		public ulong ReqeustId;
+		public ulong RequestId;
 
 		public SkillFailureReason FailureReason;
 		
@@ -28,7 +28,7 @@ namespace RAW.Contracts.Skills
 
 			return new SkillExecutionResult
 			{
-				ReqeustId = requestId,
+				RequestId = requestId,
 				FailureReason = failureReason,
 
 				TargetEntityId = targetEntityId,
@@ -52,7 +52,7 @@ namespace RAW.Contracts.Skills
 		{
 			return new SkillExecutionResult
 			{
-				ReqeustId = requestId,
+				RequestId = requestId,
 				FailureReason = SkillFailureReason.None,
 
 				TargetEntityId = targetEntityId,
