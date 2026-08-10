@@ -1,0 +1,16 @@
+{
+    "name": "RAW.Persistence",
+    "rootNamespace": "",
+    "references": [
+        "GUID:006236d6931fa4bad9a1ca4a5079e85a"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

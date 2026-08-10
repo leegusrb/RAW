@@ -1,0 +1,20 @@
+{
+    "name": "RAW.Network",
+    "rootNamespace": "",
+    "references": [
+        "GUID:006236d6931fa4bad9a1ca4a5079e85a",
+        "GUID:38080686cce374f4bab94bf9e6a1fee4",
+        "GUID:181a87b1883f14fe88f51da1a21859d5",
+        "GUID:1491147abca9d7d4bb7105af628b223e",
+        "GUID:e0cd26848372d4e5c891c569017e11f1"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
