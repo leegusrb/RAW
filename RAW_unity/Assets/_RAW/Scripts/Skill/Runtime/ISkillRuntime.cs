@@ -4,5 +4,5 @@ public interface ISkillRuntime
 
 	double GetRemainingCooldown(string skillId);
 
-	SkillUseDispatchResult RequestUseSkill(SkillSlot slot);
+	SkillUseHandlingResult RequestUseSkill(SkillSlot slot);
 }

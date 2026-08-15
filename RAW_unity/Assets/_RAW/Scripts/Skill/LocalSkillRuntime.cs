@@ -31,11 +31,11 @@ public class LocalSkillRuntime :
 		return 0d;
 	}
 
-	public SkillUseDispatchResult RequestUseSkill(SkillSlot slot)
+	public SkillUseHandlingResult RequestUseSkill(SkillSlot slot)
 	{
 		if (!TryGetSkillForSlot(slot, out _))
-			return SkillUseDispatchResult.DispatchFailed;
+			return SkillUseHandlingResult.Failed;
 
-		return SkillUseDispatchResult.ExecuteLocally;
+		return SkillUseHandlingResult.ExecuteLocally;
 	}
 }
