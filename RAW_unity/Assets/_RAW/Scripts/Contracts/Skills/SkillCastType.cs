@@ -1,4 +1,4 @@
-public enum CastType
+public enum SkillCastType
 {
     bar = 0,
 	area = 1,

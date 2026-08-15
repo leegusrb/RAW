@@ -42,7 +42,7 @@ public class Char_Control : MonoBehaviour{
 	private ISkillRuntime skillRuntime;
 
     private SkillSpec currentCastingSkill;
-	private KeyMapping currentCastingSlot;
+	private SkillSlot currentCastingSlot;
     private bool isIndicatingSkill;
 
     private string currentCastingSkillKey;
@@ -79,7 +79,7 @@ public class Char_Control : MonoBehaviour{
             
         }
 
-		if (TryGetPressedSkillSlot(out KeyMapping pressedSkillSlot))
+		if (TryGetPressedSkillSlot(out SkillSlot pressedSkillSlot))
 		{
 			ShowIndicator(pressedSkillSlot);
 		}
@@ -108,35 +108,35 @@ public class Char_Control : MonoBehaviour{
             IndicateSkill();
     }
 
-	private bool TryGetPressedSkillSlot(out KeyMapping skillSlot)
+	private bool TryGetPressedSkillSlot(out SkillSlot skillSlot)
 	{
 		if (Input.GetKeyDown(KeyCode.Q))
 		{
-			skillSlot = KeyMapping.Q;
+			skillSlot = SkillSlot.Q;
 			return true;
 		}
 
 		if (Input.GetKeyDown(KeyCode.W))
 		{
-			skillSlot = KeyMapping.W;
+			skillSlot = SkillSlot.W;
 			return true;
 		}
 
 		if (Input.GetKeyDown(KeyCode.E))
 		{
-			skillSlot = KeyMapping.E;
+			skillSlot = SkillSlot.E;
 			return true;
 		}
 
 		if (Input.GetKeyDown(KeyCode.R))
 		{
-			skillSlot = KeyMapping.R;
+			skillSlot = SkillSlot.R;
 			return true;
 		}
 
 		if (Input.GetKeyDown(KeyCode.A))
 		{
-			skillSlot = KeyMapping.A;
+			skillSlot = SkillSlot.A;
 			return true;
 		}
 
@@ -151,13 +151,13 @@ public class Char_Control : MonoBehaviour{
         mousePos = new Vector3(mousePos.x, mousePos.y, -1);
         switch (currentCastingSkill.castType)
         {
-            case CastType.bar:
+            case SkillCastType.bar:
                 IndicateBarType(mousePos);
                 break;
-            case CastType.target:
+            case SkillCastType.target:
                 IndicateTargertingType(mousePos);
                 break;
-            case CastType.area:
+            case SkillCastType.area:
                 IndicateAreaType(mousePos);
                 break;
             default:
@@ -212,7 +212,7 @@ public class Char_Control : MonoBehaviour{
         skillAreaIndicator.transform.position = mousePos;
     }
 
-    private void ShowIndicator(KeyMapping skillSlot)
+    private void ShowIndicator(SkillSlot skillSlot)
     {
         HideIndicator();
 
@@ -242,12 +242,12 @@ public class Char_Control : MonoBehaviour{
 
 		switch (currentCastingSkill.castType)
 		{
-			case CastType.bar:
+			case SkillCastType.bar:
 				skillBarIndicator.transform.localScale = new Vector2(currentCastingSkill.range, currentCastingSkill.size);
 				skillBarIndicator.SetActive(true);
 				break;
 
-			case CastType.target:
+			case SkillCastType.target:
             	skillTargetingIndicator.SetActive(true);
 
 				TargettingSkillIndicator targetIndicator = skillTargetingIndicator.GetComponent<TargettingSkillIndicator>();
@@ -257,7 +257,7 @@ public class Char_Control : MonoBehaviour{
 
 				break;
 
-			case CastType.area:
+			case SkillCastType.area:
 				skillAreaIndicator.transform.localScale = new Vector2(currentCastingSkill.size, currentCastingSkill.size);
 				skillAreaIndicator.SetActive(true);
 				break;
@@ -299,19 +299,19 @@ public class Char_Control : MonoBehaviour{
 			return;
 		}
 
-		SkillUseRequestResult requestResult = skillRuntime.RequestUseSkill(currentCastingSlot);
+		SkillUseDispatchResult requestResult = skillRuntime.RequestUseSkill(currentCastingSlot);
 
 		switch (requestResult)
 		{
-			case SkillUseRequestResult.ExecuteLocally:
+			case SkillUseDispatchResult.ExecuteLocally:
 				ActivateSkill();
 				return;
 
-			case SkillUseRequestResult.HandleByRuntime:
+			case SkillUseDispatchResult.Dispatched:
 				HideIndicator();
 				return;
 
-			case SkillUseRequestResult.Rejected:
+			case SkillUseDispatchResult.DispatchFailed:
 			default:
 				Debug.LogWarning($"{currentCastingSlot} 스킬 요청이 거절되었습니다.", this);
 
@@ -513,7 +513,7 @@ public class Char_Control : MonoBehaviour{
 		if (currentCastingSkill == null)
 			return false;
 
-		if (currentCastingSkill.castType != CastType.target)
+		if (currentCastingSkill.castType != SkillCastType.target)
 			return true;
 
 		TargettingSkillIndicator indicator = skillTargetingIndicator.GetComponent<TargettingSkillIndicator>();
@@ -528,7 +528,7 @@ public class Char_Control : MonoBehaviour{
 
         switch (currentCastingSkill.castType)
         {
-            case CastType.target:
+            case SkillCastType.target:
 				TargettingSkillIndicator indicator = skillTargetingIndicator.GetComponent<TargettingSkillIndicator>();
 
 				if (indicator == null || indicator.targettingTarget == null)
@@ -543,11 +543,11 @@ public class Char_Control : MonoBehaviour{
 
                 break;
 	
-            case CastType.area:
+            case SkillCastType.area:
                 currentActivatingSkillTargetPosition = mousePos;
                 break;
 
-            case CastType.bar:
+            case SkillCastType.bar:
                 currentActivatingSkillTargetPosition = transform.position;
                 break;
         }
@@ -556,7 +556,7 @@ public class Char_Control : MonoBehaviour{
     private IEnumerator CoroutineActivateSkill(SkillSpec currentActivatingSkill, float skillRangeRadius, string skillInputKey, Enemy currentActivatingSkillTarget)
     {
         
-        if (currentActivatingSkill.castType == CastType.target || currentActivatingSkill.castType == CastType.area)
+        if (currentActivatingSkill.castType == SkillCastType.target || currentActivatingSkill.castType == SkillCastType.area)
         {
             while (IsInsideRange(transform.position, currentActivatingSkillTargetPosition, skillRangeRadius) == false)
             {
@@ -591,16 +591,16 @@ public class Char_Control : MonoBehaviour{
         currentActivatingSkillCoroutine = null;
     }
 
-    private Vector3 GetSkillGeneratePosition(CastType currentActivatingSkillCastType, Vector2 activatingMousePosition)
+    private Vector3 GetSkillGeneratePosition(SkillCastType currentActivatingSkillCastType, Vector2 activatingMousePosition)
     {
         Vector3 position = transform.position;
         switch (currentActivatingSkillCastType)
         {
-            case CastType.area:
-            case CastType.target:
+            case SkillCastType.area:
+            case SkillCastType.target:
                 position = activatingMousePosition;
                 break;
-            case CastType.bar:
+            case SkillCastType.bar:
                 position = transform.position;
                 break;           
         }

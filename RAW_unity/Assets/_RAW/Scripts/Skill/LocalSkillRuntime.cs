@@ -5,7 +5,7 @@ public class LocalSkillRuntime :
 	MonoBehaviour,
 	ISkillRuntime
 {
-    public bool TryGetSkillForSlot(KeyMapping slot, out SkillSpec skill)
+    public bool TryGetSkillForSlot(SkillSlot slot, out SkillSpec skill)
 	{
 		skill = null;
 
@@ -31,11 +31,11 @@ public class LocalSkillRuntime :
 		return 0d;
 	}
 
-	public SkillUseRequestResult RequestUseSkill(KeyMapping slot)
+	public SkillUseDispatchResult RequestUseSkill(SkillSlot slot)
 	{
 		if (!TryGetSkillForSlot(slot, out _))
-			return SkillUseRequestResult.Rejected;
+			return SkillUseDispatchResult.DispatchFailed;
 
-		return SkillUseRequestResult.ExecuteLocally;
+		return SkillUseDispatchResult.ExecuteLocally;
 	}
 }

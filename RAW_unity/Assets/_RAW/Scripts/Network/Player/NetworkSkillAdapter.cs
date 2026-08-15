@@ -31,7 +31,7 @@ namespace RAW.Network
 				networkSkillController = GetComponent<NetworkSkillController>();
 		}
 
-		public bool TryGetSkillForSlot(KeyMapping slot, out SkillSpec skill)
+		public bool TryGetSkillForSlot(SkillSlot slot, out SkillSpec skill)
 		{
 			if (networkSkillController == null)
 			{
@@ -50,17 +50,17 @@ namespace RAW.Network
 			return networkSkillController.GetRemainingCooldown(skillId);
 		}
 
-		public SkillUseRequestResult RequestUseSkill(KeyMapping slot)
+		public SkillUseDispatchResult RequestUseSkill(SkillSlot slot)
 		{
 			if (networkSkillController == null)
 			{
 				Debug.LogError("스킬을 요청할 NetworkSkillController가 없습니다.", this);
-				return SkillUseRequestResult.Rejected;
+				return SkillUseDispatchResult.DispatchFailed;
 			}
 
 			networkSkillController.RequestUseSkill(slot);
 
-			return SkillUseRequestResult.HandleByRuntime;
+			return SkillUseDispatchResult.Dispatched;
 		}
 	}
 	

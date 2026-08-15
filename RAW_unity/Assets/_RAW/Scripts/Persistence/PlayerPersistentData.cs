@@ -40,7 +40,7 @@ namespace RAW.Persistence
 	[Serializable]
 	public sealed class PlayerSkillSlotData
 	{
-		public KeyMapping slot;
+		public SkillSlot slot;
 		public string skillId;
 
 		public PlayerSkillSlotData DeepCopy()

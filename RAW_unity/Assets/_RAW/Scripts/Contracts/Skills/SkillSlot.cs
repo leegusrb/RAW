@@ -1,4 +1,4 @@
-public enum KeyMapping
+public enum SkillSlot
 {
     Q = 0,
 	W = 1,
