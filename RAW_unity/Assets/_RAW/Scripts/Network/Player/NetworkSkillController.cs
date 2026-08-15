@@ -9,10 +9,10 @@ namespace RAW.Network
 	[Serializable]
 	public class DefaultSkillLoadoutEntry
 	{
-		[SerializeField] private SkillSlot slot;
+		[SerializeField] private KeyMapping slot;
 		[SerializeField] private SkillSpec skill;
 
-		public SkillSlot Slot => slot;
+		public KeyMapping Slot => slot;
 		public SkillSpec Skill => skill;
 	}
 
@@ -49,10 +49,10 @@ namespace RAW.Network
 		INetworkSerializable,
 		IEquatable<NetworkSkillLoadoutEntry>
 	{
-		public SkillSlot Slot;
+		public KeyMapping Slot;
 		public FixedString64Bytes SkillId;
 
-		public NetworkSkillLoadoutEntry(SkillSlot slot, string skillId)
+		public NetworkSkillLoadoutEntry(KeyMapping slot, string skillId)
 		{
 			Slot = slot;
 			SkillId = new FixedString64Bytes(skillId);
@@ -67,7 +67,7 @@ namespace RAW.Network
 			serializer.SerializeValue(ref SkillId);
 
 			if (serializer.IsReader)
-				Slot = (SkillSlot)slotValue;
+				Slot = (KeyMapping)slotValue;
 		}
 
 		public bool Equals(NetworkSkillLoadoutEntry other)
@@ -162,7 +162,7 @@ namespace RAW.Network
 
 			skillLoadout.Clear();
 
-			HashSet<SkillSlot> assignedSlots = new HashSet<SkillSlot>();
+			HashSet<KeyMapping> assignedSlots = new HashSet<KeyMapping>();
 
 			for (int i = 0; i < defaultSkillLoadout.Count; i++)
 			{
@@ -174,7 +174,7 @@ namespace RAW.Network
 					continue;
 				}
 
-				if (!Enum.IsDefined(typeof(SkillSlot), entry.Slot))
+				if (!Enum.IsDefined(typeof(KeyMapping), entry.Slot))
 				{
 					Debug.LogError($"유효하지 않은 스킬 슬롯입니다: {entry.Slot}", this);
 					continue;
@@ -196,7 +196,7 @@ namespace RAW.Network
 			}
 		}
 
-		public bool TryGetSkillForSlot(SkillSlot slot, out SkillSpec skill)
+		public bool TryGetSkillForSlot(KeyMapping slot, out SkillSpec skill)
 		{
 			if (!TryGetSkillIdForSlot(slot, out string skillId))
 			{
@@ -207,7 +207,7 @@ namespace RAW.Network
 			return skillCatalog.TryGetSkill(skillId, out skill);
 		}
 
-		private bool TryGetSkillIdForSlot(SkillSlot slot, out string skillId)
+		private bool TryGetSkillIdForSlot(KeyMapping slot, out string skillId)
 		{
 			for (int i = 0; i < skillLoadout.Count; i++)
 			{
@@ -235,7 +235,7 @@ namespace RAW.Network
 			return skillCatalog.TryGetSkill(skillId, out skill);
 		}
 
-		public void RequestUseSkill(SkillSlot skillSlot)
+		public void RequestUseSkill(KeyMapping skillSlot)
 		{
 			if (!IsSpawned)
 			{
@@ -249,7 +249,7 @@ namespace RAW.Network
 				return;
 			}
 
-			if (!Enum.IsDefined(typeof(SkillSlot), skillSlot))
+			if (!Enum.IsDefined(typeof(KeyMapping), skillSlot))
 			{
 				Debug.LogWarning($"유효하지 않은 스킬 슬롯입니다: {skillSlot}", this);
 				return;
@@ -266,17 +266,17 @@ namespace RAW.Network
 		}
 
 		[Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Owner)]
-		private void RequestUseSkillRpc(SkillSlot skillSlot)
+		private void RequestUseSkillRpc(KeyMapping skillSlot)
 		{
 			TryStartSkillOnServer(skillSlot);
 		}
 
-		private bool TryStartSkillOnServer(SkillSlot skillSlot)
+		private bool TryStartSkillOnServer(KeyMapping skillSlot)
 		{
 			if (!IsServer)
 				return false;
 
-			if (!Enum.IsDefined(typeof(SkillSlot), skillSlot))
+			if (!Enum.IsDefined(typeof(KeyMapping), skillSlot))
 			{
 				Debug.LogWarning($"스킬 요청 거절: 유효하지 않은 슬롯입니다. OwnerClientId={OwnerClientId}, Slot={skillSlot}", this);
 				return false;
@@ -391,7 +391,7 @@ namespace RAW.Network
 			if (!CanRunOwnerTest())
 				return;
 
-			RequestUseSkill(SkillSlot.W);
+			RequestUseSkill(KeyMapping.W);
 		}
 
 		[ContextMenu("Test - Request Invalid Slot")]
@@ -400,7 +400,7 @@ namespace RAW.Network
 			if (!CanRunOwnerTest())
 				return;
 
-			RequestUseSkill((SkillSlot)999);
+			RequestUseSkill((KeyMapping)999);
 		}
 
 		[ContextMenu("Test - Print W Skill Cooldown")]
@@ -409,7 +409,7 @@ namespace RAW.Network
 			if (!CanRunOwnerTest())
 				return;
 
-			if (!TryGetSkillForSlot(SkillSlot.W, out SkillSpec skill))
+			if (!TryGetSkillForSlot(KeyMapping.W, out SkillSpec skill))
 			{
 				Debug.LogWarning("W 슬롯에 등록된 스킬이 없습니다.", this);
 				return;

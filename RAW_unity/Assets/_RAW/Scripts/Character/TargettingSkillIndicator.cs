@@ -7,7 +7,7 @@ public class TargettingSkillIndicator : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
 
 
-    public SkillTargetRelation target = SkillTargetRelation.None;
+    public TargettingSkillTarget target = TargettingSkillTarget.None;
     public bool isTargetting;
     [SerializeField] private LayerMask currentTargetLayer;
     public GameObject targetableIndicator;
@@ -38,11 +38,11 @@ public class TargettingSkillIndicator : MonoBehaviour
 
     void SetLayer()
     {
-        if (target == SkillTargetRelation.Enemy)
+        if (target == TargettingSkillTarget.Enemy)
         {
             currentTargetLayer = LayerMask.GetMask("Enemy");
         }
-        else if (target == SkillTargetRelation.Ally)
+        else if (target == TargettingSkillTarget.Ally)
         {
             currentTargetLayer = LayerMask.GetMask("Ally");
         }

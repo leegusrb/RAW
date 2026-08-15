@@ -1,8 +1,8 @@
 public interface ISkillRuntime
 {
-    bool TryGetSkillForSlot(SkillSlot slot, out SkillSpec skill);
+    bool TryGetSkillForSlot(KeyMapping slot, out SkillSpec skill);
 
 	double GetRemainingCooldown(string skillId);
 
-	SkillUseHandlingResult RequestUseSkill(SkillSlot slot);
+	SkillUseRequestResult RequestUseSkill(KeyMapping slot);
 }

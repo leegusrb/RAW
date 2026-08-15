@@ -1,4 +1,4 @@
-public enum SkillTargetRelation
+public enum TargettingSkillTarget
 {
     None = 0,
 	Enemy = 1,

@@ -20,8 +20,8 @@ public class SkillSpec : ScriptableObject
     //public string skillName;
     //public string iconDirectory;
     //public string description;
-    public SkillCastType castType;
-    public SkillTargetRelation targettingSkillTarget;
+    public CastType castType;
+    public TargettingSkillTarget targettingSkillTarget;
     //public string dealType;
     //public int maxLevel;
     //public Vector2 radius;

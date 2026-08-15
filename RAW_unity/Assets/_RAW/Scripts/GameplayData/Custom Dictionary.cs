@@ -102,7 +102,7 @@ namespace CustomDict
     public class CustomDictBodyColor : SerializableDictionary<EquipmentSlot, Color> { }
 
     [Serializable]
-    public class CustomDictKeyMap : SerializableDictionary<SkillSlot, KeyCode> { }
+    public class CustomDictKeyMap : SerializableDictionary<KeyMapping, KeyCode> { }
 
     [Serializable]
     public class CustomDictSkill : SerializableDictionary<string, SkillSpec> { };

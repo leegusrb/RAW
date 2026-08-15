@@ -12,13 +12,13 @@ public class SkillObject : MonoBehaviour
         targetEnemy = skillTargetEnemy;
         Destroy(gameObject, spec.remainTime);
 
-        if (spec.castType == SkillCastType.target)
+        if (spec.castType == CastType.target)
             ApplyDamageToTarget();
     }
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (spec == null || spec.castType == SkillCastType.target || hasAppliedDamage)
+        if (spec == null || spec.castType == CastType.target || hasAppliedDamage)
             return;
 
         Enemy enemy = other.GetComponentInParent<Enemy>();
