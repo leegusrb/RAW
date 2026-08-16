@@ -23,6 +23,9 @@ namespace RAW.Network
 
 		private uint nextRequestSequence;
 
+		private uint lastReceivedRequestSequence;
+		private bool hasReceivedRequestSequence;
+
 		public event Action CooldownChanged;
 		public event Action LoadoutChanged;
 
@@ -71,8 +74,16 @@ namespace RAW.Network
 			cooldownList.OnListChanged += HandleCooldownListChanged;
 			skillLoadout.OnListChanged += HandleSkillLoadoutChanged;
 
+			if (IsOwner)
+				nextRequestSequence = 0;
+
 			if (IsServer)
+			{
+				lastReceivedRequestSequence = 0;
+				hasReceivedRequestSequence = false;
+
 				InitializeDefaultLoadoutOnServer();
+			}
 		}
 
 		public override void OnNetworkDespawn()
@@ -203,6 +214,19 @@ namespace RAW.Network
 			if (!IsServer)
 				return false;
 
+			if (!TryRegisterRequestSequence(request.RequestSequence))
+			{
+				Debug.LogWarning(
+					$"스킬 요청 무시: 중복되었거나 이전 요청입니다. " +
+					$"OwnerClientId={OwnerClientId}, " +
+					$"Sequence={request.RequestSequence}, " +
+					$"LastSequence={lastReceivedRequestSequence}",
+					this
+				);
+				
+				return false;
+			}
+
 			string skillId = request.SkillId.ToString();
 
 			if (string.IsNullOrWhiteSpace(skillId))
@@ -270,6 +294,31 @@ namespace RAW.Network
 			Debug.Log($"스킬 요청 승인: OwnerClientId={OwnerClientId}, SkillId={skillId}, Mana={characterState.MP}, Cooldown={skill.CooldownSeconds:F2}, Sequence={request.RequestSequence}", this);
 
 			return true;
+		}
+
+		private bool TryRegisterRequestSequence(uint requestSequence)
+		{
+			if (requestSequence == 0)
+				return false;
+
+			if (hasReceivedRequestSequence &&
+				!IsNewerRequestSequence(
+					requestSequence,
+					lastReceivedRequestSequence
+				))
+			{
+				return false;
+			}
+
+			lastReceivedRequestSequence = requestSequence;
+			hasReceivedRequestSequence = true;
+
+			return true;
+		}
+
+		private static bool IsNewerRequestSequence(uint candidate, uint previous)
+		{
+			return unchecked((int)(candidate - previous)) > 0;
 		}
 
 		private bool IsSkillEquipped(FixedString64Bytes skillId)
