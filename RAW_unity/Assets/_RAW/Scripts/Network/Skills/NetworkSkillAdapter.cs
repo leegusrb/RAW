@@ -2,6 +2,8 @@ using UnityEngine;
 
 namespace RAW.Network
 {
+	[DisallowMultipleComponent]
+	[RequireComponent(typeof(NetworkSkillController))]
 	public class NetworkSkillAdapter :
 		MonoBehaviour,
 		ISkillRuntime

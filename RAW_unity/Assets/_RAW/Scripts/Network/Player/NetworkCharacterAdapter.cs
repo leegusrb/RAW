@@ -1,3 +1,4 @@
+using System;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -5,6 +6,7 @@ namespace RAW.Network
 {
     [DisallowMultipleComponent]
     [RequireComponent(typeof(NetworkObject))]
+	[RequireComponent(typeof(Char_Control))]
     public class NetworkCharacterAdapter : NetworkBehaviour
     {
         [SerializeField] private Char_Control characterControl;
