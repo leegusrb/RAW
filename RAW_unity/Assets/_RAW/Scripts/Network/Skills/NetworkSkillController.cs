@@ -1,81 +1,10 @@
 using System;
 using System.Collections.Generic;
-using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
 
 namespace RAW.Network
 {
-	[Serializable]
-	public class DefaultSkillLoadoutEntry
-	{
-		[SerializeField] private KeyMapping slot;
-		[SerializeField] private SkillSpec skill;
-
-		public KeyMapping Slot => slot;
-		public SkillSpec Skill => skill;
-	}
-
-	[Serializable]
-	public struct NetworkSkillCooldownEntry :
-		INetworkSerializable,
-		IEquatable<NetworkSkillCooldownEntry>
-	{
-		public FixedString64Bytes SkillId;
-		public double CooldownEndTime;
-
-		public NetworkSkillCooldownEntry(string skillId, double cooldownEndTime)
-		{
-			SkillId = new FixedString64Bytes(skillId);
-			CooldownEndTime = cooldownEndTime;
-		}
-
-		public void NetworkSerialize<T>(BufferSerializer<T> serializer)
-			where T : IReaderWriter
-		{
-			serializer.SerializeValue(ref SkillId);
-			serializer.SerializeValue(ref CooldownEndTime);
-		}
-
-		public bool Equals(NetworkSkillCooldownEntry other)
-		{
-			return SkillId.Equals(other.SkillId) &&
-				CooldownEndTime.Equals(other.CooldownEndTime);
-		}
-	}
-
-	[Serializable]
-	public struct NetworkSkillLoadoutEntry :
-		INetworkSerializable,
-		IEquatable<NetworkSkillLoadoutEntry>
-	{
-		public KeyMapping Slot;
-		public FixedString64Bytes SkillId;
-
-		public NetworkSkillLoadoutEntry(KeyMapping slot, string skillId)
-		{
-			Slot = slot;
-			SkillId = new FixedString64Bytes(skillId);
-		}
-
-		public void NetworkSerialize<T>(BufferSerializer<T> serializer)
-			where T : IReaderWriter
-		{
-			int slotValue = (int)Slot;
-
-			serializer.SerializeValue(ref slotValue);
-			serializer.SerializeValue(ref SkillId);
-
-			if (serializer.IsReader)
-				Slot = (KeyMapping)slotValue;
-		}
-
-		public bool Equals(NetworkSkillLoadoutEntry other)
-		{
-			return Slot == other.Slot && SkillId.Equals(other.SkillId);
-		}
-	}
-
 	[DisallowMultipleComponent]
 	[RequireComponent(typeof(NetworkObject))]
 	[RequireComponent(typeof(NetworkCharacterState))]
