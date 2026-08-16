@@ -4,7 +4,7 @@ using UnityEngine;
 [Serializable]
 public class SkillCastEvent
 {
-    public long casterObjectId;
+    public ulong casterObjectId;
 	public string skillId;
 
 	public Vector3 casterPosition;

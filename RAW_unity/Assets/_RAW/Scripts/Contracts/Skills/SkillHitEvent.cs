@@ -4,8 +4,8 @@ using UnityEngine;
 [Serializable]
 public class SkillHitEvent
 {
-	public ulong casterEntityId;
-	public ulong targetEntityId;
+	public ulong casterObjectId;
+	public ulong targetObjectId;
 	
 	public string skillId;
 
