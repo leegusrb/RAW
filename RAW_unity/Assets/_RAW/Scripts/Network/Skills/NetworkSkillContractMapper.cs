@@ -1,6 +1,5 @@
 using System.Text;
 using Unity.Collections;
-using UnityEngine;
 
 namespace RAW.Network
 {
@@ -43,6 +42,16 @@ namespace RAW.Network
 				target.targetPosition,
 				target.targetObjectId
 			);
+		}
+
+		public static SkillUseRejectedEvent ToContract(NetworkSkillUseRejectedEvent networkEvent)
+		{
+			return new SkillUseRejectedEvent
+			{
+				skillId = networkEvent.SkillId.ToString(),
+				requestSequence = networkEvent.RequestSequence,
+				reason = networkEvent.Reason
+			};
 		}
 	}
 }

@@ -28,6 +28,8 @@ namespace RAW.Network
 
 		public event Action CooldownChanged;
 		public event Action LoadoutChanged;
+		
+		public event Action<SkillUseRejectedEvent> SkillUseRejected;
 
 		private void Reset()
 		{
@@ -238,13 +240,15 @@ namespace RAW.Network
 				))
 			{
 				Debug.LogWarning(
-					$"스킬 요청 거철: " +
+					$"스킬 요청 거절: " +
 					$"OwnerClientId={OwnerClientId}, " +
 					$"SkillId={skillId}, " +
 					$"Sequence={request.RequestSequence}, " +
 					$"Reason={rejectionReason}",
 					this
 				);
+
+				SendSkillUseRejected(request, rejectionReason);
 
 				return false;
 			}
@@ -257,6 +261,11 @@ namespace RAW.Network
 					$"SkillId={skillId}, " +
 					$"Sequence={request.RequestSequence}",
 					this
+				);
+
+				SendSkillUseRejected(
+					request,
+					SkillUseRejectionReason.NotEnoughResource
 				);
 
 				return false;
@@ -440,9 +449,14 @@ namespace RAW.Network
 			networkRequest.RequestSequence = IssueRequestSequence();
 
 			if (IsServer)
-				return TryStartSkillOnServer(networkRequest);
+			{
+				TryStartSkillOnServer(networkRequest);
+			}
+			else
+			{
+				RequestUseSkillRpc(networkRequest);
+			}
 
-			RequestUseSkillRpc(networkRequest);
 			return true;
 		}
 
@@ -455,6 +469,30 @@ namespace RAW.Network
 			while (nextRequestSequence == 0);
 
 			return nextRequestSequence;
+		}
+
+		private void SendSkillUseRejected(NetworkSkillUseRequest request, SkillUseRejectionReason reason)
+		{
+			if (!IsServer)
+				return;
+
+			NetworkSkillUseRejectedEvent networkEvent =
+				new NetworkSkillUseRejectedEvent(
+					request.SkillId,
+					request.RequestSequence,
+					reason
+				);
+
+			NotifySkillUseRejectedRpc(networkEvent);
+		}
+
+		[Rpc(SendTo.Owner, InvokePermission = RpcInvokePermission.Server)]
+		private void NotifySkillUseRejectedRpc(NetworkSkillUseRejectedEvent networkEvent)
+		{
+			SkillUseRejectedEvent rejectedEvent =
+				NetworkSkillContractMapper.ToContract(networkEvent);
+
+			SkillUseRejected?.Invoke(rejectedEvent);
 		}
 
 		private void HandleCooldownListChanged(NetworkListEvent<NetworkSkillCooldownEntry> changeEvent)
