@@ -5,6 +5,7 @@ namespace RAW.Network
 {
 	[DisallowMultipleComponent]
 	[RequireComponent(typeof(NetworkObject))]
+	[RequireComponent(typeof(Char_State))]
 	public class NetworkCharacterState : NetworkBehaviour
 	{
 		[SerializeField] private Char_State characterState;
@@ -33,6 +34,22 @@ namespace RAW.Network
 		public int HP => healthPoint.Value;
 		public int MP => manaPoint.Value;
 		public bool IsMovable => isMovable.Value;
+
+		private void Reset()
+		{
+			CacheComponents();
+		}
+
+		private void Awake()
+		{
+			CacheComponents();
+		}
+
+		private void CacheComponents()
+		{
+			if (characterState == null)
+				characterState = GetComponent<Char_State>();
+		}
 
 		public override void OnNetworkSpawn()
 		{
