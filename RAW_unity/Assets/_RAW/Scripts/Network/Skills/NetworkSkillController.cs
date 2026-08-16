@@ -20,8 +20,8 @@ namespace RAW.Network
 		private NetworkList<NetworkSkillCooldownEntry> cooldownList;
 		private NetworkList<NetworkSkillLoadoutEntry> skillLoadout;
 
-		public event Action OnCooldownChanged;
-		public event Action OnLoadoutChanged;
+		public event Action CooldownChanged;
+		public event Action LoadoutChanged;
 
 		private void Reset()
 		{
@@ -303,13 +303,13 @@ namespace RAW.Network
 		private void HandleCooldownListChanged(NetworkListEvent<NetworkSkillCooldownEntry> changeEvent)
 		{
 			if (IsOwner)
-				OnCooldownChanged?.Invoke();
+				CooldownChanged?.Invoke();
 		}
 
 		private void HandleSkillLoadoutChanged(NetworkListEvent<NetworkSkillLoadoutEntry> changeEvent)
 		{
 			if (IsOwner)
-				OnLoadoutChanged?.Invoke();
+				LoadoutChanged?.Invoke();
 		}
 
 #if UNITY_EDITOR

@@ -132,19 +132,19 @@ namespace RAW.Network
 				return false;
 			}
 
-			if (!TryNormalizeUserId(userId, out string normalizeUserId))
+			if (!TryNormalizeUserId(userId, out string normalizedUserId))
 			{
 				Debug.LogError("사용자 ID가 올바르지 않습니다.", this);
 				return false;
 			}
 
-			developmentUserId = normalizeUserId;
+			developmentUserId = normalizedUserId;
 			return true;
 		}
 
-		private static bool TryNormalizeUserId(string userId, out string normalizeUserId)
+		private static bool TryNormalizeUserId(string userId, out string normalizedUserId)
 		{
-			normalizeUserId = null;
+			normalizedUserId = null;
 
 			if (string.IsNullOrWhiteSpace(userId))
 				return false;
@@ -168,13 +168,13 @@ namespace RAW.Network
 					return false;
 			}
 
-			normalizeUserId = trimmedUserId;
+			normalizedUserId = trimmedUserId;
 			return true;
 		}
 
 		private bool TryConfigureConnectionPayload()
 		{
-			if (!TryNormalizeUserId(developmentUserId, out string normalizeUserId))
+			if (!TryNormalizeUserId(developmentUserId, out string normalizedUserId))
 			{
 				Debug.LogError("개발용 사용자 ID가 올바르지 않습니다.", this);
 				return false;
@@ -184,7 +184,7 @@ namespace RAW.Network
 				new NetworkConnectionPayload
 				{
 					protocolVersion = CurrentProtocolVersion,
-					userId = normalizeUserId
+					userId = normalizedUserId
 				};
 
 			string json = JsonUtility.ToJson(payload);
@@ -248,11 +248,11 @@ namespace RAW.Network
 		{
 			clientId = default;
 
-			if (!TryNormalizeUserId(userId, out string normalizeUserId))
+			if (!TryNormalizeUserId(userId, out string normalizedUserId))
 				return false;
 
 			return clientIdByUserId.TryGetValue(
-				normalizeUserId,
+				normalizedUserId,
 				out clientId
 			);
 		}
@@ -384,13 +384,13 @@ namespace RAW.Network
 				return;
 			}
 
-			if (!TryNormalizeUserId(payload.userId, out string normalizeUserId))
+			if (!TryNormalizeUserId(payload.userId, out string normalizedUserId))
 			{
 				RejectConnection(response, "사용자 ID가 올바르지 않습니다.");
 				return;
 			}
 
-			if (!TryReserveUserIdentity(request.ClientNetworkId, normalizeUserId, out string rejectionReason))
+			if (!TryReserveUserIdentity(request.ClientNetworkId, normalizedUserId, out string rejectionReason))
 			{
 				RejectConnection(response, rejectionReason);
 				return;
@@ -402,7 +402,7 @@ namespace RAW.Network
 			Debug.Log(
 				$"접속 승인: " +
 				$"ClientId={request.ClientNetworkId}, " +
-				$"UserId={normalizeUserId}, " +
+				$"UserId={normalizedUserId}, " +
 				$"Protocol={payload.protocolVersion}",
 				this
 			);

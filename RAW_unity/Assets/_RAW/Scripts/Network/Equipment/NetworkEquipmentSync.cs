@@ -57,9 +57,9 @@ namespace RAW.Network
 			inventory.OnEquipmentChanged += HandleLocalEquipmentChanged;
 
 			if (IsServer)
-				WriteInventoryToNetworkList();
+				WriteEquipmentToNetworkState();
 			else
-				ApplyNetworkListToInventory();
+				ApplyNetworkStateToEquipment();
 		}
 
 		public override void OnNetworkDespawn()
@@ -234,7 +234,7 @@ namespace RAW.Network
 
 			if (IsServer)
 			{
-				WriteInventoryToNetworkList();
+				WriteEquipmentToNetworkState();
 			}
 			else
 			{
@@ -244,7 +244,7 @@ namespace RAW.Network
 			}
 		}
 
-		private void WriteInventoryToNetworkList()
+		private void WriteEquipmentToNetworkState()
 		{
 			if (!IsServer || inventory == null)
 				return;
@@ -284,10 +284,10 @@ namespace RAW.Network
 				return;
 
 			applyQueued = false;
-			ApplyNetworkListToInventory();
+			ApplyNetworkStateToEquipment();
 		}
 
-		private void ApplyNetworkListToInventory()
+		private void ApplyNetworkStateToEquipment()
 		{
 			if (inventory == null)
 				return;

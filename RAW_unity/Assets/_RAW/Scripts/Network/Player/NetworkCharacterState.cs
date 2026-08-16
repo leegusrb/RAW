@@ -142,7 +142,7 @@ namespace RAW.Network
 			isMovable.Value = movable;
 		}
 
-		public bool InitializePersistentStateOnServer(int loadedHeathPoint, int loadedManaPoint)
+		public bool InitializePersistentStateOnServer(int loadedHealthPoint, int loadedManaPoint)
 		{
 			if (!IsSpawned || !IsServer)
 			{
@@ -156,7 +156,7 @@ namespace RAW.Network
 				return false;
 			}
 
-			healthPoint.Value = Mathf.Max(0, loadedHeathPoint);
+			healthPoint.Value = Mathf.Max(0, loadedHealthPoint);
 			manaPoint.Value = Mathf.Max(0, loadedManaPoint);
 
 			isMovable.Value = healthPoint.Value > 0;
