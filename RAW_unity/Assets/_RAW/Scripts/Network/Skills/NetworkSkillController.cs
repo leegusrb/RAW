@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -19,6 +20,8 @@ namespace RAW.Network
 
 		private NetworkList<NetworkSkillCooldownEntry> cooldownList;
 		private NetworkList<NetworkSkillLoadoutEntry> skillLoadout;
+
+		private uint nextRequestSequence;
 
 		public event Action CooldownChanged;
 		public event Action LoadoutChanged;
@@ -164,62 +167,79 @@ namespace RAW.Network
 			return skillCatalog.TryGetSkill(skillId, out skill);
 		}
 
-		public void RequestUseSkill(KeyMapping skillSlot)
+		public bool TryRequestUseSkill(KeyMapping skillSlot)
 		{
-			if (!IsSpawned)
-			{
-				Debug.LogWarning("NetworkPlayer가 아직 Spawn되지 않았습니다.", this);
-				return;
-			}
-
-			if (!IsOwner)
-			{
-				Debug.LogWarning("자신이 소유한 캐릭터만 스킬을 요청할 수 있습니다.", this);
-				return;
-			}
-
 			if (!Enum.IsDefined(typeof(KeyMapping), skillSlot))
 			{
 				Debug.LogWarning($"유효하지 않은 스킬 슬롯입니다: {skillSlot}", this);
-				return;
+				return false;
 			}
 
-			if (IsServer)
+			if (!TryGetSkillForSlot(skillSlot, out SkillSpec skill))
 			{
-				TryStartSkillOnServer(skillSlot);
+				Debug.LogWarning($"스킬이 장착되지 않은 슬롯입니다: {skillSlot}");
+				return false;
 			}
-			else
-			{
-				RequestUseSkillRpc(skillSlot);
-			}
+			
+			SkillUseRequest request =
+				new SkillUseRequest
+				{
+					skillId = skill.SkillId,
+					requestSequence = 0,
+					target = null
+				};
+
+			return TryRequestUseSkill(request);
 		}
 
 		[Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Owner)]
-		private void RequestUseSkillRpc(KeyMapping skillSlot)
+		private void RequestUseSkillRpc(NetworkSkillUseRequest request)
 		{
-			TryStartSkillOnServer(skillSlot);
+			TryStartSkillOnServer(request);
 		}
 
-		private bool TryStartSkillOnServer(KeyMapping skillSlot)
+		private bool TryStartSkillOnServer(NetworkSkillUseRequest request)
 		{
 			if (!IsServer)
 				return false;
 
-			if (!Enum.IsDefined(typeof(KeyMapping), skillSlot))
-			{
-				Debug.LogWarning($"스킬 요청 거절: 유효하지 않은 슬롯입니다. OwnerClientId={OwnerClientId}, Slot={skillSlot}", this);
-				return false;
-			}
+			string skillId = request.SkillId.ToString();
 
-			if (!TryGetSkillIdForSlot(skillSlot, out string skillId))
+			if (string.IsNullOrWhiteSpace(skillId))
 			{
-				Debug.LogWarning($"스킬 요청 거절: 비어 있는 스킬 슬롯입니다. OwnerClientId={OwnerClientId}, Slot={skillSlot}", this);
+				Debug.LogWarning(
+					$"스킬 요청 거절: SkillId가 비어 있습니다. " +
+					$"OwnerClientId={OwnerClientId}, " +
+					$"Sequence={request.RequestSequence}",
+					this
+				);
+
 				return false;
 			}
 
 			if (!skillCatalog.TryGetSkill(skillId, out SkillSpec skill))
 			{
-				Debug.LogWarning($"스킬 요청 거절: 등록되지 않은 스킬입니다. OwnerClientId={OwnerClientId}, Slot={skillSlot}, SkillId={skillId}", this);
+				Debug.LogWarning(
+					$"스킬 요청 거절: 등록되지 않은 스킬입니다. " +
+					$"OwnerClientId={OwnerClientId}, " +
+					$"SkillId={skillId}, " +
+					$"Sequence={request.RequestSequence}",
+					this
+				);
+
+				return false;
+			}
+
+			if (!IsSkillEquipped(request.SkillId))
+			{
+				Debug.LogWarning(
+					$"스킬 요청 거절: 장착되지 않은 스킬입니다. " +
+					$"OwnerClientId={OwnerClientId}, " +
+					$"SkillId={skillId}, " +
+					$"Sequence={request.RequestSequence}",
+					this
+				);
+
 				return false;
 			}
 
@@ -247,9 +267,20 @@ namespace RAW.Network
 
 			SetCooldownOnServer(skillId, skill.CooldownSeconds, serverTime);
 
-			Debug.Log($"스킬 요청 승인: OwnerClientId={OwnerClientId}, Slot={skillSlot}, SkillId={skillId}, Mana={characterState.MP}, Cooldown={skill.CooldownSeconds:F2}", this);
+			Debug.Log($"스킬 요청 승인: OwnerClientId={OwnerClientId}, SkillId={skillId}, Mana={characterState.MP}, Cooldown={skill.CooldownSeconds:F2}, Sequence={request.RequestSequence}", this);
 
 			return true;
+		}
+
+		private bool IsSkillEquipped(FixedString64Bytes skillId)
+		{
+			for (int i = 0; i < skillLoadout.Count; i++)
+			{
+				if (skillLoadout[i].SkillId.Equals(skillId))
+					return true;
+			}
+
+			return false;
 		}
 
 		public double GetRemainingCooldown(string skillId)
@@ -298,7 +329,50 @@ namespace RAW.Network
 				cooldownList[index] = entry;
 			else
 				cooldownList.Add(entry);
-		}	
+		}
+
+		public bool TryRequestUseSkill(SkillUseRequest request)
+		{
+			if (!IsSpawned)
+			{
+				Debug.LogWarning("NetworkPlayer가 아직 Spawn되지 않았습니다.", this);
+				return false;
+			}
+
+			if (!IsOwner)
+			{
+				Debug.LogWarning("자신이 소유한 캐릭터만 스킬을 요청할 수 있습니다.", this);
+				return false;
+			}
+
+			if (!NetworkSkillContractMapper.TryToNetwork(
+				request,
+				out NetworkSkillUseRequest networkRequest
+			))
+			{
+				Debug.LogWarning("스킬 요청을 네트워크 데이터로 변환할 수 없습니다.", this);
+				return false;
+			}
+
+			networkRequest.RequestSequence = IssueRequestSequence();
+
+			if (IsServer)
+				return TryStartSkillOnServer(networkRequest);
+
+			RequestUseSkillRpc(networkRequest);
+			return true;
+		}
+
+		private uint IssueRequestSequence()
+		{
+			do
+			{
+				nextRequestSequence++;
+			}
+			while (nextRequestSequence == 0);
+
+			return nextRequestSequence;
+		}
 
 		private void HandleCooldownListChanged(NetworkListEvent<NetworkSkillCooldownEntry> changeEvent)
 		{
@@ -320,7 +394,7 @@ namespace RAW.Network
 			if (!CanRunOwnerTest())
 				return;
 
-			RequestUseSkill(KeyMapping.W);
+			TryRequestUseSkill(KeyMapping.W);
 		}
 
 		[ContextMenu("Test - Request Invalid Slot")]
@@ -329,7 +403,7 @@ namespace RAW.Network
 			if (!CanRunOwnerTest())
 				return;
 
-			RequestUseSkill((KeyMapping)999);
+			TryRequestUseSkill((KeyMapping)999);
 		}
 
 		[ContextMenu("Test - Print W Skill Cooldown")]
