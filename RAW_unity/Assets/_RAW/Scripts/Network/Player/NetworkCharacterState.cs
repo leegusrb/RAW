@@ -5,6 +5,7 @@ namespace RAW.Network
 {
 	[DisallowMultipleComponent]
 	[RequireComponent(typeof(NetworkObject))]
+	[RequireComponent(typeof(Char_State))]
 	public class NetworkCharacterState : NetworkBehaviour
 	{
 		[SerializeField] private Char_State characterState;
@@ -33,6 +34,22 @@ namespace RAW.Network
 		public int HP => healthPoint.Value;
 		public int MP => manaPoint.Value;
 		public bool IsMovable => isMovable.Value;
+
+		private void Reset()
+		{
+			CacheComponents();
+		}
+
+		private void Awake()
+		{
+			CacheComponents();
+		}
+
+		private void CacheComponents()
+		{
+			if (characterState == null)
+				characterState = GetComponent<Char_State>();
+		}
 
 		public override void OnNetworkSpawn()
 		{
@@ -125,7 +142,7 @@ namespace RAW.Network
 			isMovable.Value = movable;
 		}
 
-		public bool InitializePersistentStateOnServer(int loadedHeathPoint, int loadedManaPoint)
+		public bool InitializePersistentStateOnServer(int loadedHealthPoint, int loadedManaPoint)
 		{
 			if (!IsSpawned || !IsServer)
 			{
@@ -139,7 +156,7 @@ namespace RAW.Network
 				return false;
 			}
 
-			healthPoint.Value = Mathf.Max(0, loadedHeathPoint);
+			healthPoint.Value = Mathf.Max(0, loadedHealthPoint);
 			manaPoint.Value = Mathf.Max(0, loadedManaPoint);
 
 			isMovable.Value = healthPoint.Value > 0;

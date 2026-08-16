@@ -1,3 +1,4 @@
+using System;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -5,6 +6,7 @@ namespace RAW.Network
 {
     [DisallowMultipleComponent]
     [RequireComponent(typeof(NetworkObject))]
+	[RequireComponent(typeof(Char_Control))]
     public class NetworkCharacterAdapter : NetworkBehaviour
     {
         [SerializeField] private Char_Control characterControl;
@@ -44,11 +46,11 @@ namespace RAW.Network
             if (IsServer)
                 isFacingLeft.Value  = currentFacingLeft;
             else
-                SubmitFacingRPC(currentFacingLeft);
+                SubmitFacingRpc(currentFacingLeft);
         }
 
         [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Owner)]
-        private void SubmitFacingRPC(bool facingLeft)
+        private void SubmitFacingRpc(bool facingLeft)
         {
             isFacingLeft.Value = facingLeft;
         }
@@ -146,7 +148,7 @@ namespace RAW.Network
 			if (IsServer)
 				isFacingLeft.Value = facingLeft;
 			else
-				SubmitFacingRPC(facingLeft);
+				SubmitFacingRpc(facingLeft);
 		}
     }
 }
