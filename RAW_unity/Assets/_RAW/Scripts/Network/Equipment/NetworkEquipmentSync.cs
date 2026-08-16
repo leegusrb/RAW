@@ -40,6 +40,7 @@ namespace RAW.Network
 
 	[DisallowMultipleComponent]
 	[RequireComponent(typeof(NetworkObject))]
+	[RequireComponent(typeof(Char_Inventory))]
 	public class NetworkEquipmentSync : NetworkBehaviour
 	{
 		[SerializeField] private Char_Inventory inventory;
