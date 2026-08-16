@@ -7,14 +7,6 @@ using UnityEngine;
 
 namespace RAW.Network
 {
-	public enum PlayerDataLoadState
-	{
-		None,
-		Loading,
-		Ready,
-		Failed
-	}
-
 	[DisallowMultipleComponent]
 	public sealed class ServerPlayerSessionManager : MonoBehaviour
 	{
