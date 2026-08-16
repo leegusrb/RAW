@@ -227,71 +227,52 @@ namespace RAW.Network
 				return false;
 			}
 
-			string skillId = request.SkillId.ToString();
-
-			if (string.IsNullOrWhiteSpace(skillId))
-			{
-				Debug.LogWarning(
-					$"스킬 요청 거절: SkillId가 비어 있습니다. " +
-					$"OwnerClientId={OwnerClientId}, " +
-					$"Sequence={request.RequestSequence}",
-					this
-				);
-
-				return false;
-			}
-
-			if (!skillCatalog.TryGetSkill(skillId, out SkillSpec skill))
-			{
-				Debug.LogWarning(
-					$"스킬 요청 거절: 등록되지 않은 스킬입니다. " +
-					$"OwnerClientId={OwnerClientId}, " +
-					$"SkillId={skillId}, " +
-					$"Sequence={request.RequestSequence}",
-					this
-				);
-
-				return false;
-			}
-
-			if (!IsSkillEquipped(request.SkillId))
-			{
-				Debug.LogWarning(
-					$"스킬 요청 거절: 장착되지 않은 스킬입니다. " +
-					$"OwnerClientId={OwnerClientId}, " +
-					$"SkillId={skillId}, " +
-					$"Sequence={request.RequestSequence}",
-					this
-				);
-
-				return false;
-			}
-
-			if (characterState.HP <= 0 || !characterState.IsMovable)
-			{
-				Debug.LogWarning($"스킬 요청 거절: 현재 스킬을 사용할 수 없는 상태입니다. OwnerClientId={OwnerClientId}, SkillId={skillId}", this);
-				return false;
-			}
-
 			double serverTime = NetworkManager.ServerTime.Time;
 
-			double remainingCooldown = GetRemainingCooldownAt(skillId, serverTime);
-
-			if (remainingCooldown > 0d)
+			if (!TryValidateSkillUseOnServer(
+					request,
+					serverTime,
+					out string skillId,
+					out SkillSpec skill,
+					out SkillUseRejectionReason rejectionReason
+				))
 			{
-				Debug.LogWarning($"스킬 요청 거절: 쿨다운 중입니다. OwnerClientId={OwnerClientId}, SkillId={skillId}, Remaining={remainingCooldown:F2}", this);
+				Debug.LogWarning(
+					$"스킬 요청 거철: " +
+					$"OwnerClientId={OwnerClientId}, " +
+					$"SkillId={skillId}, " +
+					$"Sequence={request.RequestSequence}, " +
+					$"Reason={rejectionReason}",
+					this
+				);
+
 				return false;
 			}
 
 			if (skill.ManaCost > 0 && !characterState.TryConsumeMana(skill.ManaCost))
 			{
-				Debug.LogWarning($"스킬 요청 거절: 마나가 부족합니다. OwnerClientId={OwnerClientId}, SkillId={skillId}, Required={skill.ManaCost}, Current={characterState.MP}", this);
+				Debug.LogWarning(
+					$"스킬 요청 상태 반영 실패: " +
+					$"OwnerClientId={OwnerClientId}, " +
+					$"SkillId={skillId}, " +
+					$"Sequence={request.RequestSequence}",
+					this
+				);
+
 				return false;
 			}
 
 			SetCooldownOnServer(skillId, skill.CooldownSeconds, serverTime);
 
-			Debug.Log($"스킬 요청 승인: OwnerClientId={OwnerClientId}, SkillId={skillId}, Mana={characterState.MP}, Cooldown={skill.CooldownSeconds:F2}, Sequence={request.RequestSequence}", this);
+			Debug.Log(
+				$"스킬 요청 승인: " +
+				$"OwnerClientId={OwnerClientId}, " +
+				$"SkillId={skillId}, " +
+				$"Mana={characterState.MP}, " +
+				$"Cooldown={skill.CooldownSeconds:F2}, " +
+				$"Sequence={request.RequestSequence}",
+				this
+			);
 
 			return true;
 		}
@@ -378,6 +359,59 @@ namespace RAW.Network
 				cooldownList[index] = entry;
 			else
 				cooldownList.Add(entry);
+		}
+
+		private bool TryValidateSkillUseOnServer(
+			NetworkSkillUseRequest request,
+			double serverTime,
+			out string skillId,
+			out SkillSpec skill,
+			out SkillUseRejectionReason rejectionReason
+		)
+		{
+			skillId = request.SkillId.ToString();
+			skill = null;
+			rejectionReason = SkillUseRejectionReason.Unknown;
+
+			if (string.IsNullOrWhiteSpace(skillId))
+			{
+				rejectionReason = SkillUseRejectionReason.SkillNotFound;
+				return false;
+			}
+
+			if (skillCatalog == null || !skillCatalog.TryGetSkill(skillId, out skill))
+			{
+				rejectionReason = SkillUseRejectionReason.SkillNotFound;
+				return false;
+			}
+
+			if (!IsSkillEquipped(request.SkillId))
+			{
+				rejectionReason = SkillUseRejectionReason.SkillNotEquipped;
+				return false;
+			}
+
+			if (characterState == null || characterState.HP <= 0 || !characterState.IsMovable)
+			{
+				rejectionReason = SkillUseRejectionReason.InvalidState;
+				return false;
+			}
+
+			double remainingCooldown = GetRemainingCooldownAt(skillId, serverTime);
+
+			if (remainingCooldown > 0d)
+			{
+				rejectionReason = SkillUseRejectionReason.Cooldown;
+				return false;
+			}
+
+			if (skill.ManaCost > 0 && characterState.MP < skill.ManaCost)
+			{
+				rejectionReason = SkillUseRejectionReason.NotEnoughResource;
+				return false;
+			}
+
+			return true;
 		}
 
 		public bool TryRequestUseSkill(SkillUseRequest request)
