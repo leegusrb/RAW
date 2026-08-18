@@ -53,5 +53,28 @@ namespace RAW.Network
 				reason = networkEvent.Reason
 			};
 		}
+
+		public static SkillCastEvent ToContract(NetworkSkillCastEvent networkEvent)
+		{
+			return new SkillCastEvent
+			{
+				casterObjectId = networkEvent.CasterObjectId,
+				skillId = networkEvent.SkillId.ToString(),
+				casterPosition = networkEvent.CasterPosition,
+				targetInfo = ToContractTarget(networkEvent.TargetInfo),
+				requestSequence = networkEvent.RequestSequence,
+				castServerTime = networkEvent.CastServerTime
+			};
+		}
+
+		private static SkillTargetInfo ToContractTarget(NetworkSkillTargetInfo networkTarget)
+		{
+			return new SkillTargetInfo
+			{
+				direction = networkTarget.Direction,
+				targetPosition = networkTarget.TargetPosition,
+				targetObjectId = networkTarget.TargetObjectId
+			};
+		}
 	}
 }
