@@ -31,9 +31,9 @@ public class LocalSkillRuntime :
 		return 0d;
 	}
 
-	public SkillUseRequestResult RequestUseSkill(KeyMapping slot)
+	public SkillUseRequestResult RequestUseSkill(string skillId)
 	{
-		if (!TryGetSkillForSlot(slot, out _))
+		if (string.IsNullOrWhiteSpace(skillId))
 			return SkillUseRequestResult.Rejected;
 
 		return SkillUseRequestResult.ExecuteLocally;

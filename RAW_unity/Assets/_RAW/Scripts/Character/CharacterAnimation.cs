@@ -5,6 +5,9 @@ public class CharacterAnimation : MonoBehaviour
 {
     [SerializeField] private Animator animator;
 
+    private const string SkillPlaceholderName = "skill_cast";
+    private static readonly int CastSkillHash = Animator.StringToHash("castSkill");
+
     private AnimatorOverrideController overrideController;
 
     private void Awake()
@@ -33,7 +36,7 @@ public class CharacterAnimation : MonoBehaviour
         animator.runtimeAnimatorController = overrideController;
     }
 
-    public bool PlaySkill(KeyMapping slot, SkillSpec skill)
+    public bool PlaySkill(SkillSpec skill)
     {
         if (skill == null)
             return false;
@@ -50,49 +53,8 @@ public class CharacterAnimation : MonoBehaviour
             return false;
         }
 
-        if (!TryGetSlotAnimationNames(slot, out string clipName, out string triggerName))
-        {
-            Debug.LogWarning($"{slot} 슬롯의 Animator 바인딩이 없습니다.", this);
-            return false;
-        }
-
-        overrideController[clipName] = skill.animationClip;
-        animator.SetTrigger(triggerName);
+        overrideController[SkillPlaceholderName] = skill.animationClip;
+        animator.SetTrigger(CastSkillHash);
         return true;
-    }
-
-    private static bool TryGetSlotAnimationNames(
-        KeyMapping slot,
-        out string clipName,
-        out string triggerName
-    )
-    {
-        switch (slot)
-        {
-            case KeyMapping.Q:
-                clipName = "skill_Q";
-                triggerName = "q";
-                return true;
-
-            case KeyMapping.W:
-                clipName = "skill_W";
-                triggerName = "w";
-                return true;
-
-            case KeyMapping.E:
-                clipName = "skill_E";
-                triggerName = "e";
-                return true;
-
-            case KeyMapping.R:
-                clipName = "skill_R";
-                triggerName = "r";
-                return true;
-
-            default:
-                clipName = null;
-                triggerName = null;
-                return false;
-        }
     }
 }

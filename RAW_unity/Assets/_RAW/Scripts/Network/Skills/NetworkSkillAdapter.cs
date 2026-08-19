@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace RAW.Network
@@ -52,7 +53,7 @@ namespace RAW.Network
 			return networkSkillController.GetRemainingCooldown(skillId);
 		}
 
-		public SkillUseRequestResult RequestUseSkill(KeyMapping slot)
+		public SkillUseRequestResult RequestUseSkill(string skillId)
 		{
 			if (networkSkillController == null)
 			{
@@ -60,9 +61,23 @@ namespace RAW.Network
 				return SkillUseRequestResult.Rejected;
 			}
 
-			networkSkillController.RequestUseSkill(slot);
+			if (string.IsNullOrWhiteSpace(skillId))
+				return SkillUseRequestResult.Rejected;
 
-			return SkillUseRequestResult.HandleByRuntime;
+			foreach (KeyMapping slot in Enum.GetValues(typeof(KeyMapping)))
+			{
+				if (!networkSkillController.TryGetSkillForSlot(slot, out SkillSpec skill))
+					continue;
+
+				if (!string.Equals(skill.SkillId, skillId, StringComparison.Ordinal))
+					continue;
+
+				networkSkillController.RequestUseSkill(slot);
+				return SkillUseRequestResult.HandleByRuntime;
+			}
+
+			Debug.LogWarning($"장착되지 않은 스킬입니다: {skillId}", this);
+			return SkillUseRequestResult.Rejected;
 		}
 	}
 	

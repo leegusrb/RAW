@@ -19,7 +19,6 @@ public class CharacterSkillCastingController : MonoBehaviour
     private ISkillRuntime skillRuntime;
 
     private SkillSpec currentCastingSkill;
-    private KeyMapping currentCastingSlot;
     private bool isIndicatingSkill;
 
     private Coroutine currentActivatingSkillCoroutine;
@@ -86,7 +85,6 @@ public class CharacterSkillCastingController : MonoBehaviour
             return;
         }
 
-        currentCastingSlot = skillSlot;
         currentCastingSkill = skill;
 
         switch (currentCastingSkill.castType)
@@ -228,12 +226,12 @@ public class CharacterSkillCastingController : MonoBehaviour
 
         if (remainingCooldown > 0d)
         {
-            Debug.LogWarning($"{currentCastingSlot} 스킬은 쿨다운 중입니다. 남은 시간={remainingCooldown:F2}", this);
+            Debug.LogWarning($"{skill.name} 스킬은 쿨다운 중입니다. 남은 시간={remainingCooldown:F2}", this);
             HideIndicator();
             return;
         }
 
-        SkillUseRequestResult requestResult = skillRuntime.RequestUseSkill(currentCastingSlot);
+        SkillUseRequestResult requestResult = skillRuntime.RequestUseSkill(skill.SkillId);
 
         switch (requestResult)
         {
@@ -247,7 +245,7 @@ public class CharacterSkillCastingController : MonoBehaviour
 
             case SkillUseRequestResult.Rejected:
             default:
-                Debug.LogWarning($"{currentCastingSlot} 스킬 요청이 거절되었습니다.", this);
+                Debug.LogWarning($"{skill.name} 스킬 요청이 거절되었습니다.", this);
                 HideIndicator();
                 return;
         }
@@ -283,7 +281,6 @@ public class CharacterSkillCastingController : MonoBehaviour
             ActivateSkillCoroutine(
                 currentCastingSkill,
                 currentCastingSkillRangeRadius,
-                currentCastingSlot,
                 targetEnemy
             )
         );
@@ -340,7 +337,6 @@ public class CharacterSkillCastingController : MonoBehaviour
     private IEnumerator ActivateSkillCoroutine(
         SkillSpec skill,
         float skillRangeRadius,
-        KeyMapping skillSlot,
         Enemy targetEnemy
     )
     {
@@ -360,7 +356,7 @@ public class CharacterSkillCastingController : MonoBehaviour
         characterState.IsActivatingSkill = true;
         FlipTowards(currentActivatingSkillTargetPosition);
 
-        characterAnimation.PlaySkill(skillSlot, skill);
+        characterAnimation.PlaySkill(skill);
 
         yield return new WaitForSeconds(skill.preDelay);
 
