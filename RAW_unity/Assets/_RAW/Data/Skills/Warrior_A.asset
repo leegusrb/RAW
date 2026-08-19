@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: afcd4b312eca36642bcb6bc70de961e8, type: 3}
   m_Name: Warrior_A
   m_EditorClassIdentifier: Assembly-CSharp::SkillSpec
+  skillId: warrior_a
   castType: 0
   targettingSkillTarget: 1
   range: 1

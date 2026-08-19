@@ -7,6 +7,15 @@ using UnityEngine;
 [RequireComponent(typeof(CharacterAnimation))]
 public class CharacterSkillCastingController : MonoBehaviour
 {
+    private sealed class SkillCastContext
+    {
+        public SkillSpec Skill;
+        public float RangeRadius;
+        public Vector2 TargetPosition;
+        public GameObject TargetObject;
+        public Enemy TargetEnemy;
+    }
+
     [SerializeField] private CharacterControl characterControl;
     [SerializeField] private CharacterState characterState;
     [SerializeField] private CharacterAnimation characterAnimation;
@@ -22,11 +31,11 @@ public class CharacterSkillCastingController : MonoBehaviour
     private bool isIndicatingSkill;
 
     private Coroutine currentActivatingSkillCoroutine;
-    private Vector2 currentActivatingSkillTargetPosition;
-    private GameObject currentActivatingSkillTargetObject;
     private float currentCastingSkillRangeRadius;
+    private SkillCastContext pendingSkillCast;
 
     public bool IsTargeting => isIndicatingSkill;
+    public bool IsSkillPending => pendingSkillCast != null;
 
     private void Awake()
     {
@@ -44,6 +53,9 @@ public class CharacterSkillCastingController : MonoBehaviour
     {
         if (isIndicatingSkill)
             IndicateSkill();
+
+        if (pendingSkillCast != null)
+            UpdatePendingSkillCast();
     }
 
     private void CacheComponents()
@@ -62,6 +74,7 @@ public class CharacterSkillCastingController : MonoBehaviour
 
     public void BeginTargeting(KeyMapping skillSlot)
     {
+        CancelPendingSkillCast();
         HideIndicator();
 
         if (!enabled)
@@ -136,13 +149,32 @@ public class CharacterSkillCastingController : MonoBehaviour
         if (!isIndicatingSkill || !IsPossibleToActivateSkill())
             return false;
 
-        SetSkillTarget(mouseWorldPosition, currentCastingSkill);
-        RequestCurrentSkill(currentCastingSkill);
+        SkillCastContext castContext = CreateSkillCastContext(
+            mouseWorldPosition,
+            currentCastingSkill,
+            currentCastingSkillRangeRadius
+        );
+
+        if (castContext == null)
+            return false;
+
+        HideIndicator();
+
+        if (RequiresRangeCheck(castContext.Skill) &&
+            !IsInsideRange(transform.position, castContext.TargetPosition, castContext.RangeRadius))
+        {
+            pendingSkillCast = castContext;
+            characterControl.SetMoveDestination(castContext.TargetPosition);
+            return true;
+        }
+
+        RequestSkill(castContext);
         return true;
     }
 
     public void CancelCasting()
     {
+        CancelPendingSkillCast();
         StopActivatingSkill();
         HideIndicator();
     }
@@ -206,17 +238,17 @@ public class CharacterSkillCastingController : MonoBehaviour
         );
     }
 
-    private void RequestCurrentSkill(SkillSpec skill)
+    private void RequestSkill(SkillCastContext castContext)
     {
-        if (!isIndicatingSkill || skill == null)
+        if (castContext == null || castContext.Skill == null)
             return;
 
+        SkillSpec skill = castContext.Skill;
         double remainingCooldown = skillRuntime.GetRemainingCooldown(skill.SkillId);
 
         if (remainingCooldown > 0d)
         {
             Debug.LogWarning($"{skill.name} 스킬은 쿨다운 중입니다. 남은 시간={remainingCooldown:F2}", this);
-            HideIndicator();
             return;
         }
 
@@ -225,17 +257,15 @@ public class CharacterSkillCastingController : MonoBehaviour
         switch (requestResult)
         {
             case SkillUseRequestResult.ExecuteLocally:
-                ActivateSkill();
+                ActivateSkill(castContext);
                 return;
 
             case SkillUseRequestResult.HandleByRuntime:
-                HideIndicator();
                 return;
 
             case SkillUseRequestResult.Rejected:
             default:
                 Debug.LogWarning($"{skill.name} 스킬 요청이 거절되었습니다.", this);
-                HideIndicator();
                 return;
         }
     }
@@ -257,24 +287,13 @@ public class CharacterSkillCastingController : MonoBehaviour
             indicator.SetActive(isActive);
     }
 
-    private void ActivateSkill()
+    private void ActivateSkill(SkillCastContext castContext)
     {
         StopActivatingSkill();
 
-        Enemy targetEnemy = null;
-
-        if (currentActivatingSkillTargetObject != null)
-            targetEnemy = currentActivatingSkillTargetObject.GetComponent<Enemy>();
-
         currentActivatingSkillCoroutine = StartCoroutine(
-            ActivateSkillCoroutine(
-                currentCastingSkill,
-                currentCastingSkillRangeRadius,
-                targetEnemy
-            )
+            ActivateSkillCoroutine(castContext)
         );
-
-        HideIndicator();
     }
 
     private bool IsPossibleToActivateSkill()
@@ -291,10 +310,18 @@ public class CharacterSkillCastingController : MonoBehaviour
         return indicator != null && indicator.targettingTarget != null;
     }
 
-    private void SetSkillTarget(Vector2 mousePosition, SkillSpec skill)
+    private SkillCastContext CreateSkillCastContext(
+        Vector2 mousePosition,
+        SkillSpec skill,
+        float rangeRadius
+    )
     {
-        currentActivatingSkillTargetPosition = transform.position;
-        currentActivatingSkillTargetObject = null;
+        SkillCastContext castContext = new SkillCastContext
+        {
+            Skill = skill,
+            RangeRadius = rangeRadius,
+            TargetPosition = transform.position
+        };
 
         switch (skill.castType)
         {
@@ -303,47 +330,87 @@ public class CharacterSkillCastingController : MonoBehaviour
                     skillTargetingIndicator.GetComponent<TargettingSkillIndicator>();
 
                 if (indicator == null || indicator.targettingTarget == null)
-                    return;
+                    return null;
 
-                currentActivatingSkillTargetObject = indicator.targettingTarget;
-
-                Enemy enemy = currentActivatingSkillTargetObject.GetComponent<Enemy>();
-
-                if (enemy != null)
-                    currentActivatingSkillTargetPosition = enemy.hitPoint;
+                castContext.TargetObject = indicator.targettingTarget;
+                castContext.TargetEnemy = castContext.TargetObject.GetComponent<Enemy>();
+                RefreshTargetPosition(castContext);
                 break;
 
             case CastType.area:
-                currentActivatingSkillTargetPosition = mousePosition;
+                castContext.TargetPosition = mousePosition;
                 break;
 
             case CastType.bar:
-                currentActivatingSkillTargetPosition = transform.position;
+                castContext.TargetPosition = transform.position;
                 break;
         }
+
+        return castContext;
     }
 
-    private IEnumerator ActivateSkillCoroutine(
-        SkillSpec skill,
-        float skillRangeRadius,
-        Enemy targetEnemy
-    )
+    private void UpdatePendingSkillCast()
     {
-        if (skill.castType == CastType.target || skill.castType == CastType.area)
+        SkillCastContext castContext = pendingSkillCast;
+
+        if (!RefreshTargetPosition(castContext))
         {
-            while (!IsInsideRange(
-                transform.position,
-                currentActivatingSkillTargetPosition,
-                skillRangeRadius
-            ))
-            {
-                characterControl.MoveTo(currentActivatingSkillTargetPosition);
-                yield return null;
-            }
+            CancelPendingSkillCast();
+            return;
         }
 
+        if (!IsInsideRange(
+            transform.position,
+            castContext.TargetPosition,
+            castContext.RangeRadius
+        ))
+        {
+            characterControl.SetMoveDestination(castContext.TargetPosition);
+            return;
+        }
+
+        pendingSkillCast = null;
+        characterControl.StopMoving();
+        RequestSkill(castContext);
+    }
+
+    private bool RefreshTargetPosition(SkillCastContext castContext)
+    {
+        if (castContext.Skill.castType != CastType.target)
+            return true;
+
+        if (castContext.TargetObject == null)
+            return false;
+
+        castContext.TargetPosition = castContext.TargetEnemy != null
+            ? castContext.TargetEnemy.hitPoint
+            : castContext.TargetObject.transform.position;
+
+        return true;
+    }
+
+    private void CancelPendingSkillCast()
+    {
+        if (pendingSkillCast == null)
+            return;
+
+        pendingSkillCast = null;
+        characterControl.StopMoving();
+    }
+
+    private static bool RequiresRangeCheck(SkillSpec skill)
+    {
+        return skill.castType == CastType.target || skill.castType == CastType.area;
+    }
+
+    private IEnumerator ActivateSkillCoroutine(SkillCastContext castContext)
+    {
+        SkillSpec skill = castContext.Skill;
+
+        RefreshTargetPosition(castContext);
+
         characterState.IsActivatingSkill = true;
-        FlipTowards(currentActivatingSkillTargetPosition);
+        FlipTowards(castContext.TargetPosition);
 
         characterAnimation.PlaySkill(skill);
 
@@ -351,7 +418,7 @@ public class CharacterSkillCastingController : MonoBehaviour
 
         GameObject skillObject = Instantiate(
             skill.skillPrefab,
-            GetSkillGeneratePosition(skill.castType, currentActivatingSkillTargetPosition),
+            GetSkillGeneratePosition(skill.castType, castContext.TargetPosition),
             Quaternion.identity
         );
 
@@ -364,7 +431,7 @@ public class CharacterSkillCastingController : MonoBehaviour
         SkillObject skillObjectComponent = skillObject.GetComponent<SkillObject>();
 
         if (skillObjectComponent != null)
-            skillObjectComponent.Initialize(skill, targetEnemy);
+            skillObjectComponent.Initialize(skill, castContext.TargetEnemy);
 
         yield return new WaitForSeconds(skill.postDelay);
 

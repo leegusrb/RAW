@@ -72,7 +72,7 @@ public class CharacterControl : MonoBehaviour
             StopMoving();
     }
 
-    public void MoveTo(Vector2 position)
+    public void SetMoveDestination(Vector2 position)
     {
         targetPos = position;
     }
@@ -139,7 +139,7 @@ public class CharacterControl : MonoBehaviour
         if (hit.collider == null)
             return;
 
-        MoveTo(hit.point);
+        SetMoveDestination(hit.point);
 
         if (targetPointing != null)
             StopCoroutine(targetPointing);
