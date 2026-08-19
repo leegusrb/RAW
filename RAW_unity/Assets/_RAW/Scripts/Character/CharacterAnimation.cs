@@ -1,6 +1,7 @@
 using UnityEngine;
 
 [DisallowMultipleComponent]
+[RequireComponent(typeof(Animator))]
 public class CharacterAnimation : MonoBehaviour
 {
     [SerializeField] private Animator animator;
@@ -14,13 +15,6 @@ public class CharacterAnimation : MonoBehaviour
     {
         if (animator == null)
             animator = GetComponent<Animator>();
-
-        if (animator == null)
-        {
-            Debug.LogError("Animator 컴포넌트를 찾을 수 없습니다.", this);
-            enabled = false;
-            return;
-        }
 
         if (animator.runtimeAnimatorController == null)
         {
@@ -41,7 +35,7 @@ public class CharacterAnimation : MonoBehaviour
         if (skill == null)
             return false;
 
-        if (overrideController == null || animator == null)
+        if (overrideController == null)
         {
             Debug.LogError("스킬 애니메이션을 실행할 Animator가 준비되지 않았습니다.", this);
             return false;

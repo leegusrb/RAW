@@ -30,17 +30,12 @@ public class CharacterControl : MonoBehaviour
         if (characterState == null)
             characterState = GetComponent<CharacterState>();
 
-        if (skillCastingController == null)
-            skillCastingController = GetComponent<CharacterSkillCastingController>();
-
-        if (characterState == null)
-            Debug.LogError("CharacterState 컴포넌트를 찾을 수 없습니다.", this);
-
-        if (skillCastingController == null)
+        if (skillCastingController == null &&
+            !TryGetComponent(out skillCastingController))
+        {
             Debug.LogError("CharacterSkillCastingController 컴포넌트를 찾을 수 없습니다.", this);
-
-        if (characterState == null || skillCastingController == null)
             enabled = false;
+        }
     }
 
     private void Start()
@@ -71,7 +66,7 @@ public class CharacterControl : MonoBehaviour
             StopMoving();
         }
 
-        if (characterState != null && characterState.IsMovable)
+        if (characterState.IsMovable)
             MoveCharacter();
         else
             StopMoving();
@@ -86,7 +81,7 @@ public class CharacterControl : MonoBehaviour
     {
         targetPos = transform.position;
 
-        if (characterState != null && characterState.IsMoving)
+        if (characterState.IsMoving)
         {
             characterState.IsMoving = false;
 
@@ -201,9 +196,6 @@ public class CharacterControl : MonoBehaviour
 
     private void DoMove(Vector2 targetDirection)
     {
-        if (characterState == null)
-            return;
-
         if (!characterState.IsMoving)
         {
             characterState.IsMoving = true;

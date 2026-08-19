@@ -31,14 +31,13 @@ public class CharacterSkillCastingController : MonoBehaviour
     private void Awake()
     {
         CacheComponents();
+        HideIndicator();
 
         if (skillRuntime == null)
+        {
             Debug.LogError("ISkillRuntime 구현체를 찾을 수 없습니다.", this);
-    }
-
-    private void Start()
-    {
-        HideIndicator();
+            enabled = false;
+        }
     }
 
     private void Update()
@@ -65,11 +64,8 @@ public class CharacterSkillCastingController : MonoBehaviour
     {
         HideIndicator();
 
-        if (skillRuntime == null)
-        {
-            Debug.LogError("스킬 런타임이 연결되지 않았습니다.", this);
+        if (!enabled)
             return;
-        }
 
         if (!skillRuntime.TryGetSkillForSlot(skillSlot, out SkillSpec skill))
         {
@@ -214,13 +210,6 @@ public class CharacterSkillCastingController : MonoBehaviour
     {
         if (!isIndicatingSkill || skill == null)
             return;
-
-        if (skillRuntime == null)
-        {
-            Debug.LogError("스킬 런타임이 연결되지 않았습니다.", this);
-            HideIndicator();
-            return;
-        }
 
         double remainingCooldown = skillRuntime.GetRemainingCooldown(skill.SkillId);
 
@@ -417,8 +406,7 @@ public class CharacterSkillCastingController : MonoBehaviour
         StopCoroutine(currentActivatingSkillCoroutine);
         currentActivatingSkillCoroutine = null;
 
-        if (characterState != null)
-            characterState.IsActivatingSkill = false;
+        characterState.IsActivatingSkill = false;
 
         characterControl.StopMoving();
     }
