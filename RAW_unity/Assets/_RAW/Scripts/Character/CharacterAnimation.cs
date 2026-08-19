@@ -1,10 +1,10 @@
 using UnityEngine;
 
-public class Char_Animation : MonoBehaviour
+public class CharacterAnimation : MonoBehaviour
 {
 
     public Animator animator;
-    public Char_State state;
+    public CharacterState state;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()

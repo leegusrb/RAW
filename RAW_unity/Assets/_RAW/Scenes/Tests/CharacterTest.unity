@@ -1095,7 +1095,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c33a06031b0ba6041ba31d60746e47a3, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Char_State
+  m_EditorClassIdentifier: Assembly-CSharp::CharacterState
   healthPoint: 100
   manaPoint: 100
   maxHealthPoint: 100
@@ -2023,7 +2023,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 6384901998301933020}
-        m_TargetAssemblyTypeName: Char_Appearance, Assembly-CSharp
+        m_TargetAssemblyTypeName: CharacterAppearance, Assembly-CSharp
         m_MethodName: SetAppearance
         m_Mode: 1
         m_Arguments:

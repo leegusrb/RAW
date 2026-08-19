@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class Char_State : MonoBehaviour
+public class CharacterState : MonoBehaviour
 {
 	[Header("Status")]
 	

@@ -24,7 +24,7 @@ public class InventorySlot
     }
 }
 
-public class Char_Inventory : MonoBehaviour
+public class CharacterInventory : MonoBehaviour
 {
     [SerializeField]
     private int currentInventoryCapacity = 10;

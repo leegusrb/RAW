@@ -11,14 +11,14 @@ public class Enemy : MonoBehaviour
     private EnemySpec spec;
 
     [SerializeField]
-    private Char_State characterState;
+    private CharacterState characterState;
 
     private void Awake()
     {
         hitPoint = hitPositionObject.position;
 
         if (characterState == null)
-            characterState = GetComponent<Char_State>();
+            characterState = GetComponent<CharacterState>();
     }
     void Start()
     {
@@ -43,7 +43,7 @@ public class Enemy : MonoBehaviour
     {
         if (characterState == null)
         {
-            Debug.LogError("Enemy에 Char_State가 연결되어 있지 않습니다.", this);
+            Debug.LogError("Enemy에 CharacterState가 연결되어 있지 않습니다.", this);
             return;
         }
 

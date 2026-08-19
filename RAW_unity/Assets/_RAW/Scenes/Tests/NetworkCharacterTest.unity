@@ -1561,7 +1561,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: Char_Appearance, Assembly-CSharp
+        m_TargetAssemblyTypeName: CharacterAppearance, Assembly-CSharp
         m_MethodName: SetAppearance
         m_Mode: 1
         m_Arguments:

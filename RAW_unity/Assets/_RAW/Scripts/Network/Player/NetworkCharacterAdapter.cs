@@ -6,10 +6,10 @@ namespace RAW.Network
 {
     [DisallowMultipleComponent]
     [RequireComponent(typeof(NetworkObject))]
-	[RequireComponent(typeof(Char_Control))]
+	[RequireComponent(typeof(CharacterControl))]
     public class NetworkCharacterAdapter : NetworkBehaviour
     {
-        [SerializeField] private Char_Control characterControl;
+        [SerializeField] private CharacterControl characterControl;
         [SerializeField] private GameObject[] localOnlyVisuals;
 
         private readonly NetworkVariable<bool> isFacingLeft =
@@ -79,7 +79,7 @@ namespace RAW.Network
 
             if (characterControl == null)
             {
-                Debug.LogError("Char_Control 컴포넌트를 찾을 수 없습니다.", this);
+                Debug.LogError("CharacterControl 컴포넌트를 찾을 수 없습니다.", this);
 
                 enabled = false;
                 return;
@@ -122,7 +122,7 @@ namespace RAW.Network
         private void CacheComponents()
         {
             if (characterControl == null)
-                characterControl = GetComponent<Char_Control>();
+                characterControl = GetComponent<CharacterControl>();
         }
 
         private void HideLocalOnlyVisuals()

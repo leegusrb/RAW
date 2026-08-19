@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using UnityEngine;
 
-public class Char_Control : MonoBehaviour{
+public class CharacterControl : MonoBehaviour{
     [SerializeField]
     private LayerMask groundLayer;
     [SerializeField]
@@ -24,7 +24,7 @@ public class Char_Control : MonoBehaviour{
     
 
     [SerializeField]
-    private Char_State characterState;
+    private CharacterState characterState;
 
     [SerializeField]
     private Animator animator;    

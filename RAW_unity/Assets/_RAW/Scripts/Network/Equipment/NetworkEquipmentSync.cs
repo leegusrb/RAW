@@ -7,10 +7,10 @@ using UnityEngine;
 namespace RAW.Network
 {
 	[RequireComponent(typeof(NetworkObject))]
-	[RequireComponent(typeof(Char_Inventory))]
+	[RequireComponent(typeof(CharacterInventory))]
 	public class NetworkEquipmentSync : NetworkBehaviour
 	{
-		[SerializeField] private Char_Inventory inventory;
+		[SerializeField] private CharacterInventory inventory;
 		[SerializeField] private EquipmentCatalog equipmentCatalog;
 
 		private NetworkList<NetworkEquipmentEntry> equipmentList;
@@ -73,7 +73,7 @@ namespace RAW.Network
 		private void CacheComponents()
 		{
 			if (inventory == null)
-				inventory = GetComponent<Char_Inventory>();
+				inventory = GetComponent<CharacterInventory>();
 		}
 
 		public bool TryGetRegisteredSlot(string itemId, out EquipmentSlot equipmentSlot)

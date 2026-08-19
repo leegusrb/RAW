@@ -5,10 +5,10 @@ using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
 
-public class Char_Appearance : MonoBehaviour
+public class CharacterAppearance : MonoBehaviour
 {
     [SerializeField]
-    private Char_Inventory inventory;
+    private CharacterInventory inventory;
 
     [SerializeField]
     private SpriteRenderer back;
