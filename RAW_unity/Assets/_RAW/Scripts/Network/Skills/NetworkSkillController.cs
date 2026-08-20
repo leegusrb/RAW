@@ -31,6 +31,7 @@ namespace RAW.Network
 		
 		public event Action<SkillUseRejectedEvent> SkillUseRejected;
 		public event Action<SkillCastEvent> SkillCast;
+		public event Action<SkillHitEvent> SkillHit;
 
 		private void Reset()
 		{
@@ -516,12 +517,51 @@ namespace RAW.Network
 			NotifySkillCastRpc(networkEvent);
 		}
 
+		private void SendSkillHit(
+			ulong targetObjectId,
+			FixedString64Bytes skillId,
+			int damage,
+			int targetHpAfterHit,
+			Vector3 hitPosition,
+			uint requestSequence,
+			ushort hitIndex
+		)
+		{
+			if (!IsServer)
+				return;
+
+			double hitServerTime = NetworkManager.ServerTime.Time;
+
+			NetworkSkillHitEvent networkEvent =
+				new NetworkSkillHitEvent(
+					NetworkObjectId,
+					targetObjectId,
+					skillId,
+					damage,
+					targetHpAfterHit,
+					hitPosition,
+					requestSequence,
+					hitIndex,
+					hitServerTime
+				);
+
+			NotifySkillHitRpc(networkEvent);
+		}
+
 		[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
 		private void NotifySkillCastRpc(NetworkSkillCastEvent networkEvent)
 		{
 			SkillCastEvent castEvent = NetworkSkillContractMapper.ToContract(networkEvent);
 
 			SkillCast?.Invoke(castEvent);
+		}
+
+		[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
+		private void NotifySkillHitRpc(NetworkSkillHitEvent networkEvent)
+		{
+			SkillHitEvent hitEvent = NetworkSkillContractMapper.ToContract(networkEvent);
+
+			SkillHit?.Invoke(hitEvent);
 		}
 
 		private void HandleCooldownListChanged(NetworkListEvent<NetworkSkillCooldownEntry> changeEvent)
