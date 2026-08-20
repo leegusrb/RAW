@@ -67,6 +67,22 @@ namespace RAW.Network
 			};
 		}
 
+		public static SkillHitEvent ToContract(NetworkSkillHitEvent networkEvent)
+		{
+			return new SkillHitEvent
+			{
+				casterObjectId = networkEvent.CasterObjectId,
+				targetObjectId = networkEvent.TargetObjectId,
+				skillId = networkEvent.SkillId.ToString(),
+				damage = networkEvent.Damage,
+				targetHpAfterHit = networkEvent.TargetHpAfterHit,
+				hitPosition = networkEvent.HitPosition,
+				requestSequence = networkEvent.RequestSequence,
+				hitIndex = networkEvent.HitIndex,
+				hitServerTime = networkEvent.HitServerTime
+			};
+		}
+
 		private static SkillTargetInfo ToContractTarget(NetworkSkillTargetInfo networkTarget)
 		{
 			return new SkillTargetInfo
