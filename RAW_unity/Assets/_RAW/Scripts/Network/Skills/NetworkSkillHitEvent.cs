@@ -22,7 +22,17 @@ namespace RAW.Network
 		public ushort HitIndex;
 		public double HitServerTime;
 
-		public NetworkSkillHitEvent(ulong casterObjectId, ulong targetObjectId, FixedString64Bytes skillId, int damage, int targetHpAfterHit, Vector3 hitPosition, uint requestSequence, ushort hitIndex, double hitServerTime)
+		public NetworkSkillHitEvent(
+			ulong casterObjectId,
+			ulong targetObjectId,
+			FixedString64Bytes skillId,
+			int damage,
+			int targetHpAfterHit,
+			Vector3 hitPosition,
+			uint requestSequence,
+			ushort hitIndex,
+			double hitServerTime
+		)
 		{
 			CasterObjectId = casterObjectId;
 			TargetObjectId = targetObjectId;

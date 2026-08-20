@@ -32,18 +32,6 @@ namespace RAW.Network
 			return true;
 		}
 
-		private static NetworkSkillTargetInfo ToNetworkTarget(SkillTargetInfo target)
-		{
-			if (target == null)
-				return default;
-
-			return new NetworkSkillTargetInfo(
-				target.direction,
-				target.targetPosition,
-				target.targetObjectId
-			);
-		}
-
 		public static SkillUseRejectedEvent ToContract(NetworkSkillUseRejectedEvent networkEvent)
 		{
 			return new SkillUseRejectedEvent
@@ -81,6 +69,18 @@ namespace RAW.Network
 				hitIndex = networkEvent.HitIndex,
 				hitServerTime = networkEvent.HitServerTime
 			};
+		}
+
+		private static NetworkSkillTargetInfo ToNetworkTarget(SkillTargetInfo target)
+		{
+			if (target == null)
+				return default;
+
+			return new NetworkSkillTargetInfo(
+				target.direction,
+				target.targetPosition,
+				target.targetObjectId
+			);
 		}
 
 		private static SkillTargetInfo ToContractTarget(NetworkSkillTargetInfo networkTarget)

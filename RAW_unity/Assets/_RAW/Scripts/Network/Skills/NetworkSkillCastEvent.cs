@@ -15,7 +15,14 @@ namespace RAW.Network
 		public uint RequestSequence;
 		public double CastServerTime;
 
-		public NetworkSkillCastEvent(ulong casterObjectId, FixedString64Bytes skillId, Vector3 casterPosition, NetworkSkillTargetInfo targetInfo, uint requestSequence, double castServerTime)
+		public NetworkSkillCastEvent(
+			ulong casterObjectId,
+			FixedString64Bytes skillId,
+			Vector3 casterPosition,
+			NetworkSkillTargetInfo targetInfo,
+			uint requestSequence,
+			double castServerTime
+		)
 		{
 			CasterObjectId = casterObjectId;
 			SkillId = skillId;
