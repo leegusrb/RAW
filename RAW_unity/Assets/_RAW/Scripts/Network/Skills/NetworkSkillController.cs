@@ -30,6 +30,7 @@ namespace RAW.Network
 		public event Action LoadoutChanged;
 		
 		public event Action<SkillUseRejectedEvent> SkillUseRejected;
+		public event Action<SkillCastEvent> SkillCast;
 
 		private void Reset()
 		{
@@ -273,6 +274,8 @@ namespace RAW.Network
 
 			SetCooldownOnServer(skillId, skill.CooldownSeconds, serverTime);
 
+			SendSkillCast(request, serverTime);
+
 			Debug.Log(
 				$"스킬 요청 승인: " +
 				$"OwnerClientId={OwnerClientId}, " +
@@ -493,6 +496,32 @@ namespace RAW.Network
 				NetworkSkillContractMapper.ToContract(networkEvent);
 
 			SkillUseRejected?.Invoke(rejectedEvent);
+		}
+
+		private void SendSkillCast(NetworkSkillUseRequest request, double castServerTime)
+		{
+			if (!IsServer)
+				return;
+
+			NetworkSkillCastEvent networkEvent =
+				new NetworkSkillCastEvent(
+					NetworkObjectId,
+					request.SkillId,
+					transform.position,
+					request.Target,
+					request.RequestSequence,
+					castServerTime
+				);
+
+			NotifySkillCastRpc(networkEvent);
+		}
+
+		[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
+		private void NotifySkillCastRpc(NetworkSkillCastEvent networkEvent)
+		{
+			SkillCastEvent castEvent = NetworkSkillContractMapper.ToContract(networkEvent);
+
+			SkillCast?.Invoke(castEvent);
 		}
 
 		private void HandleCooldownListChanged(NetworkListEvent<NetworkSkillCooldownEntry> changeEvent)
