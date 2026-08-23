@@ -16,7 +16,13 @@ MonoBehaviour:
   manaCost: 25
   cooldownSeconds: 6
   castType: 0
-  targetEnemy: 0
-  targetAlly: 0
-  range: 1
+  targettingSkillTarget: 0
+  range: 0
   size: 1
+  skillPrefab: {fileID: 0}
+  moveSpeed: 5
+  animationClip: {fileID: 0}
+  preDelay: 0
+  postDelay: 0
+  remainTime: 0
+  damage: 0

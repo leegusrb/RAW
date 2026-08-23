@@ -10,19 +10,19 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: afcd4b312eca36642bcb6bc70de961e8, type: 3}
-  m_Name: Warrior_Q_Crush
+  m_Name: Magician_R_Judgment
   m_EditorClassIdentifier: Assembly-CSharp::SkillSpec
-  skillId: WAR_Q_CRUSH
+  skillId: MAG_R_JUDGMENT
   manaCost: 0
   cooldownSeconds: 0
-  castType: 2
-  targettingSkillTarget: 1
-  range: 1
-  size: 1
-  skillPrefab: {fileID: 8850884371554800505, guid: 7d803b75b208bd34ca73cfe52af6e510, type: 3}
+  castType: 0
+  targettingSkillTarget: 0
+  range: 0
+  size: 0
+  skillPrefab: {fileID: 0}
   moveSpeed: 5
-  animationClip: {fileID: 7400000, guid: a99175957e506f94f8ce9e8b24599d61, type: 2}
+  animationClip: {fileID: 0}
   preDelay: 0
   postDelay: 0
-  remainTime: 0.5
-  damage: 10
+  remainTime: 0
+  damage: 0
