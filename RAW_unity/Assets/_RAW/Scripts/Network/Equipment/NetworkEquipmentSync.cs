@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using RAW.Persistence;
 using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
@@ -74,6 +75,81 @@ namespace RAW.Network
 		{
 			if (inventory == null)
 				inventory = GetComponent<Char_Inventory>();
+		}
+
+		public bool InitializePersistentStateOnServer(
+			IReadOnlyList<PlayerEquipmentSlotData> equipment
+		)
+		{
+			if (!IsSpawned || !IsServer)
+			{
+				Debug.LogWarning("Spawn된 서버 NetworkPlayer에서만 장비를 초기화할 수 있습니다.", this);
+				return false;
+			}
+
+			if (inventory == null || equipmentCatalog == null)
+			{
+				Debug.LogError("Char_Inventory 또는 EquipmentCatalog가 없습니다.", this);
+				return false;
+			}
+
+			Dictionary<EquipmentSlot, string> snapshot = new();
+
+			if (equipment != null)
+			{
+				for (int i = 0; i < equipment.Count; i++)
+				{
+					PlayerEquipmentSlotData source = equipment[i];
+
+					if (source == null ||
+						!Enum.IsDefined(typeof(EquipmentSlot), source.slot) ||
+						string.IsNullOrWhiteSpace(source.itemId) ||
+						snapshot.ContainsKey(source.slot))
+					{
+						Debug.LogError($"영속 장비 데이터가 올바르지 않습니다. Index={i}", this);
+						return false;
+					}
+
+					if (!equipmentCatalog.IsValidForSlot(source.itemId, source.slot))
+					{
+						Debug.LogError(
+							$"등록되지 않았거나 슬롯이 일치하지 않는 장비입니다. " +
+							$"Slot={source.slot}, ItemId={source.itemId}",
+							this
+						);
+
+						return false;
+					}
+
+					if (!inventory.HasItem(source.itemId))
+					{
+						Debug.LogError(
+							$"인벤토리에 없는 장비입니다. " +
+							$"Slot={source.slot}, ItemId={source.itemId}",
+							this
+						);
+
+						return false;
+					}
+
+					snapshot.Add(source.slot, source.itemId);
+				}
+			}
+
+			isApplyingNetworkState = true;
+
+			try
+			{
+				inventory.ReplaceEquipment(snapshot);
+			}
+			finally
+			{
+				isApplyingNetworkState = false;
+			}
+
+			WriteEquipmentToNetworkState();
+
+			return true;
 		}
 
 		public bool TryGetRegisteredSlot(string itemId, out EquipmentSlot equipmentSlot)

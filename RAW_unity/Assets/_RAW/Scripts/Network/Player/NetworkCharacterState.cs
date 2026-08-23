@@ -156,9 +156,19 @@ namespace RAW.Network
 				return false;
 			}
 
-			healthPoint.Value = Mathf.Max(0, loadedHealthPoint);
-			manaPoint.Value = Mathf.Max(0, loadedManaPoint);
+			if (loadedHealthPoint < 0 || loadedManaPoint < 0)
+			{
+				Debug.LogError(
+					$"영속 상태 값이 올바르지 않습니다. " +
+					$"HP={loadedHealthPoint}, MP={loadedManaPoint}",
+					this
+				);
 
+				return false;
+			}
+
+			healthPoint.Value = loadedHealthPoint;
+			manaPoint.Value = loadedManaPoint;
 			isMovable.Value = healthPoint.Value > 0;
 
 			ApplyCurrentState();

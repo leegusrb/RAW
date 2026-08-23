@@ -58,6 +58,15 @@ namespace RAW.Network{
 				return;
 			}
 
+			if (!PlayerPersistentDataValidator.TryValidate(
+				playerData,
+				out string validationError
+			))
+			{
+				FailPlayerSpawn(clientId, $"플레이어 데이터 검증 실패: {validationError}");
+				return;
+			}
+
 			if (!networkManager.ConnectedClients.TryGetValue(clientId, out NetworkClient networkClient))
 			{
 				Debug.LogWarning($"데이터 로드 후 클라이언트가 이미 종료되었습니다. ClientId={clientId}", this);
@@ -89,6 +98,12 @@ namespace RAW.Network{
 				return;
 			}
 
+			if (!playerPrefab.TryGetComponent<NetworkPlayerPersistenceAdapter>(out _))
+			{
+				FailPlayerSpawn(clientId, "NetworkPlayer Prefab에 NetworkPlayerPersistenceAdapter가 없습니다.");
+				return;
+			}
+
 			ResolveSpawnPose(
 				clientId,
 				playerPrefab,
@@ -111,16 +126,26 @@ namespace RAW.Network{
 				return;
 			}
 
+			if (!playerInstance.TryGetComponent(
+				out NetworkPlayerPersistenceAdapter persistenceAdapter
+			))
+			{
+				Destroy(playerInstance);
+
+				FailPlayerSpawn(clientId, "생성된 플레이어에 NetworkPlayerPersistenceAdapter가 없습니다.");
+				return;
+			}
+
 			try
 			{
 				playerNetworkObject.SpawnAsPlayerObject(clientId, false);
 			}
 			catch (Exception exception)
 			{
-				if (playerNetworkObject.IsSpawned)
-					playerNetworkObject.Despawn(true);
-				else
-					Destroy(playerInstance);
+				CleanupFailedPlayer(
+					playerInstance,
+					playerNetworkObject
+				);
 
 				Debug.LogError(
 					$"PlayerObject Spawn 실패: " +
@@ -134,31 +159,18 @@ namespace RAW.Network{
 				return;
 			}
 
-			if (!playerInstance.TryGetComponent(out NetworkCharacterState networkCharacterState))
+			if (!persistenceAdapter.InitializePersistentStateOnServer(
+				playerData,
+				out string applyError
+			))
 			{
-				if (playerNetworkObject.IsSpawned)
-					playerNetworkObject.Despawn(true);
-				else
-					Destroy(playerInstance);
-
-				FailPlayerSpawn(clientId, "생성된 플레이어에 NetworkCharacterState가 없습니다.");
-				return;
-			}
-
-			bool stateApplied =
-				networkCharacterState.InitializePersistentStateOnServer(
-					playerData.healthPoint,
-					playerData.manaPoint
+				CleanupFailedPlayer(
+					playerInstance,
+					playerNetworkObject
 				);
 
-			if (!stateApplied)
-			{
-				if (playerNetworkObject.IsSpawned)
-					playerNetworkObject.Despawn(true);
-				else
-					Destroy(playerInstance);
+				FailPlayerSpawn(clientId, $"플레이어 영속 상태 적용에 실패했습니다: {applyError}");
 
-				FailPlayerSpawn(clientId, "플레이어 초기 상태 적용에 실패했습니다.");
 				return;
 			}
 
@@ -167,12 +179,31 @@ namespace RAW.Network{
 				$"ClientId={clientId}, " +
 				$"UserId={playerData.userId}, " +
 				$"NetworkObjectId={playerNetworkObject.NetworkObjectId}, " +
-				$"HP={networkCharacterState.HP}, " +
-				$"MP={networkCharacterState.MP}",
+				$"HP={playerData.healthPoint}, " +
+				$"MP={playerData.manaPoint}, " +
+				$"InventoryCapacity={playerData.inventoryCapacity}, " +
+				$"InventoryCount={playerData.inventory?.Count ?? 0}, " +
+				$"EquipmentCount={playerData.equipment?.Count ?? 0}",
 				this
 			);
 
 			PlayerSpawned?.Invoke(clientId, playerNetworkObject, playerData);
+		}
+
+		private void CleanupFailedPlayer(
+			GameObject playerInstance,
+			NetworkObject playerNetworkObject
+		)
+		{
+			if (playerNetworkObject != null &&
+				playerNetworkObject.IsSpawned)
+			{
+				playerNetworkObject.Despawn(true);
+				return;
+			}
+
+			if (playerInstance != null)
+				Destroy(playerInstance);
 		}
 
 		private void HandlePlayerDataLoadFailed(ulong clientId, string error)

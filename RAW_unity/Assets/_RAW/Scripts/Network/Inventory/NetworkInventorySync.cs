@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using RAW.Persistence;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -71,6 +72,71 @@ namespace RAW.Network
 
 			if (inventory != null)
 				inventory.OnInventoryChanged -= HandleLocalInventoryChanged;
+		}
+
+		public bool InitializePersistentStateOnServer(
+			int capacity,
+			IReadOnlyList<PlayerInventorySlotData> slots
+		)
+		{
+			if (!IsSpawned || !IsServer)
+			{
+				Debug.LogWarning("Spawn된 서버 NetworkPlayer에서만 인벤토리를 초기화할 수 있습니다.", this);
+				return false;
+			}
+
+			if (inventory == null)
+			{
+				Debug.LogError("Char_Inventory가 없습니다.", this);
+				return false;
+			}
+
+			if (capacity < 0)
+			{
+				Debug.LogError($"잘못된 인벤토리 용량입니다: {capacity}", this);
+				return false;
+			}
+
+			Dictionary<int, InventorySlot> snapshot = new();
+
+			if (slots != null)
+			{
+				for (int i = 0; i < slots.Count; i++)
+				{
+					PlayerInventorySlotData source = slots[i];
+
+					if (source == null ||
+						source.slotIndex < 0 ||
+						source.slotIndex >= capacity ||
+						string.IsNullOrWhiteSpace(source.itemId) ||
+						source.count <= 0 ||
+						snapshot.ContainsKey(source.slotIndex))
+					{
+						Debug.LogError($"영속 인벤토리 데이터가 올바르지 않습니다. Index={i}", this);
+						return false;
+					}
+
+					InventorySlot destination = new();
+					destination.Set(source.itemId, source.count);
+
+					snapshot.Add(source.slotIndex, destination);
+				}
+			}
+
+			isApplyingNetworkState = true;
+
+			try
+			{
+				inventory.ReplaceInventory(capacity, snapshot);
+			}
+			finally
+			{
+				isApplyingNetworkState = false;
+			}
+
+			WriteInventoryToNetworkState();
+
+			return true;
 		}
 
 		private void CacheComponents()
