@@ -1,3 +1,4 @@
+using System;
 using RAW.Persistence;
 using Unity.Netcode;
 using UnityEngine;
@@ -9,11 +10,16 @@ namespace RAW.Network
 	[RequireComponent(typeof(NetworkCharacterState))]
 	[RequireComponent(typeof(NetworkInventorySync))]
 	[RequireComponent(typeof(NetworkEquipmentSync))]
-	public sealed class NetworkPlayerPersistenceAdapter : MonoBehaviour
+	public sealed class NetworkPlayerPersistenceAdapter : NetworkBehaviour
 	{
 		[SerializeField] private NetworkCharacterState characterState;
 		[SerializeField] private NetworkInventorySync inventorySync;
 		[SerializeField] private NetworkEquipmentSync equipmentSync;
+
+		private PlayerPersistentData persistentDataBaseline;
+
+		public event Action<ulong, PlayerPersistentData> PersistentStateCaptureBeforeDespawn;
+		public event Action<ulong, string> PersistentStateCaptureFailedBeforeDespawn;
 
 		private void Reset()
 		{
@@ -23,6 +29,43 @@ namespace RAW.Network
 		private void Awake()
 		{
 			CacheComponents();
+		}
+
+		public override void OnNetworkPreDespawn()
+		{
+			if (!IsServer)
+				return;
+
+			if (persistentDataBaseline == null)
+			{
+				PersistentStateCaptureFailedBeforeDespawn?.Invoke(
+					OwnerClientId,
+					"스냅샷의 기준이 될 플레이어 데이터가 없습니다."
+				);
+
+				return;
+			}
+
+			if (!TryCapturePersistentStateOnServer(
+				persistentDataBaseline,
+				out PlayerPersistentData snapshot,
+				out string error
+			))
+			{
+				PersistentStateCaptureFailedBeforeDespawn?.Invoke(
+					OwnerClientId,
+					error
+				);
+
+				return;
+			}
+
+			persistentDataBaseline = snapshot.DeepCopy();
+
+			PersistentStateCaptureBeforeDespawn?.Invoke(
+				OwnerClientId,
+				snapshot
+			);
 		}
 
 		public bool InitializePersistentStateOnServer(
@@ -73,6 +116,8 @@ namespace RAW.Network
 				error = "장비 적용에 실패했습니다.";
 				return false;
 			}
+
+			persistentDataBaseline = playerData.DeepCopy();
 
 			error = null;
 			return true;

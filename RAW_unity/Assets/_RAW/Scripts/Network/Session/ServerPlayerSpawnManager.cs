@@ -174,6 +174,22 @@ namespace RAW.Network{
 				return;
 			}
 
+			if (!sessionManager.TryAttachPlayerPersistence(
+				clientId,
+				persistenceAdapter,
+				out string attachError
+			))
+			{
+				CleanupFailedPlayer(
+					playerInstance,
+					playerNetworkObject
+				);
+
+				FailPlayerSpawn(clientId, $"플레이어 Persistence 연결 실패: {attachError}");
+
+				return;
+			}
+
 			Debug.Log(
 				$"데이터 로드 후 PlayerObject 생성 완료: " +
 				$"ClientId={clientId}, " +
