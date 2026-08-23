@@ -12,6 +12,7 @@ public class CharacterSkillCastingController : MonoBehaviour
         public SkillSpec Skill;
         public float RangeRadius;
         public Vector2 TargetPosition;
+        public Vector2 CastDirection;
         public GameObject TargetObject;
         public Enemy TargetEnemy;
     }
@@ -24,6 +25,7 @@ public class CharacterSkillCastingController : MonoBehaviour
     [SerializeField] private GameObject skillTargetingIndicator;
     [SerializeField] private GameObject skillBarIndicator;
     [SerializeField] private GameObject skillRangeIndicator;
+    [SerializeField] private Transform projectileSpawnPoint;
 
     private ISkillRuntime skillRuntime;
 
@@ -74,7 +76,6 @@ public class CharacterSkillCastingController : MonoBehaviour
 
     public void BeginTargeting(KeyMapping skillSlot)
     {
-        CancelPendingSkillCast();
         HideIndicator();
 
         if (!enabled)
@@ -99,10 +100,6 @@ public class CharacterSkillCastingController : MonoBehaviour
         switch (currentCastingSkill.castType)
         {
             case CastType.bar:
-                skillBarIndicator.transform.localScale = new Vector2(
-                    currentCastingSkill.range,
-                    currentCastingSkill.size
-                );
                 skillBarIndicator.SetActive(true);
                 break;
 
@@ -142,6 +139,7 @@ public class CharacterSkillCastingController : MonoBehaviour
         );
 
         isIndicatingSkill = true;
+        IndicateSkill();
     }
 
     public bool TryConfirmCasting(Vector2 mouseWorldPosition)
@@ -158,6 +156,7 @@ public class CharacterSkillCastingController : MonoBehaviour
         if (castContext == null)
             return false;
 
+        CancelPendingSkillCast();
         HideIndicator();
 
         if (RequiresRangeCheck(castContext.Skill) &&
@@ -210,11 +209,11 @@ public class CharacterSkillCastingController : MonoBehaviour
     private void IndicateBarType(Vector3 mousePosition)
     {
         Vector2 center = transform.position;
-        float angleRadians = Mathf.Atan2(
-            mousePosition.y - center.y,
-            mousePosition.x - center.x
-        );
-        float angleDegrees = angleRadians * Mathf.Rad2Deg;
+        Vector2 castDirection = GetBarCastDirection(center, mousePosition);
+        float angleDegrees = Mathf.Atan2(
+            castDirection.y,
+            castDirection.x
+        ) * Mathf.Rad2Deg;
 
         if (transform.localScale.x > 0f)
             angleDegrees -= 180f;
@@ -224,13 +223,10 @@ public class CharacterSkillCastingController : MonoBehaviour
             Vector3.forward
         );
 
-        const float semiMajorAxis = 1f;
-        const float semiMinorAxis = 0.5f;
-        float slope = (mousePosition.y - center.y) / (mousePosition.x - center.x);
-        float ellipseAngle = Mathf.Atan((slope * semiMajorAxis) / semiMinorAxis);
-        float intersectX = center.x + semiMajorAxis * Mathf.Cos(ellipseAngle);
-        float intersectY = center.y + semiMinorAxis * Mathf.Sin(ellipseAngle);
-        float ratio = Vector2.Distance(center, new Vector2(intersectX, intersectY));
+        float ratio = Vector2.Distance(
+            center,
+            GetEllipseIntersection(center, center + castDirection, 1f)
+        );
 
         skillBarIndicator.transform.localScale = new Vector2(
             currentCastingSkill.range * ratio,
@@ -342,7 +338,11 @@ public class CharacterSkillCastingController : MonoBehaviour
                 break;
 
             case CastType.bar:
-                castContext.TargetPosition = transform.position;
+                castContext.TargetPosition = mousePosition;
+                castContext.CastDirection = GetBarCastDirection(
+                    transform.position,
+                    mousePosition
+                );
                 break;
         }
 
@@ -416,12 +416,16 @@ public class CharacterSkillCastingController : MonoBehaviour
 
         yield return new WaitForSeconds(skill.preDelay);
 
+        GetSkillObjectPositions(
+            castContext,
+            out Vector3 spawnPosition,
+            out Vector3 destinationPosition
+        );
+
         skillRuntime.CreateSkillObject(
             skillSpec: skill,
-            spawnPosition: GetSkillGeneratePosition(
-                skill.castType,
-                castContext.TargetPosition
-            ),
+            spawnPosition: spawnPosition,
+            destinationPosition: destinationPosition,
             skillObjectLocalScale: new Vector3(
                 transform.localScale.x < 0f ? -1f : 1f,
                 1f,
@@ -436,18 +440,42 @@ public class CharacterSkillCastingController : MonoBehaviour
         currentActivatingSkillCoroutine = null;
     }
 
-    private Vector3 GetSkillGeneratePosition(CastType castType, Vector2 targetPosition)
+    private void GetSkillObjectPositions(
+        SkillCastContext castContext,
+        out Vector3 spawnPosition,
+        out Vector3 destinationPosition
+    )
     {
-        switch (castType)
+        if (castContext.Skill.castType == CastType.bar)
         {
-            case CastType.area:
-            case CastType.target:
-                return targetPosition;
-
-            case CastType.bar:
-            default:
-                return transform.position;
+            spawnPosition = projectileSpawnPoint.position;
+            Vector2 destination = GetRayEllipseIntersection(
+                spawnPosition,
+                castContext.CastDirection,
+                transform.position,
+                castContext.RangeRadius
+            );
+            destinationPosition = new Vector3(
+                destination.x,
+                destination.y,
+                spawnPosition.z
+            );
+            return;
         }
+
+        spawnPosition = castContext.TargetPosition;
+        destinationPosition = spawnPosition;
+    }
+
+    private Vector2 GetBarCastDirection(Vector2 center, Vector2 target)
+    {
+        Vector2 direction = target - center;
+        if (direction.sqrMagnitude > Mathf.Epsilon)
+            return direction.normalized;
+
+        return transform.localScale.x < 0f
+            ? Vector2.right
+            : Vector2.left;
     }
 
     private static bool IsInsideRange(Vector2 center, Vector2 target, float semiMajorAxis)
@@ -486,6 +514,48 @@ public class CharacterSkillCastingController : MonoBehaviour
         );
 
         return center + direction * scale;
+    }
+
+    private static Vector2 GetRayEllipseIntersection(
+        Vector2 rayOrigin,
+        Vector2 rayDirection,
+        Vector2 ellipseCenter,
+        float semiMajorAxis
+    )
+    {
+        if (semiMajorAxis <= 0f || rayDirection.sqrMagnitude <= Mathf.Epsilon)
+            return rayOrigin;
+
+        rayDirection.Normalize();
+
+        float semiMinorAxis = semiMajorAxis * 0.5f;
+        Vector2 originOffset = rayOrigin - ellipseCenter;
+
+        float coefficientA =
+            (rayDirection.x * rayDirection.x) / (semiMajorAxis * semiMajorAxis) +
+            (rayDirection.y * rayDirection.y) / (semiMinorAxis * semiMinorAxis);
+        float coefficientB = 2f * (
+            (originOffset.x * rayDirection.x) / (semiMajorAxis * semiMajorAxis) +
+            (originOffset.y * rayDirection.y) / (semiMinorAxis * semiMinorAxis)
+        );
+        float coefficientC =
+            (originOffset.x * originOffset.x) / (semiMajorAxis * semiMajorAxis) +
+            (originOffset.y * originOffset.y) / (semiMinorAxis * semiMinorAxis) -
+            1f;
+
+        float discriminant =
+            coefficientB * coefficientB - 4f * coefficientA * coefficientC;
+
+        if (discriminant < 0f)
+            return rayOrigin;
+
+        float intersectionDistance =
+            (-coefficientB + Mathf.Sqrt(discriminant)) / (2f * coefficientA);
+
+        if (intersectionDistance <= 0f)
+            return rayOrigin;
+
+        return rayOrigin + rayDirection * intersectionDistance;
     }
 
     public static float GetDistanceToEllipse(Vector2 center, Vector2 target, float semiMajorAxis)

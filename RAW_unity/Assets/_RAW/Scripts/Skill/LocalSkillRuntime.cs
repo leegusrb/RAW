@@ -42,6 +42,7 @@ public class LocalSkillRuntime :
 	public void CreateSkillObject(
 		SkillSpec skillSpec,
 		Vector3 spawnPosition,
+		Vector3 destinationPosition,
 		Vector3 skillObjectLocalScale,
 		Enemy skillTargetEnemy
 	)
@@ -79,6 +80,10 @@ public class LocalSkillRuntime :
 			return;
 		}
 
-		skillObjectComponent.Initialize(skillSpec, skillTargetEnemy);
+		skillObjectComponent.Initialize(
+			skillSpec,
+			destinationPosition,
+			skillTargetEnemy
+		);
 	}
 }

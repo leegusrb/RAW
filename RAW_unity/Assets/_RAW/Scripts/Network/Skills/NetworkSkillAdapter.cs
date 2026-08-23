@@ -83,6 +83,7 @@ namespace RAW.Network
 		public void CreateSkillObject(
 			SkillSpec skillSpec,
 			Vector3 spawnPosition,
+			Vector3 destinationPosition,
 			Vector3 skillObjectLocalScale,
 			Enemy skillTargetEnemy
 		)
