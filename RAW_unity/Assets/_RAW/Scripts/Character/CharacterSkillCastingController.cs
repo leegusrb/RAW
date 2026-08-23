@@ -416,22 +416,19 @@ public class CharacterSkillCastingController : MonoBehaviour
 
         yield return new WaitForSeconds(skill.preDelay);
 
-        GameObject skillObject = Instantiate(
-            skill.skillPrefab,
-            GetSkillGeneratePosition(skill.castType, castContext.TargetPosition),
-            Quaternion.identity
+        skillRuntime.CreateSkillObject(
+            skillSpec: skill,
+            spawnPosition: GetSkillGeneratePosition(
+                skill.castType,
+                castContext.TargetPosition
+            ),
+            skillObjectLocalScale: new Vector3(
+                transform.localScale.x < 0f ? -1f : 1f,
+                1f,
+                1f
+            ),
+            skillTargetEnemy: castContext.TargetEnemy
         );
-
-        skillObject.transform.localScale = new Vector3(
-            transform.localScale.x < 0f ? -1f : 1f,
-            1f,
-            1f
-        );
-
-        SkillObject skillObjectComponent = skillObject.GetComponent<SkillObject>();
-
-        if (skillObjectComponent != null)
-            skillObjectComponent.Initialize(skill, castContext.TargetEnemy);
 
         yield return new WaitForSeconds(skill.postDelay);
 

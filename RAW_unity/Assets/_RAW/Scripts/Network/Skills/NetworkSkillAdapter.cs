@@ -79,6 +79,15 @@ namespace RAW.Network
 			Debug.LogWarning($"장착되지 않은 스킬입니다: {skillId}", this);
 			return SkillUseRequestResult.Rejected;
 		}
+
+		public void CreateSkillObject(
+			SkillSpec skillSpec,
+			Vector3 spawnPosition,
+			Vector3 skillObjectLocalScale,
+			Enemy skillTargetEnemy
+		)
+		{
+		}
 	}
 	
 }
