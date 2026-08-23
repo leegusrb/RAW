@@ -78,6 +78,61 @@ namespace RAW.Network
 			return true;
 		}
 
+		public bool TryCapturePersistentStateOnServer(
+			PlayerPersistentData existingData,
+			out PlayerPersistentData snapshot,
+			out string error
+		)
+		{
+			snapshot = null;
+
+			CacheComponents();
+
+			if (existingData == null)
+			{
+				error = "스냅샷의 기준이 될 플레이어 데이터가 없습니다.";
+				return false;
+			}
+
+			if (characterState == null ||
+				inventorySync == null ||
+				equipmentSync == null)
+			{
+				error = "영속 상태 추출에 필요한 컴포넌트가 없습니다.";
+				return false;
+			}
+
+			PlayerPersistentData candidate = existingData.DeepCopy();
+
+			if (!characterState.TryWritePersistentStateOnServer(candidate))
+			{
+				error = "HP/MP 상태 추출에 실패했습니다.";
+				return false;
+			}
+
+			if (!inventorySync.TryWritePersistentStateOnServer(candidate))
+			{
+				error = "인벤토리 상태 추출에 실패했습니다.";
+				return false;
+			}
+
+			if (!equipmentSync.TryWritePersistentStateOnServer(candidate))
+			{
+				error = "장비 상태 추출에 실패했습니다.";
+				return false;
+			}
+
+			if (!PlayerPersistentDataValidator.TryValidate(candidate, out error))
+			{
+				return false;
+			}
+
+			snapshot = candidate;
+			error = null;
+
+			return true;
+		}
+
 		private void CacheComponents()
 		{
 			if (characterState == null)

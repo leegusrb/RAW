@@ -1,3 +1,4 @@
+using RAW.Persistence;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -180,6 +181,26 @@ namespace RAW.Network
 				$"MP={manaPoint.Value}",
 				this
 			);
+
+			return true;
+		}
+
+		public bool TryWritePersistentStateOnServer(PlayerPersistentData playerData)
+		{
+			if (!IsSpawned || !IsServer)
+			{
+				Debug.LogWarning("Spawn된 서버 NetworkPlayer에서만 영속 상태를 추출할 수 있습니다.", this);
+				return false;
+			}
+
+			if (playerData == null)
+			{
+				Debug.LogError("상태를 기록할 PlayerPersistentData가 없습니다.", this);
+				return false;
+			}
+
+			playerData.healthPoint = healthPoint.Value;
+			playerData.manaPoint = manaPoint.Value;
 
 			return true;
 		}

@@ -139,6 +139,70 @@ namespace RAW.Network
 			return true;
 		}
 
+		public bool TryWritePersistentStateOnServer(PlayerPersistentData playerData)
+		{
+			if (!IsSpawned || !IsServer)
+			{
+				Debug.LogWarning("Spawn된 서버 NetworkPlayer에서만 인벤토리 상태를 추출할 수 있습니다.", this);
+				return false;
+			}
+
+			if (playerData == null)
+			{
+				Debug.LogError("인벤토리를 기록할 PlayerPersistentData가 없습니다.", this);
+				return false;
+			}
+
+			if (inventory == null)
+			{
+				Debug.LogError("Char_Inventory가 없습니다.", this);
+				return false;
+			}
+
+			int capacity = inventory.CurrentInventoryCapacity;
+
+			if (capacity < 0)
+			{
+				Debug.LogError($"현재 인벤토리 용량이 올바르지 않습니다: {capacity}", this);
+				return false;
+			}
+
+			List<PlayerInventorySlotData> snapshot = new();
+
+			for (int i = 0; i < capacity; i++)
+			{
+				InventorySlot slot = inventory.GetInventorySlot(i);
+
+				if (slot == null || slot.IsEmpty)
+					continue;
+
+				if (string.IsNullOrWhiteSpace(slot.itemId) || slot.count <= 0)
+				{
+					Debug.LogError(
+						$"현재 인벤토리 슬롯 상태가 올바르지 않습니다. " +
+						$"Slot={i}, ItemId={slot.itemId}, Count={slot.count}",
+						this
+					);
+
+					return false;
+				}
+
+				snapshot.Add(
+					new PlayerInventorySlotData
+					{
+						slotIndex = i,
+						itemId = slot.itemId,
+						count = slot.count
+					}
+				);
+			}
+
+			playerData.inventoryCapacity = capacity;
+			playerData.inventory = snapshot;
+
+			return true;
+		}
+
 		private void CacheComponents()
 		{
 			if (inventory == null)

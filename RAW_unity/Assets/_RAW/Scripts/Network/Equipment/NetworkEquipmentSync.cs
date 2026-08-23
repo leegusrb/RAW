@@ -152,6 +152,83 @@ namespace RAW.Network
 			return true;
 		}
 
+		public bool TryWritePersistentStateOnServer(PlayerPersistentData playerData)
+		{
+			if (!IsSpawned || !IsServer)
+			{
+				Debug.LogWarning("Spawn된 서버 NetworkPlayer에서만 장비 상태를 추출할 수 있습니다.", this);
+				return false;
+			}
+
+			if (playerData == null)
+			{
+				Debug.LogError("장비를 기록할 PlayerPersistentData가 없습니다.", this);
+				return false;
+			}
+
+			if (inventory == null || equipmentCatalog == null)
+			{
+				Debug.LogError("Char_Inventory 또는 EquipmentCatalog가 없습니다.", this);
+				return false;
+			}
+
+			List<PlayerEquipmentSlotData> snapshot = new();
+
+			foreach (KeyValuePair<EquipmentSlot, string> pair in inventory.EquippedItems)
+			{
+				if (!Enum.IsDefined(typeof(EquipmentSlot), pair.Key))
+				{
+					Debug.LogError($"현재 장비 슬롯이 올바르지 않습니다: {pair.Key}", this);
+					return false;
+				}
+
+				if (string.IsNullOrWhiteSpace(pair.Value))
+				{
+					Debug.LogError($"현재 장비 ItemId가 비어 있습니다: {pair.Key}", this);
+					return false;
+				}
+
+				if (!equipmentCatalog.IsValidForSlot(pair.Value, pair.Key))
+				{
+					Debug.LogError(
+						$"현재 장비가 Catalog와 일치하지 않습니다. " +
+						$"Slot={pair.Key}, ItemId={pair.Value}",
+						this
+					);
+
+					return false;
+				}
+
+				if (!inventory.HasItem(pair.Value))
+				{
+					Debug.LogError(
+						$"인벤토리에 없는 장비가 장착되어 있습니다. " +
+						$"Slot={pair.Key}, ItemId={pair.Value}",
+						this
+					);
+
+					return false;
+				}
+
+				snapshot.Add(
+					new PlayerEquipmentSlotData
+					{
+						slot = pair.Key,
+						itemId = pair.Value
+					}
+				);
+			}
+
+			snapshot.Sort(
+				(left, right) =>
+					((int)left.slot).CompareTo((int)right.slot)
+			);
+
+			playerData.equipment = snapshot;
+
+			return true;
+		}
+
 		public bool TryGetRegisteredSlot(string itemId, out EquipmentSlot equipmentSlot)
 		{
 			if (equipmentCatalog == null)
