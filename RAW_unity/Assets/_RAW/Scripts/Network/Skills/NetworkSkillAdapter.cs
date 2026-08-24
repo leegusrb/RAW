@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 namespace RAW.Network
@@ -61,23 +60,7 @@ namespace RAW.Network
 				return SkillUseRequestResult.Rejected;
 			}
 
-			if (string.IsNullOrWhiteSpace(skillId))
-				return SkillUseRequestResult.Rejected;
-
-			foreach (KeyMapping slot in Enum.GetValues(typeof(KeyMapping)))
-			{
-				if (!networkSkillController.TryGetSkillForSlot(slot, out SkillSpec skill))
-					continue;
-
-				if (!string.Equals(skill.SkillId, skillId, StringComparison.Ordinal))
-					continue;
-
-				networkSkillController.RequestUseSkill(slot);
-				return SkillUseRequestResult.HandleByRuntime;
-			}
-
-			Debug.LogWarning($"장착되지 않은 스킬입니다: {skillId}", this);
-			return SkillUseRequestResult.Rejected;
+			return SkillUseRequestResult.HandleByRuntime;
 		}
 
 		public void CreateSkillObject(
