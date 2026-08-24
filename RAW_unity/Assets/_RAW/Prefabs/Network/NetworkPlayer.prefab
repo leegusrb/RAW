@@ -228,6 +228,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 2598696420236482373, guid: 67dbb23091e48f9418e69cd1c99a178b, type: 3}
       insertIndex: -1
       addedObject: {fileID: 3312777262975726096}
+    - targetCorrespondingSourceObject: {fileID: 2598696420236482373, guid: 67dbb23091e48f9418e69cd1c99a178b, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8884036133389200554}
   m_SourcePrefab: {fileID: 100100000, guid: 67dbb23091e48f9418e69cd1c99a178b, type: 3}
 --- !u!1 &124719763721653724 stripped
 GameObject:
@@ -533,6 +536,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RAW.Network.NetworkSkillAdapter
   networkSkillController: {fileID: 7574358915048637377}
+--- !u!114 &8884036133389200554
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5662116675036114195}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1d3225c6be3f54325bd6687057460f7c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: RAW.Network::RAW.Network.NetworkPlayerPersistenceAdapter
+  characterState: {fileID: 365905181430154016}
+  inventorySync: {fileID: 6312858080780476418}
+  equipmentSync: {fileID: 7775273453424153153}
 --- !u!1 &7511849947110713824 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 197311793952166838, guid: 67dbb23091e48f9418e69cd1c99a178b, type: 3}
