@@ -21,10 +21,6 @@ namespace RAW.Network
 		private NetworkList<NetworkSkillCooldownEntry> cooldownList;
 		private NetworkList<NetworkSkillLoadoutEntry> skillLoadout;
 
-		private uint lastIssuedRequestSequence;
-		private uint lastReceivedRequestSequence;
-		private bool hasLastReceivedRequestSequence;
-
 		public event Action CooldownChanged;
 		public event Action LoadoutChanged;
 
@@ -77,16 +73,8 @@ namespace RAW.Network
 			cooldownList.OnListChanged += HandleCooldownListChanged;
 			skillLoadout.OnListChanged += HandleSkillLoadoutChanged;
 
-			if (IsOwner)
-				lastIssuedRequestSequence = 0;
-
 			if (IsServer)
-			{
-				lastReceivedRequestSequence = 0;
-				hasLastReceivedRequestSequence = false;
-
 				InitializeDefaultLoadoutOnServer();
-			}
 		}
 
 		public override void OnNetworkDespawn()
@@ -190,8 +178,7 @@ namespace RAW.Network
 				new SkillUseRequest
 				{
 					skillId = skill.SkillId,
-					requestSequence = 0,
-					target = null
+					target = default
 				};
 
 			return TryRequestUseSkill(request);
@@ -220,8 +207,6 @@ namespace RAW.Network
 				return false;
 			}
 
-			networkRequest.RequestSequence = IssueRequestSequence();
-
 			if (IsServer)
 			{
 				TryProcessSkillUseRequestOnServer(networkRequest);
@@ -234,17 +219,6 @@ namespace RAW.Network
 			return true;
 		}
 
-		private uint IssueRequestSequence()
-		{
-			do
-			{
-				lastIssuedRequestSequence++;
-			}
-			while (lastIssuedRequestSequence == 0);
-
-			return lastIssuedRequestSequence;
-		}
-
 		[Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Owner)]
 		private void RequestUseSkillRpc(NetworkSkillUseRequest request)
 		{
@@ -255,19 +229,6 @@ namespace RAW.Network
 		{
 			if (!IsServer)
 				return false;
-
-			if (!TryRegisterRequestSequence(request.RequestSequence))
-			{
-				Debug.LogWarning(
-					$"스킬 요청 무시: 중복되었거나 이전 요청입니다. " +
-					$"OwnerClientId={OwnerClientId}, " +
-					$"Sequence={request.RequestSequence}, " +
-					$"LastSequence={lastReceivedRequestSequence}",
-					this
-				);
-
-				return false;
-			}
 
 			double serverTime = NetworkManager.ServerTime.Time;
 
@@ -283,7 +244,6 @@ namespace RAW.Network
 					$"스킬 요청 거절: " +
 					$"OwnerClientId={OwnerClientId}, " +
 					$"SkillId={skillId}, " +
-					$"Sequence={request.RequestSequence}, " +
 					$"Reason={rejectionReason}",
 					this
 				);
@@ -298,8 +258,7 @@ namespace RAW.Network
 				Debug.LogWarning(
 					$"스킬 요청 상태 반영 실패: " +
 					$"OwnerClientId={OwnerClientId}, " +
-					$"SkillId={skillId}, " +
-					$"Sequence={request.RequestSequence}",
+					$"SkillId={skillId}, ",
 					this
 				);
 
@@ -313,44 +272,18 @@ namespace RAW.Network
 
 			SetCooldownOnServer(skillId, skill.CooldownSeconds, serverTime);
 
-			SendSkillCastEvent(request, serverTime);
+			SendSkillCastEvent(request);
 
 			Debug.Log(
 				$"스킬 요청 승인: " +
 				$"OwnerClientId={OwnerClientId}, " +
 				$"SkillId={skillId}, " +
 				$"Mana={characterState.MP}, " +
-				$"Cooldown={skill.CooldownSeconds:F2}, " +
-				$"Sequence={request.RequestSequence}",
+				$"Cooldown={skill.CooldownSeconds:F2}, ",
 				this
 			);
 
 			return true;
-		}
-
-		private bool TryRegisterRequestSequence(uint requestSequence)
-		{
-			if (requestSequence == 0)
-				return false;
-
-			if (hasLastReceivedRequestSequence &&
-				!IsNewerRequestSequence(
-					requestSequence,
-					lastReceivedRequestSequence
-				))
-			{
-				return false;
-			}
-
-			lastReceivedRequestSequence = requestSequence;
-			hasLastReceivedRequestSequence = true;
-
-			return true;
-		}
-
-		private static bool IsNewerRequestSequence(uint candidate, uint previous)
-		{
-			return unchecked((int)(candidate - previous)) > 0;
 		}
 
 		private bool TryValidateSkillUseOnServer(
@@ -480,11 +413,11 @@ namespace RAW.Network
 				return;
 
 			NetworkSkillUseRejectedEvent networkEvent =
-				new NetworkSkillUseRejectedEvent(
-					request.SkillId,
-					request.RequestSequence,
-					reason
-				);
+				new NetworkSkillUseRejectedEvent
+				{
+					SkillId = request.SkillId,
+					Reason = reason
+				};
 
 			NotifySkillUseRejectedRpc(networkEvent);
 		}
@@ -498,20 +431,17 @@ namespace RAW.Network
 			SkillUseRejected?.Invoke(rejectedEvent);
 		}
 
-		private void SendSkillCastEvent(NetworkSkillUseRequest request, double castServerTime)
+		private void SendSkillCastEvent(NetworkSkillUseRequest request)
 		{
 			if (!IsServer)
 				return;
 
 			NetworkSkillCastEvent networkEvent =
-				new NetworkSkillCastEvent(
-					NetworkObjectId,
-					request.SkillId,
-					transform.position,
-					request.Target,
-					request.RequestSequence,
-					castServerTime
-				);
+				new NetworkSkillCastEvent
+				{
+					SkillId = request.SkillId,
+					TargetInfo = request.TargetInfo
+				};
 
 			NotifySkillCastRpc(networkEvent);
 		}
@@ -519,7 +449,7 @@ namespace RAW.Network
 		[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
 		private void NotifySkillCastRpc(NetworkSkillCastEvent networkEvent)
 		{
-			SkillCastEvent castEvent = NetworkSkillContractMapper.ToContract(networkEvent);
+			SkillCastEvent castEvent = NetworkSkillContractMapper.ToContract(networkEvent, NetworkObjectId);
 
 			SkillCast?.Invoke(castEvent);
 		}
@@ -527,30 +457,19 @@ namespace RAW.Network
 		private void SendSkillHitEvent(
 			ulong targetObjectId,
 			FixedString64Bytes skillId,
-			int damage,
-			int targetHpAfterHit,
-			Vector3 hitPosition,
-			uint requestSequence,
-			ushort hitIndex
+			int damage
 		)
 		{
 			if (!IsServer)
 				return;
 
-			double hitServerTime = NetworkManager.ServerTime.Time;
-
 			NetworkSkillHitEvent networkEvent =
-				new NetworkSkillHitEvent(
-					NetworkObjectId,
-					targetObjectId,
-					skillId,
-					damage,
-					targetHpAfterHit,
-					hitPosition,
-					requestSequence,
-					hitIndex,
-					hitServerTime
-				);
+				new NetworkSkillHitEvent
+				{
+					SkillId = skillId,
+					TargetObjectId = targetObjectId,
+					Damage = damage
+				};
 
 			NotifySkillHitRpc(networkEvent);
 		}
@@ -558,7 +477,7 @@ namespace RAW.Network
 		[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
 		private void NotifySkillHitRpc(NetworkSkillHitEvent networkEvent)
 		{
-			SkillHitEvent hitEvent = NetworkSkillContractMapper.ToContract(networkEvent);
+			SkillHitEvent hitEvent = NetworkSkillContractMapper.ToContract(networkEvent, NetworkObjectId);
 
 			SkillHit?.Invoke(hitEvent);
 		}

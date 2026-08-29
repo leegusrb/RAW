@@ -3,14 +3,14 @@ using Unity.Collections;
 
 namespace RAW.Network
 {
-	public static class NetworkSkillContractMapper
+	internal static class NetworkSkillContractMapper
 	{
 		public static bool TryToNetwork(
 			SkillUseRequest request,
-			out NetworkSkillUseRequest networkRequest
+			out NetworkSkillUseRequest result
 		)
 		{
-			networkRequest = default;
+			result = default;
 
 			if (request == null || string.IsNullOrWhiteSpace(request.skillId))
 				return false;
@@ -20,14 +20,11 @@ namespace RAW.Network
 			if (skillIdByteCount > FixedString64Bytes.UTF8MaxLengthInBytes)
 				return false;
 
-			NetworkSkillTargetInfo networkTarget = ToNetworkTarget(request.target);
-
-			networkRequest =
-				new NetworkSkillUseRequest(
-					request.skillId,
-					request.requestSequence,
-					networkTarget
-				);
+			result = new NetworkSkillUseRequest
+			{
+				SkillId = new FixedString64Bytes(request.skillId),
+				TargetInfo = ToNetworkTarget(request.target)
+			};
 
 			return true;
 		}
@@ -37,50 +34,39 @@ namespace RAW.Network
 			return new SkillUseRejectedEvent
 			{
 				skillId = networkEvent.SkillId.ToString(),
-				requestSequence = networkEvent.RequestSequence,
 				reason = networkEvent.Reason
 			};
 		}
 
-		public static SkillCastEvent ToContract(NetworkSkillCastEvent networkEvent)
+		public static SkillCastEvent ToContract(NetworkSkillCastEvent networkEvent, ulong casterObjectId)
 		{
 			return new SkillCastEvent
 			{
-				casterObjectId = networkEvent.CasterObjectId,
+				casterObjectId = casterObjectId,
 				skillId = networkEvent.SkillId.ToString(),
-				casterPosition = networkEvent.CasterPosition,
-				targetInfo = ToContractTarget(networkEvent.TargetInfo),
-				requestSequence = networkEvent.RequestSequence,
-				castServerTime = networkEvent.CastServerTime
+				targetInfo = ToContractTarget(networkEvent.TargetInfo)
 			};
 		}
 
-		public static SkillHitEvent ToContract(NetworkSkillHitEvent networkEvent)
+		public static SkillHitEvent ToContract(NetworkSkillHitEvent networkEvent, ulong casterObjectId)
 		{
 			return new SkillHitEvent
 			{
-				casterObjectId = networkEvent.CasterObjectId,
-				targetObjectId = networkEvent.TargetObjectId,
 				skillId = networkEvent.SkillId.ToString(),
+				casterObjectId = casterObjectId,
+				targetObjectId = networkEvent.TargetObjectId,
 				damage = networkEvent.Damage,
-				targetHpAfterHit = networkEvent.TargetHpAfterHit,
-				hitPosition = networkEvent.HitPosition,
-				requestSequence = networkEvent.RequestSequence,
-				hitIndex = networkEvent.HitIndex,
-				hitServerTime = networkEvent.HitServerTime
 			};
 		}
 
 		private static NetworkSkillTargetInfo ToNetworkTarget(SkillTargetInfo target)
 		{
-			if (target == null)
-				return default;
-
-			return new NetworkSkillTargetInfo(
-				target.direction,
-				target.targetPosition,
-				target.targetObjectId
-			);
+			return new NetworkSkillTargetInfo
+			{
+				Direction = target.direction,
+				TargetPosition = target.targetPosition,
+				TargetObjectId = target.targetObjectId
+			};
 		}
 
 		private static SkillTargetInfo ToContractTarget(NetworkSkillTargetInfo networkTarget)
