@@ -78,10 +78,10 @@ public class CharacterSkillCastingController : MonoBehaviour
     {
         HideIndicator();
 
-        if (!enabled)
+        if (enabled == false)
             return;
 
-        if (!skillRuntime.TryGetSkillForSlot(skillSlot, out SkillSpec skill))
+        if (skillRuntime.TryGetSkillForSlot(skillSlot, out SkillSpec skill) == false)
         {
             Debug.LogWarning($"{skillSlot} 슬롯에 등록된 스킬이 없습니다.", this);
             return;
@@ -138,7 +138,7 @@ public class CharacterSkillCastingController : MonoBehaviour
 
     public bool TryConfirmCasting(Vector2 mouseWorldPosition)
     {
-        if (!isIndicatingSkill || !IsPossibleToActivateSkill())
+        if (isIndicatingSkill == false || IsPossibleToActivateSkill() == false)
             return false;
 
         SkillCastContext castContext = CreateSkillCastContext(
@@ -154,7 +154,7 @@ public class CharacterSkillCastingController : MonoBehaviour
         HideIndicator();
 
         if (RequiresRangeCheck(castContext.Skill) &&
-            !IsInsideRange(transform.position, castContext.TargetPosition, castContext.RangeRadius))
+            IsInsideRange(transform.position, castContext.TargetPosition, castContext.RangeRadius) == false)
         {
             pendingSkillCast = castContext;
             characterControl.SetMoveDestination(castContext.TargetPosition);
@@ -351,17 +351,17 @@ public class CharacterSkillCastingController : MonoBehaviour
     {
         SkillCastContext castContext = pendingSkillCast;
 
-        if (!RefreshTargetPosition(castContext))
+        if (RefreshTargetPosition(castContext) == false)
         {
             CancelPendingSkillCast();
             return;
         }
 
-        if (!IsInsideRange(
+        if (IsInsideRange(
             transform.position,
             castContext.TargetPosition,
             castContext.RangeRadius
-        ))
+        ) == false)
         {
             characterControl.SetMoveDestination(castContext.TargetPosition);
             return;
