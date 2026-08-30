@@ -44,7 +44,7 @@ public class LocalSkillRuntime :
 		Vector3 spawnPosition,
 		Vector3 destinationPosition,
 		Vector3 skillObjectLocalScale,
-		Enemy skillTargetEnemy
+		SkillTarget skillTarget
 	)
 	{
 		if (skillSpec == null)
@@ -83,7 +83,7 @@ public class LocalSkillRuntime :
 		skillObjectComponent.Initialize(
 			skillSpec,
 			destinationPosition,
-			skillTargetEnemy
+			skillTarget
 		);
 	}
 }

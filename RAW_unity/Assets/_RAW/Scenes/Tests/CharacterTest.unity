@@ -207,6 +207,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 2577585254963922481, guid: 63ee4b6a40c55fd429759b807832ded1, type: 3}
   m_PrefabInstance: {fileID: 113705130}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &126734429 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2067141113459073165, guid: 67dbb23091e48f9418e69cd1c99a178b, type: 3}
+  m_PrefabInstance: {fileID: 6384901998301933019}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eff3e1f39d530f949b3181c546d0da76, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::TargettingSkillIndicator
 --- !u!1 &202335831
 GameObject:
   m_ObjectHideFlags: 0
@@ -1066,6 +1077,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 1532218796454169711, guid: ec58634b610c94022b27f39f0cee941e, type: 3}
       insertIndex: -1
       addedObject: {fileID: 642646808}
+    - targetCorrespondingSourceObject: {fileID: 1532218796454169711, guid: ec58634b610c94022b27f39f0cee941e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 642646811}
   m_SourcePrefab: {fileID: 100100000, guid: ec58634b610c94022b27f39f0cee941e, type: 3}
 --- !u!1 &642646806 stripped
 GameObject:
@@ -1108,8 +1122,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 89ef715ad69dbfe409cca5a6bc2b9986, type: 3}
   m_Name:
   m_EditorClassIdentifier: Assembly-CSharp::Enemy
-  hitPoint: {x: 0, y: 0}
-  hitPositionObject: {fileID: 543121591}
   spec: {fileID: 11400000, guid: eadfcf60004694d438fd83b68ed0d560, type: 2}
   characterState: {fileID: 642646808}
 --- !u!70 &642646810
@@ -1149,6 +1161,20 @@ CapsuleCollider2D:
   m_Offset: {x: 0, y: 0.3404306}
   m_Size: {x: 0.5, y: 0.6828287}
   m_Direction: 0
+--- !u!114 &642646811
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 642646806}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a7f16d78ef64b6a974c2d61e991815e, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::SkillTarget
+  hitPosition: {fileID: 543121591}
+  characterState: {fileID: 0}
 --- !u!1 &665918037
 GameObject:
   m_ObjectHideFlags: 0
@@ -1751,8 +1777,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 89ef715ad69dbfe409cca5a6bc2b9986, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Enemy
-  hitPoint: {x: 0, y: 0}
-  hitPositionObject: {fileID: 665918038}
   spec: {fileID: 11400000, guid: eadfcf60004694d438fd83b68ed0d560, type: 2}
   characterState: {fileID: 1268022737}
 --- !u!114 &1268022737
@@ -1774,6 +1798,20 @@ MonoBehaviour:
   moveSpeed: 0
   isMovable: 1
   healthBar: {fileID: 202335833}
+--- !u!114 &1268022738
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1268022731}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a7f16d78ef64b6a974c2d61e991815e, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::SkillTarget
+  hitPosition: {fileID: 665918038}
+  characterState: {fileID: 1268022737}
 --- !u!1 &1277544656
 GameObject:
   m_ObjectHideFlags: 0
@@ -2609,6 +2647,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 1532218796454169711, guid: ec58634b610c94022b27f39f0cee941e, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1268022737}
+    - targetCorrespondingSourceObject: {fileID: 1532218796454169711, guid: ec58634b610c94022b27f39f0cee941e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1268022738}
   m_SourcePrefab: {fileID: 100100000, guid: ec58634b610c94022b27f39f0cee941e, type: 3}
 --- !u!1001 &1644885769
 PrefabInstance:
@@ -7816,6 +7857,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4478123098765412301, guid: 67dbb23091e48f9418e69cd1c99a178b, type: 3}
+      propertyPath: targetIndicator
+      value:
+      objectReference: {fileID: 126734429}
     - target: {fileID: 4478123098765412301, guid: 67dbb23091e48f9418e69cd1c99a178b, type: 3}
       propertyPath: projectileSpawnPoint
       value:

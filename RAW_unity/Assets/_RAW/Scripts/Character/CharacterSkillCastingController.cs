@@ -13,8 +13,7 @@ public class CharacterSkillCastingController : MonoBehaviour
         public float RangeRadius;
         public Vector2 TargetPosition;
         public Vector2 CastDirection;
-        public GameObject TargetObject;
-        public Enemy TargetEnemy;
+        public SkillTarget Target;
     }
 
     [SerializeField] private CharacterControl characterControl;
@@ -26,6 +25,7 @@ public class CharacterSkillCastingController : MonoBehaviour
     [SerializeField] private GameObject skillBarIndicator;
     [SerializeField] private GameObject skillRangeIndicator;
     [SerializeField] private Transform projectileSpawnPoint;
+    [SerializeField] private TargettingSkillIndicator targetIndicator;
 
     private ISkillRuntime skillRuntime;
 
@@ -104,13 +104,8 @@ public class CharacterSkillCastingController : MonoBehaviour
                 break;
 
             case CastType.target:
+                targetIndicator.target = currentCastingSkill.targettingSkillTarget;
                 skillTargetingIndicator.SetActive(true);
-
-                TargettingSkillIndicator targetIndicator =
-                    skillTargetingIndicator.GetComponent<TargettingSkillIndicator>();
-
-                if (targetIndicator != null)
-                    targetIndicator.target = currentCastingSkill.targettingSkillTarget;
                 break;
 
             case CastType.area:
@@ -328,8 +323,7 @@ public class CharacterSkillCastingController : MonoBehaviour
                 if (indicator == null || indicator.targettingTarget == null)
                     return null;
 
-                castContext.TargetObject = indicator.targettingTarget;
-                castContext.TargetEnemy = castContext.TargetObject.GetComponent<Enemy>();
+                castContext.Target = indicator.targettingTarget;
                 RefreshTargetPosition(castContext);
                 break;
 
@@ -379,12 +373,10 @@ public class CharacterSkillCastingController : MonoBehaviour
         if (castContext.Skill.castType != CastType.target)
             return true;
 
-        if (castContext.TargetObject == null)
+        if (castContext.Target == null)
             return false;
 
-        castContext.TargetPosition = castContext.TargetEnemy != null
-            ? castContext.TargetEnemy.hitPoint
-            : castContext.TargetObject.transform.position;
+        castContext.TargetPosition = castContext.Target.HitPosition;
 
         return true;
     }
@@ -431,7 +423,7 @@ public class CharacterSkillCastingController : MonoBehaviour
                 1f,
                 1f
             ),
-            skillTargetEnemy: castContext.TargetEnemy
+            skillTarget: castContext.Target
         );
 
         yield return new WaitForSeconds(skill.postDelay);

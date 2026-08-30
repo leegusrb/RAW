@@ -1169,6 +1169,7 @@ GameObject:
   - component: {fileID: 5999739329963740477}
   - component: {fileID: 4478123098765412301}
   - component: {fileID: 2864591621057478307}
+  - component: {fileID: 7531592486013579246}
   m_Layer: 5
   m_Name: Dummy
   m_TagString: Untagged
@@ -1376,6 +1377,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveSpeed: 1
+--- !u!114 &7531592486013579246
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2598696420236482373}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a7f16d78ef64b6a974c2d61e991815e, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::SkillTarget
+  hitPosition: {fileID: 0}
 --- !u!1 &2650957420405713173
 GameObject:
   m_ObjectHideFlags: 0

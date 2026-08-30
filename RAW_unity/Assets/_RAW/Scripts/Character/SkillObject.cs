@@ -3,18 +3,18 @@ using UnityEngine;
 public class SkillObject : MonoBehaviour
 {
     private SkillSpec spec;
-    private Enemy targetEnemy;
+    private SkillTarget target;
     private Vector3 destinationPosition;
     private bool hasAppliedDamage;
 
     public void Initialize(
         SkillSpec skillSpec,
         Vector3 skillDestinationPosition,
-        Enemy skillTargetEnemy
+        SkillTarget skillTarget
     )
     {
         spec = skillSpec;
-        targetEnemy = skillTargetEnemy;
+        target = skillTarget;
         destinationPosition = skillDestinationPosition;
 
         if (spec.castType == CastType.bar)
@@ -65,23 +65,23 @@ public class SkillObject : MonoBehaviour
         if (spec == null || spec.castType == CastType.target || hasAppliedDamage)
             return;
 
-        Enemy enemy = other.GetComponentInParent<Enemy>();
-        if (enemy == null)
+        SkillTarget skillTarget = other.GetComponentInParent<SkillTarget>();
+        if (skillTarget == null)
             return;
 
-        enemy.TakeDamage(spec.damage);
+        skillTarget.TakeDamage(spec.damage);
         hasAppliedDamage = true;
     }
 
     private void ApplyDamageToTarget()
     {
-        if (targetEnemy == null)
+        if (target == null)
         {
-            Debug.LogError("타겟형 스킬에 대상 적이 없습니다.", this);
+            Debug.LogError("타겟형 스킬에 대상이 없습니다.", this);
             return;
         }
 
-        targetEnemy.TakeDamage(spec.damage);
+        target.TakeDamage(spec.damage);
         hasAppliedDamage = true;
     }
 }

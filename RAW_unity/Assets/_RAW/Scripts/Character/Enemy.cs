@@ -2,11 +2,6 @@ using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    public Vector2 hitPoint;
-    [SerializeField]
-    private Transform hitPositionObject;
-
     [SerializeField]
     private EnemySpec spec;
 
@@ -15,8 +10,6 @@ public class Enemy : MonoBehaviour
 
     private void Awake()
     {
-        hitPoint = hitPositionObject.position;
-
         if (characterState == null)
             characterState = GetComponent<CharacterState>();
     }
@@ -35,19 +28,6 @@ public class Enemy : MonoBehaviour
     void Update()
     {
         
-    }
-
-    
-
-    public void TakeDamage(float damage)
-    {
-        if (characterState == null)
-        {
-            Debug.LogError("Enemy에 CharacterState가 연결되어 있지 않습니다.", this);
-            return;
-        }
-
-        characterState.TakeDamage(damage);
     }
 
     private void Death()

@@ -13,6 +13,6 @@ public interface ISkillRuntime
 		Vector3 spawnPosition,
 		Vector3 destinationPosition,
 		Vector3 skillObjectLocalScale,
-		Enemy skillTargetEnemy
+		SkillTarget skillTarget
 	);
 }
