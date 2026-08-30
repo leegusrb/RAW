@@ -11,7 +11,7 @@ public class TargettingSkillIndicator : MonoBehaviour
     public bool isTargetting;
     [SerializeField] private LayerMask currentTargetLayer;
     public GameObject targetableIndicator;
-    public GameObject targettingTarget;
+    public SkillTarget targettingTarget;
     void Start()
     {
 
@@ -23,10 +23,14 @@ public class TargettingSkillIndicator : MonoBehaviour
         Vector2 ray = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         RaycastHit2D hit = Physics2D.Raycast(ray, transform.forward, Mathf.Infinity, currentTargetLayer);
 
-        if (hit.collider != null)
+        SkillTarget skillTarget = hit.collider != null
+            ? hit.collider.GetComponentInParent<SkillTarget>()
+            : null;
+
+        if (skillTarget != null)
         {
             targetableIndicator.SetActive(true);
-            targettingTarget = hit.collider.gameObject;
+            targettingTarget = skillTarget;
         }
         else
         {

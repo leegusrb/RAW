@@ -1167,7 +1167,9 @@ GameObject:
   - component: {fileID: 9123456789012345678}
   - component: {fileID: 8628046648541683639}
   - component: {fileID: 5999739329963740477}
+  - component: {fileID: 4478123098765412301}
   - component: {fileID: 2864591621057478307}
+  - component: {fileID: 7531592486013579246}
   m_Layer: 5
   m_Name: Dummy
   m_TagString: Untagged
@@ -1315,11 +1317,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   animator: {fileID: 1529180482477143032}
-  state: {fileID: 0}
-  skillQClip: {fileID: 0}
-  skillWClip: {fileID: 0}
-  skillEClip: {fileID: 0}
-  skillRClip: {fileID: 0}
 --- !u!114 &5999739329963740477
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1347,6 +1344,22 @@ MonoBehaviour:
   targetPointer: {fileID: 397496622094931884}
   characterState: {fileID: 2864591621057478307}
   animator: {fileID: 1529180482477143032}
+  skillCastingController: {fileID: 4478123098765412301}
+--- !u!114 &4478123098765412301
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2598696420236482373}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dc5db6dbd8b640be999ddf4f19300b1b, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  characterControl: {fileID: 5999739329963740477}
+  characterState: {fileID: 2864591621057478307}
+  characterAnimation: {fileID: 8628046648541683639}
   skillAreaIndicator: {fileID: 446575267940115124}
   skillTargetingIndicator: {fileID: 7726094808036947850}
   skillBarIndicator: {fileID: 1244564291862486833}
@@ -1364,6 +1377,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveSpeed: 1
+--- !u!114 &7531592486013579246
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2598696420236482373}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a7f16d78ef64b6a974c2d61e991815e, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::SkillTarget
+  hitPosition: {fileID: 0}
 --- !u!1 &2650957420405713173
 GameObject:
   m_ObjectHideFlags: 0

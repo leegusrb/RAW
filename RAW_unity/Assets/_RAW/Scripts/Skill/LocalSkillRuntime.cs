@@ -31,11 +31,59 @@ public class LocalSkillRuntime :
 		return 0d;
 	}
 
-	public SkillUseRequestResult RequestUseSkill(KeyMapping slot)
+	public SkillUseRequestResult RequestUseSkill(SkillUseRequest skillUseRequest)
 	{
-		if (!TryGetSkillForSlot(slot, out _))
+		if (skillUseRequest == null || string.IsNullOrWhiteSpace(skillUseRequest.skillId))
 			return SkillUseRequestResult.Rejected;
 
 		return SkillUseRequestResult.ExecuteLocally;
+	}
+
+	public void CreateSkillObject(
+		SkillSpec skillSpec,
+		Vector3 spawnPosition,
+		Vector3 destinationPosition,
+		Vector3 skillObjectLocalScale,
+		SkillTarget skillTarget
+	)
+	{
+		if (skillSpec == null)
+		{
+			Debug.LogError("생성할 스킬 정보가 없습니다.", this);
+			return;
+		}
+
+		if (skillSpec.skillPrefab == null)
+		{
+			Debug.LogError(
+				$"{skillSpec.name} 스킬에 프리팹이 연결되지 않았습니다.",
+				skillSpec
+			);
+			return;
+		}
+
+		GameObject skillObject = Instantiate(
+			skillSpec.skillPrefab,
+			spawnPosition,
+			Quaternion.identity
+		);
+
+		skillObject.transform.localScale = skillObjectLocalScale;
+
+		if (!skillObject.TryGetComponent(out SkillObject skillObjectComponent))
+		{
+			Debug.LogError(
+				$"{skillSpec.name} 프리팹에 SkillObject가 없습니다.",
+				skillObject
+			);
+			Destroy(skillObject);
+			return;
+		}
+
+		skillObjectComponent.Initialize(
+			skillSpec,
+			destinationPosition,
+			skillTarget
+		);
 	}
 }

@@ -6,10 +6,10 @@ namespace RAW.Network
 {
 	[DisallowMultipleComponent]
 	[RequireComponent(typeof(NetworkObject))]
-	[RequireComponent(typeof(Char_State))]
+	[RequireComponent(typeof(CharacterState))]
 	public class NetworkCharacterState : NetworkBehaviour
 	{
-		[SerializeField] private Char_State characterState;
+		[SerializeField] private CharacterState characterState;
 
 		private readonly NetworkVariable<int> healthPoint = 
 			new NetworkVariable<int>(
@@ -49,7 +49,7 @@ namespace RAW.Network
 		private void CacheComponents()
 		{
 			if (characterState == null)
-				characterState = GetComponent<Char_State>();
+				characterState = GetComponent<CharacterState>();
 		}
 
 		public override void OnNetworkSpawn()
@@ -153,7 +153,7 @@ namespace RAW.Network
 
 			if (characterState == null)
 			{
-				Debug.LogError("초기 상태를 적용할 Char_State가 연결되지 않았습니다.", this);
+				Debug.LogError("초기 상태를 적용할 CharacterState가 연결되지 않았습니다.", this);
 				return false;
 			}
 

@@ -7,10 +7,10 @@ namespace RAW.Network
 {
 	[DisallowMultipleComponent]
 	[RequireComponent(typeof(NetworkObject))]
-	[RequireComponent(typeof(Char_Inventory))]
+	[RequireComponent(typeof(CharacterInventory))]
 	public class NetworkInventorySync : NetworkBehaviour
 	{
-		[SerializeField] private Char_Inventory inventory;
+		[SerializeField] private CharacterInventory inventory;
 
 		private readonly NetworkVariable<int> inventoryCapacity =
 			new NetworkVariable<int>(
@@ -206,7 +206,7 @@ namespace RAW.Network
 		private void CacheComponents()
 		{
 			if (inventory == null)
-				inventory = GetComponent<Char_Inventory>();
+				inventory = GetComponent<CharacterInventory>();
 		}
 
 		private void HandleLocalInventoryChanged()
