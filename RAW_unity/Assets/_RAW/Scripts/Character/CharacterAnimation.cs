@@ -13,9 +13,6 @@ public class CharacterAnimation : MonoBehaviour
 
     private void Awake()
     {
-        if (animator == null)
-            animator = GetComponent<Animator>();
-
         if (animator.runtimeAnimatorController == null)
         {
             Debug.LogError("Runtime Animator Controller가 연결되지 않았습니다.", this);

@@ -54,7 +54,7 @@ public class CharacterControl : MonoBehaviour
         if (TryGetPressedSkillSlot(out KeyMapping pressedSkillSlot))
             skillCastingController.BeginTargeting(pressedSkillSlot);
 
-        if (Input.GetMouseButtonDown(0) && Camera.main != null)
+        if (Input.GetMouseButtonDown(0))
         {
             Vector2 mouseWorldPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             skillCastingController.TryConfirmCasting(mouseWorldPosition);

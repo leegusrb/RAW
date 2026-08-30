@@ -54,7 +54,7 @@ public class CharacterSkillCastingController : MonoBehaviour
     private void Update()
     {
         if (isIndicatingSkill)
-            IndicateSkill();
+            IndicateSkill(currentCastingSkill.castType);
 
         if (pendingSkillCast != null)
             UpdatePendingSkillCast();
@@ -134,7 +134,6 @@ public class CharacterSkillCastingController : MonoBehaviour
         );
 
         isIndicatingSkill = true;
-        IndicateSkill();
     }
 
     public bool TryConfirmCasting(Vector2 mouseWorldPosition)
@@ -173,15 +172,10 @@ public class CharacterSkillCastingController : MonoBehaviour
         HideIndicator();
     }
 
-    private void IndicateSkill()
+    private void IndicateSkill(CastType currentCastingSkillCastType)
     {
-        if (currentCastingSkill == null || Camera.main == null)
-            return;
-
-        Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        mousePosition.z = -1f;
-
-        switch (currentCastingSkill.castType)
+        Vector2 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        switch (currentCastingSkillCastType)
         {
             case CastType.bar:
                 IndicateBarType(mousePosition);
