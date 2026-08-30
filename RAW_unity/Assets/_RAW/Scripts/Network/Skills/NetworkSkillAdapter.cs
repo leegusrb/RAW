@@ -60,7 +60,12 @@ namespace RAW.Network
 				return SkillUseRequestResult.Rejected;
 			}
 
-			return SkillUseRequestResult.HandleByRuntime;
+			bool requestSubmitted =
+				networkSkillController.TryRequestUseSkill(skillUseRequest);
+
+			return requestSubmitted
+				? SkillUseRequestResult.HandleByRuntime
+				: SkillUseRequestResult.Rejected;
 		}
 
 		public void CreateSkillObject(
