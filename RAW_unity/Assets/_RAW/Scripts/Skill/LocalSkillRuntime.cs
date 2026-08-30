@@ -31,9 +31,9 @@ public class LocalSkillRuntime :
 		return 0d;
 	}
 
-	public SkillUseRequestResult RequestUseSkill(string skillId)
+	public SkillUseRequestResult RequestUseSkill(SkillUseRequest skillUseRequest)
 	{
-		if (string.IsNullOrWhiteSpace(skillId))
+		if (skillUseRequest == null || string.IsNullOrWhiteSpace(skillUseRequest.skillId))
 			return SkillUseRequestResult.Rejected;
 
 		return SkillUseRequestResult.ExecuteLocally;

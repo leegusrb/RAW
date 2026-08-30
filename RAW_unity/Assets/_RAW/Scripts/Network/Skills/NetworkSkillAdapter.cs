@@ -52,7 +52,7 @@ namespace RAW.Network
 			return networkSkillController.GetRemainingCooldown(skillId);
 		}
 
-		public SkillUseRequestResult RequestUseSkill(string skillId)
+		public SkillUseRequestResult RequestUseSkill(SkillUseRequest skillUseRequest)
 		{
 			if (networkSkillController == null)
 			{

@@ -243,7 +243,17 @@ public class CharacterSkillCastingController : MonoBehaviour
             return;
         }
 
-        SkillUseRequestResult requestResult = skillRuntime.RequestUseSkill(skill.SkillId);
+        SkillUseRequest skillUseRequest = new SkillUseRequest
+        {
+            skillId = skill.SkillId,
+            target = new SkillTargetInfo
+            {
+                direction = castContext.CastDirection,
+                targetPosition = castContext.TargetPosition
+            }
+        };
+
+        SkillUseRequestResult requestResult = skillRuntime.RequestUseSkill(skillUseRequest);
 
         switch (requestResult)
         {

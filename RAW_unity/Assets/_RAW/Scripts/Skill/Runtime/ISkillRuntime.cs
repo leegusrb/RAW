@@ -6,7 +6,7 @@ public interface ISkillRuntime
 
 	double GetRemainingCooldown(string skillId);
 
-	SkillUseRequestResult RequestUseSkill(string skillId);
+	SkillUseRequestResult RequestUseSkill(SkillUseRequest skillUseRequest);
 
 	void CreateSkillObject(
 		SkillSpec skillSpec,
