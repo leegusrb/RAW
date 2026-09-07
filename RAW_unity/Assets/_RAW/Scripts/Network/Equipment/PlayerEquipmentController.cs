@@ -3,11 +3,11 @@ using UnityEngine;
 namespace RAW.Network
 {
 	[DisallowMultipleComponent]
-	[RequireComponent(typeof(Char_Inventory))]
+	[RequireComponent(typeof(CharacterInventory))]
 	[RequireComponent(typeof(NetworkEquipmentSync))]
 	public class PlayerEquipmentController : MonoBehaviour
 	{
-		[SerializeField] private Char_Inventory inventory;
+		[SerializeField] private CharacterInventory inventory;
 		[SerializeField] private NetworkEquipmentSync networkEquipmentSync;
 
 		private void Reset()
@@ -23,7 +23,7 @@ namespace RAW.Network
 		private void CacheComponents()
 		{
 			if (inventory == null)
-				inventory = GetComponent<Char_Inventory>();
+				inventory = GetComponent<CharacterInventory>();
 
 			if (networkEquipmentSync == null)
 				networkEquipmentSync = GetComponent<NetworkEquipmentSync>();

@@ -1,0 +1,533 @@
+fileFormatVersion: 2
+guid: dbc6f1cb17a09ca44be9fe92cabe739b
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 5477944729861275820
+    second: Magician_W_06_0
+  - first:
+      213: -482195862073711428
+    second: Magician_W_06_1
+  - first:
+      213: 3643823040171088311
+    second: Magician_W_06_2
+  - first:
+      213: 443310656957701813
+    second: Magician_W_06_3
+  - first:
+      213: -5084121784879998945
+    second: Magician_W_06_4
+  - first:
+      213: 6060259429710662796
+    second: Magician_W_06_5
+  - first:
+      213: -9091500628777516099
+    second: Magician_W_06_6
+  - first:
+      213: 4534246988719964705
+    second: Magician_W_06_7
+  - first:
+      213: -2846053849579698061
+    second: Magician_W_06_8
+  - first:
+      213: -979760384058567288
+    second: Magician_W_06_9
+  - first:
+      213: 3164451062839885149
+    second: Magician_W_06_10
+  - first:
+      213: 6527932049296246250
+    second: Magician_W_06_11
+  - first:
+      213: 1977377993628855641
+    second: Magician_W_06_12
+  - first:
+      213: -6369485871846080187
+    second: Magician_W_06_13
+  - first:
+      213: 6875314475594592443
+    second: Magician_W_06_14
+  - first:
+      213: 8903176159471684779
+    second: Magician_W_06_15
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 1
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Magician_W_06_0
+      rect:
+        serializedVersion: 2
+        x: 5
+        y: 52
+        width: 12
+        height: 21
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ca0ca9a55b1950c40800000000000000
+      internalID: 5477944729861275820
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Magician_W_06_1
+      rect:
+        serializedVersion: 2
+        x: 23
+        y: 65
+        width: 10
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cb4eee01b65ee49f0800000000000000
+      internalID: -482195862073711428
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Magician_W_06_2
+      rect:
+        serializedVersion: 2
+        x: 41
+        y: 58
+        width: 12
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7b918cdcfb5719230800000000000000
+      internalID: 3643823040171088311
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Magician_W_06_3
+      rect:
+        serializedVersion: 2
+        x: 20
+        y: 55
+        width: 6
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5bedb1991b4f62600800000000000000
+      internalID: 443310656957701813
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Magician_W_06_4
+      rect:
+        serializedVersion: 2
+        x: 26
+        y: 43
+        width: 18
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f1817696c229179b0800000000000000
+      internalID: -5084121784879998945
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Magician_W_06_5
+      rect:
+        serializedVersion: 2
+        x: 11
+        y: 28
+        width: 15
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c8c8d9ab7dd5a1450800000000000000
+      internalID: 6060259429710662796
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Magician_W_06_6
+      rect:
+        serializedVersion: 2
+        x: 19
+        y: 44
+        width: 7
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: db3c972d85084d180800000000000000
+      internalID: -9091500628777516099
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Magician_W_06_7
+      rect:
+        serializedVersion: 2
+        x: 51
+        y: 42
+        width: 12
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 122c98edc91ecee30800000000000000
+      internalID: 4534246988719964705
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Magician_W_06_8
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 29
+        width: 7
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3784b245a19c088d0800000000000000
+      internalID: -2846053849579698061
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Magician_W_06_9
+      rect:
+        serializedVersion: 2
+        x: 23
+        y: 5
+        width: 19
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 88550372f113762f0800000000000000
+      internalID: -979760384058567288
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Magician_W_06_10
+      rect:
+        serializedVersion: 2
+        x: 40
+        y: 28
+        width: 12
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d5dbda5c9736aeb20800000000000000
+      internalID: 3164451062839885149
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Magician_W_06_11
+      rect:
+        serializedVersion: 2
+        x: 57
+        y: 34
+        width: 6
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ae5c034cc9fd79a50800000000000000
+      internalID: 6527932049296246250
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Magician_W_06_12
+      rect:
+        serializedVersion: 2
+        x: 1
+        y: 12
+        width: 13
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 95d2ce00fce017b10800000000000000
+      internalID: 1977377993628855641
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Magician_W_06_13
+      rect:
+        serializedVersion: 2
+        x: 19
+        y: 16
+        width: 6
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 541ceb6b85a0b97a0800000000000000
+      internalID: -6369485871846080187
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Magician_W_06_14
+      rect:
+        serializedVersion: 2
+        x: 41
+        y: 13
+        width: 9
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bb0baeca6160a6f50800000000000000
+      internalID: 6875314475594592443
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Magician_W_06_15
+      rect:
+        serializedVersion: 2
+        x: 50
+        y: 15
+        width: 14
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bac4906cb8f6e8b70800000000000000
+      internalID: 8903176159471684779
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Magician_W_06_0: 5477944729861275820
+      Magician_W_06_1: -482195862073711428
+      Magician_W_06_10: 3164451062839885149
+      Magician_W_06_11: 6527932049296246250
+      Magician_W_06_12: 1977377993628855641
+      Magician_W_06_13: -6369485871846080187
+      Magician_W_06_14: 6875314475594592443
+      Magician_W_06_15: 8903176159471684779
+      Magician_W_06_2: 3643823040171088311
+      Magician_W_06_3: 443310656957701813
+      Magician_W_06_4: -5084121784879998945
+      Magician_W_06_5: 6060259429710662796
+      Magician_W_06_6: -9091500628777516099
+      Magician_W_06_7: 4534246988719964705
+      Magician_W_06_8: -2846053849579698061
+      Magician_W_06_9: -979760384058567288
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

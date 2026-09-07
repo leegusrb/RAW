@@ -52,7 +52,7 @@ namespace RAW.Network
 			return networkSkillController.GetRemainingCooldown(skillId);
 		}
 
-		public SkillUseRequestResult RequestUseSkill(KeyMapping slot)
+		public SkillUseRequestResult RequestUseSkill(SkillUseRequest skillUseRequest)
 		{
 			if (networkSkillController == null)
 			{
@@ -60,11 +60,22 @@ namespace RAW.Network
 				return SkillUseRequestResult.Rejected;
 			}
 
-			bool requestSubmitted = networkSkillController.TryRequestUseSkill(slot);
+			bool requestSubmitted =
+				networkSkillController.TryRequestUseSkill(skillUseRequest);
 
 			return requestSubmitted
 				? SkillUseRequestResult.HandleByRuntime
 				: SkillUseRequestResult.Rejected;
+		}
+
+		public void CreateSkillObject(
+			SkillSpec skillSpec,
+			Vector3 spawnPosition,
+			Vector3 destinationPosition,
+			Vector3 skillObjectLocalScale,
+			SkillTarget skillTarget
+		)
+		{
 		}
 	}
 	

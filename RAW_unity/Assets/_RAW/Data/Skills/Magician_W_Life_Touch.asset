@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: afcd4b312eca36642bcb6bc70de961e8, type: 3}
+  m_Name: Magician_W_Life_Touch
+  m_EditorClassIdentifier: Assembly-CSharp::SkillSpec
+  skillId: MAG_W_LIFE_TOUCH
+  manaCost: 0
+  cooldownSeconds: 0
+  castType: 2
+  targettingSkillTarget: 2
+  range: 5
+  size: 1
+  skillPrefab: {fileID: 8850884371554800505, guid: 492c61d587f3464da81af45e93c677b9, type: 3}
+  moveSpeed: 5
+  animationClip: {fileID: 7400000, guid: f4db1871964f4a45a27ee3c93342a98b, type: 2}
+  preDelay: 0
+  postDelay: 0
+  remainTime: 0.5
+  damage: 0
