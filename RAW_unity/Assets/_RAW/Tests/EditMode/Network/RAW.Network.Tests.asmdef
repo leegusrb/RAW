@@ -1,0 +1,16 @@
+{
+    "name": "RAW.Network.Tests",
+    "rootNamespace": "",
+    "references": [
+        "GUID:5c6755b9c61e64ee0b8e53d491f98575",
+        "GUID:006236d6931fa4bad9a1ca4a5079e85a",
+        "GUID:1491147abca9d7d4bb7105af628b223e",
+        "GUID:e0cd26848372d4e5c891c569017e11f1"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+	"optionalUnityReferences": [
+		"TestAssemblies"
+	]
+}
