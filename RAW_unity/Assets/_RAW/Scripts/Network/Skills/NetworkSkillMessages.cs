@@ -50,6 +50,59 @@ namespace RAW.Network
 		}
 	}
 
+	internal struct NetworkSkillCastStartedEvent : INetworkSerializable
+	{
+		public ulong CastId;
+		public FixedString64Bytes SkillId;
+		public NetworkSkillTargetInfo TargetInfo;
+
+		public double StartedAt;
+		public double ExecuteAt;
+
+		public void NetworkSerialize<T>(BufferSerializer<T> serializer)
+			where T : IReaderWriter
+		{
+			serializer.SerializeValue(ref CastId);
+			serializer.SerializeValue(ref SkillId);
+			serializer.SerializeValue(ref TargetInfo);
+			serializer.SerializeValue(ref StartedAt);
+			serializer.SerializeValue(ref ExecuteAt);
+		}
+	}
+
+	internal struct NetworkSkillCastCommittedEvent : INetworkSerializable
+	{
+		public ulong CastId;
+		public FixedString64Bytes SkillId;
+		public NetworkSkillTargetInfo TargetInfo;
+
+		public Vector3 SpawnPosition;
+		public double ExecutedAt;
+
+		public void NetworkSerialize<T>(BufferSerializer<T> serializer)
+			where T : IReaderWriter
+		{
+			serializer.SerializeValue(ref CastId);
+			serializer.SerializeValue(ref SkillId);
+			serializer.SerializeValue(ref TargetInfo);
+			serializer.SerializeValue(ref SpawnPosition);
+			serializer.SerializeValue(ref ExecutedAt);
+		}
+	}
+
+	internal struct NetworkSkillCastCancelledEvent : INetworkSerializable
+	{
+		public ulong CastId;
+		public SkillUseRejectionReason Reason;
+
+		public void NetworkSerialize<T>(BufferSerializer<T> serializer)
+			where T : IReaderWriter
+		{
+			serializer.SerializeValue(ref CastId);
+			serializer.SerializeValue(ref Reason);
+		}
+	}
+
 	internal struct NetworkSkillHitEvent : INetworkSerializable
 	{
 
