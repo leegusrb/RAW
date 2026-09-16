@@ -26,6 +26,42 @@ public struct SkillCastEvent
 }
 
 [Serializable]
+public struct SkillCastStartedEvent
+{
+	public ulong casterObjectId;
+	public ulong castId;
+	public string skillId;
+
+	public SkillTargetInfo targetInfo;
+
+	// 서버 네트워크 시간 기준
+	public double startedAt;
+	public double executeAt;
+}
+
+[Serializable]
+public struct SkillCastCommittedEvent
+{
+	public ulong casterObjectId;
+	public ulong castId;
+	public string skillId;
+
+	public SkillTargetInfo targetInfo;
+	public Vector3 spawnPosition;
+
+	// 서버 네트워크 시간 기준
+	public double executedAt;
+}
+
+[Serializable]
+public struct SkillCastCancelledEvent
+{
+	public ulong casterObjectId;
+	public ulong castId;
+	public SkillUseRejectionReason reason;
+}
+
+[Serializable]
 public struct SkillHitEvent
 {
 	public string skillId;

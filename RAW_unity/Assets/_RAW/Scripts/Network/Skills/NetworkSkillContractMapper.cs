@@ -48,6 +48,42 @@ namespace RAW.Network
 			};
 		}
 
+		public static SkillCastStartedEvent ToContract(NetworkSkillCastStartedEvent networkEvent, ulong casterObjectId)
+		{
+			return new SkillCastStartedEvent
+			{
+				casterObjectId = casterObjectId,
+				castId = networkEvent.CastId,
+				skillId = networkEvent.SkillId.ToString(),
+				targetInfo = ToContractTarget(networkEvent.TargetInfo),
+				startedAt = networkEvent.StartedAt,
+				executeAt = networkEvent.ExecuteAt
+			};
+		}
+
+		public static SkillCastCommittedEvent ToContract(NetworkSkillCastCommittedEvent networkEvent, ulong casterObjectId)
+		{
+			return new SkillCastCommittedEvent
+			{
+				casterObjectId = casterObjectId,
+				castId = networkEvent.CastId,
+				skillId = networkEvent.SkillId.ToString(),
+				targetInfo = ToContractTarget(networkEvent.TargetInfo),
+				spawnPosition = networkEvent.SpawnPosition,
+				executedAt = networkEvent.ExecutedAt
+			};
+		}
+
+		public static SkillCastCancelledEvent ToContract(NetworkSkillCastCancelledEvent networkEvent, ulong casterObjectId)
+		{
+			return new SkillCastCancelledEvent
+			{
+				casterObjectId = casterObjectId,
+				castId = networkEvent.CastId,
+				reason = networkEvent.Reason
+			};
+		}
+
 		public static SkillHitEvent ToContract(NetworkSkillHitEvent networkEvent, ulong casterObjectId)
 		{
 			return new SkillHitEvent
