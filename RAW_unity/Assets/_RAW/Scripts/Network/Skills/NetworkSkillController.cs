@@ -11,6 +11,36 @@ namespace RAW.Network
 	[RequireComponent(typeof(NetworkCharacterState))]
 	public class NetworkSkillController : NetworkBehaviour
 	{
+		private sealed class ServerSkillCast
+		{
+			public readonly ulong CastId;
+			public readonly NetworkSkillUseRequest Request;
+			public readonly SkillSpec Skill;
+
+			public readonly double StartedAt;
+			public readonly double ExecuteAt;
+			public readonly float PostDelay;
+
+			public bool IsCommitted;
+			public double RecoveryEndsAt;
+
+			public ServerSkillCast(
+				ulong castId,
+				NetworkSkillUseRequest request,
+				SkillSpec skill,
+				double startedAt
+			)
+			{
+				CastId = castId;
+				Request = request;
+				Skill = skill;
+
+				StartedAt = startedAt;
+				ExecuteAt = startedAt + Mathf.Max(0f, skill.preDelay);
+				PostDelay = Mathf.Max(0f, skill.postDelay);
+			}
+		}
+
 		[SerializeField] private NetworkCharacterState characterState;
 		[SerializeField] private SkillCatalog skillCatalog;
 
@@ -20,6 +50,9 @@ namespace RAW.Network
 
 		private NetworkList<NetworkSkillCooldownEntry> cooldownList;
 		private NetworkList<NetworkSkillLoadoutEntry> skillLoadout;
+
+		private ServerSkillCast activeCast;
+		private ulong lastCastId;
 
 		public event Action CooldownChanged;
 		public event Action LoadoutChanged;
@@ -81,6 +114,8 @@ namespace RAW.Network
 		{
 			cooldownList.OnListChanged -= HandleCooldownListChanged;
 			skillLoadout.OnListChanged -= HandleSkillLoadoutChanged;
+
+			activeCast = null;
 		}
 
 		private void CacheComponents()
