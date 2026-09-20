@@ -59,6 +59,11 @@ namespace RAW.Network
 
 		public event Action<SkillUseRejectedEvent> SkillUseRejected;
 		public event Action<SkillCastEvent> SkillCast;
+
+		public event Action<SkillCastStartedEvent> SkillCastStarted;
+		public event Action<SkillCastCommittedEvent> SkillCastCommitted;
+		public event Action<SkillCastCancelledEvent> SkillCastCancelled;
+
 		public event Action<SkillHitEvent> SkillHit;
 
 		private void Reset()
@@ -487,6 +492,92 @@ namespace RAW.Network
 			SkillCastEvent castEvent = NetworkSkillContractMapper.ToContract(networkEvent, NetworkObjectId);
 
 			SkillCast?.Invoke(castEvent);
+		}
+
+		private void SendSkillCastStartedEvent(ServerSkillCast cast)
+		{
+			if (!IsSpawned || !IsServer)
+				return;
+
+			NetworkSkillCastStartedEvent networkEvent =
+				new NetworkSkillCastStartedEvent
+				{
+					CastId = cast.CastId,
+					SkillId = cast.Request.SkillId,
+					TargetInfo = cast.Request.TargetInfo,
+					StartedAt = cast.StartedAt,
+					ExecuteAt = cast.ExecuteAt
+				};
+
+			NotifySkillCastStartedRpc(networkEvent);
+		}
+
+		[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
+		private void NotifySkillCastStartedRpc(NetworkSkillCastStartedEvent networkEvent)
+		{
+			SkillCastStartedEvent startedEvent =
+				NetworkSkillContractMapper.ToContract(networkEvent, NetworkObjectId);
+
+			SkillCastStarted?.Invoke(startedEvent);
+		}
+
+		private void SendSkillCastCommittedEvent(
+			ServerSkillCast cast,
+			NetworkSkillTargetInfo targetInfo,
+			Vector3 spawnPosition,
+			double executedAt
+		)
+		{
+			if (!IsSpawned || !IsServer)
+				return;
+
+			NetworkSkillCastCommittedEvent networkEvent =
+				new NetworkSkillCastCommittedEvent
+				{
+					CastId = cast.CastId,
+					SkillId = cast.Request.SkillId,
+					TargetInfo = targetInfo,
+					SpawnPosition = spawnPosition,
+					ExecutedAt = executedAt
+				};
+
+			NotifySkillCastCommittedRpc(networkEvent);
+		}
+
+		[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
+		private void NotifySkillCastCommittedRpc(NetworkSkillCastCommittedEvent networkEvent)
+		{
+			SkillCastCommittedEvent committedEvent =
+				NetworkSkillContractMapper.ToContract(networkEvent, NetworkObjectId);
+
+			SkillCastCommitted?.Invoke(committedEvent);
+		}
+
+		private void SendSkillCastCancelledEvent(
+			ServerSkillCast cast,
+			SkillUseRejectionReason reason
+		)
+		{
+			if (!IsSpawned || !IsServer)
+				return;
+
+			NetworkSkillCastCancelledEvent networkEvent =
+				new NetworkSkillCastCancelledEvent
+				{
+					CastId = cast.CastId,
+					Reason = reason
+				};
+
+			NotifySkillCastCancelledRpc(networkEvent);
+		}
+
+		[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
+		private void NotifySkillCastCancelledRpc(NetworkSkillCastCancelledEvent networkEvent)
+		{
+			SkillCastCancelledEvent cancelledEvent =
+				NetworkSkillContractMapper.ToContract(networkEvent, NetworkObjectId);
+
+			SkillCastCancelled?.Invoke(cancelledEvent);
 		}
 
 		private void SendSkillHitEvent(
