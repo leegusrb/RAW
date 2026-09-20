@@ -11,6 +11,8 @@ namespace RAW.Network
 	{
 		[SerializeField] private CharacterState characterState;
 
+		private CharacterControl characterControl;
+
 		private readonly NetworkVariable<int> healthPoint = 
 			new NetworkVariable<int>(
 				100,
@@ -28,6 +30,13 @@ namespace RAW.Network
 		private readonly NetworkVariable<bool> isMovable = 
 			new NetworkVariable<bool>(
 				true,
+				NetworkVariableReadPermission.Everyone,
+				NetworkVariableWritePermission.Server
+			);
+
+		private readonly NetworkVariable<bool> isCasting =
+			new NetworkVariable<bool>(
+				false,
 				NetworkVariableReadPermission.Everyone,
 				NetworkVariableWritePermission.Server
 			);
@@ -50,13 +59,20 @@ namespace RAW.Network
 		{
 			if (characterState == null)
 				characterState = GetComponent<CharacterState>();
+
+			if (characterControl == null)
+				characterControl = GetComponent<CharacterControl>();
 		}
 
 		public override void OnNetworkSpawn()
 		{
+			if (IsServer)
+				isCasting.Value = false;
+
 			healthPoint.OnValueChanged += HandleHealthChanged;
 			manaPoint.OnValueChanged += HandleManaChanged;
 			isMovable.OnValueChanged += HandleMovableChanged;
+			isCasting.OnValueChanged += HandleCastingChanged;
 
 			ApplyCurrentState();
 		}
@@ -66,6 +82,9 @@ namespace RAW.Network
 			healthPoint.OnValueChanged -= HandleHealthChanged;
 			manaPoint.OnValueChanged -= HandleManaChanged;
 			isMovable.OnValueChanged -= HandleMovableChanged;
+			isCasting.OnValueChanged -= HandleCastingChanged;
+
+			ApplyCastingState(false);
 		}
 
 		private void ApplyCurrentState()
@@ -76,6 +95,8 @@ namespace RAW.Network
 			characterState.HP = healthPoint.Value;
 			characterState.MP = manaPoint.Value;
 			characterState.isMovable = isMovable.Value;
+
+			ApplyCastingState(isCasting.Value);
 		}
 
 		private void HandleHealthChanged(int previousValue, int newValue)
@@ -94,6 +115,20 @@ namespace RAW.Network
 		{
 			if (characterState != null)
 				characterState.isMovable = newValue;
+		}
+
+		private void HandleCastingChanged(bool previousValue, bool newValue)
+		{
+			ApplyCastingState(newValue);
+		}
+
+		private void ApplyCastingState(bool casting)
+		{
+			if (characterState != null)
+				characterState.IsActivatingSkill = casting;
+
+			if (casting && characterControl != null)
+				characterControl.StopMoving();
 		}
 
 		public void ApplyDamage(int amount)
@@ -141,6 +176,14 @@ namespace RAW.Network
 				return;
 
 			isMovable.Value = movable;
+		}
+
+		public void SetCastingOnServer(bool casting)
+		{
+			if (!IsSpawned || !IsServer)
+				return;
+
+			isCasting.Value = casting;
 		}
 
 		public bool InitializePersistentStateOnServer(int loadedHealthPoint, int loadedManaPoint)
