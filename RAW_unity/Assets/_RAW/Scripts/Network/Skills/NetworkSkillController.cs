@@ -267,8 +267,18 @@ namespace RAW.Network
 
 		private bool TryProcessSkillUseRequestOnServer(NetworkSkillUseRequest request)
 		{
-			if (!IsServer)
+			if (!IsSpawned || !IsServer)
 				return false;
+
+			if (activeCast != null)
+			{
+				SendSkillUseRejectedEvent(
+					request,
+					SkillUseRejectionReason.InvalidState
+				);
+
+				return false;
+			}
 
 			double serverTime = NetworkManager.ServerTime.Time;
 
@@ -289,6 +299,27 @@ namespace RAW.Network
 				);
 
 				SendSkillUseRejectedEvent(request, rejectionReason);
+
+				return false;
+			}
+
+			if (float.IsNaN(skill.preDelay) ||
+				float.IsInfinity(skill.preDelay) ||
+				float.IsNaN(skill.postDelay) ||
+				float.IsInfinity(skill.postDelay))
+			{
+				Debug.LogError(
+					$"스킬 시전 시간이 올바르지 않습니다. " +
+					$"SkillId={skillId}, " +
+					$"PreDelay={skill.preDelay}, " +
+					$"PostDelay={skill.postDelay}",
+					skill
+				);
+
+				SendSkillUseRejectedEvent(
+					request,
+					SkillUseRejectionReason.InvalidState
+				);
 
 				return false;
 			}
