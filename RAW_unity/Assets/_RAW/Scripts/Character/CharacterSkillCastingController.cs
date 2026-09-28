@@ -442,25 +442,21 @@ public class CharacterSkillCastingController : MonoBehaviour
         out Vector3 destinationPosition
     )
     {
-        if (castContext.Skill.castType == CastType.bar)
-        {
-            spawnPosition = projectileSpawnPoint.position;
-            Vector2 destination = GetRayEllipseIntersection(
-                spawnPosition,
-                castContext.CastDirection,
-                transform.position,
-                castContext.RangeRadius
-            );
-            destinationPosition = new Vector3(
-                destination.x,
-                destination.y,
-                spawnPosition.z
-            );
-            return;
-        }
+		Vector3 projectilePosition = Vector3.zero;
 
-        spawnPosition = castContext.TargetPosition;
-        destinationPosition = spawnPosition;
+        if (castContext.Skill.castType == CastType.bar)
+			projectilePosition = projectileSpawnPoint.position;
+
+        SkillGeometry.GetSkillObjectPositions(
+			castContext.Skill.castType,
+			transform.position,
+			projectilePosition,
+			castContext.CastDirection,
+			castContext.TargetPosition,
+			castContext.RangeRadius,
+			out spawnPosition,
+			out destinationPosition
+		);
     }
 
     private Vector2 GetBarCastDirection(Vector2 center, Vector2 target)
@@ -476,14 +472,11 @@ public class CharacterSkillCastingController : MonoBehaviour
 
     private static bool IsInsideRange(Vector2 center, Vector2 target, float semiMajorAxis)
     {
-        float semiMinorAxis = semiMajorAxis * 0.5f;
-        Vector2 offset = target - center;
-
-        float value =
-            (offset.x * offset.x) / (semiMajorAxis * semiMajorAxis) +
-            (offset.y * offset.y) / (semiMinorAxis * semiMinorAxis);
-
-        return value <= 1f;
+        return SkillGeometry.IsInsideRange(
+			center,
+			target,
+			semiMajorAxis
+		);
     }
 
     private void StopActivatingSkill()
@@ -501,57 +494,11 @@ public class CharacterSkillCastingController : MonoBehaviour
 
     public static Vector2 GetEllipseIntersection(Vector2 center, Vector2 target, float semiMajorAxis)
     {
-        float semiMinorAxis = semiMajorAxis * 0.5f;
-        Vector2 direction = (target - center).normalized;
-
-        float scale = 1f / Mathf.Sqrt(
-            (direction.x * direction.x) / (semiMajorAxis * semiMajorAxis) +
-            (direction.y * direction.y) / (semiMinorAxis * semiMinorAxis)
-        );
-
-        return center + direction * scale;
-    }
-
-    private static Vector2 GetRayEllipseIntersection(
-        Vector2 rayOrigin,
-        Vector2 rayDirection,
-        Vector2 ellipseCenter,
-        float semiMajorAxis
-    )
-    {
-        if (semiMajorAxis <= 0f || rayDirection.sqrMagnitude <= Mathf.Epsilon)
-            return rayOrigin;
-
-        rayDirection.Normalize();
-
-        float semiMinorAxis = semiMajorAxis * 0.5f;
-        Vector2 originOffset = rayOrigin - ellipseCenter;
-
-        float coefficientA =
-            (rayDirection.x * rayDirection.x) / (semiMajorAxis * semiMajorAxis) +
-            (rayDirection.y * rayDirection.y) / (semiMinorAxis * semiMinorAxis);
-        float coefficientB = 2f * (
-            (originOffset.x * rayDirection.x) / (semiMajorAxis * semiMajorAxis) +
-            (originOffset.y * rayDirection.y) / (semiMinorAxis * semiMinorAxis)
-        );
-        float coefficientC =
-            (originOffset.x * originOffset.x) / (semiMajorAxis * semiMajorAxis) +
-            (originOffset.y * originOffset.y) / (semiMinorAxis * semiMinorAxis) -
-            1f;
-
-        float discriminant =
-            coefficientB * coefficientB - 4f * coefficientA * coefficientC;
-
-        if (discriminant < 0f)
-            return rayOrigin;
-
-        float intersectionDistance =
-            (-coefficientB + Mathf.Sqrt(discriminant)) / (2f * coefficientA);
-
-        if (intersectionDistance <= 0f)
-            return rayOrigin;
-
-        return rayOrigin + rayDirection * intersectionDistance;
+        return SkillGeometry.GetEllipseIntersection(
+			center,
+			target,
+			semiMajorAxis
+		);
     }
 
     public static float GetDistanceToEllipse(Vector2 center, Vector2 target, float semiMajorAxis)
