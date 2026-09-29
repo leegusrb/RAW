@@ -63,12 +63,12 @@ public class LocalSkillRuntime :
 
 	private static void ApplyLocalDamage(
 		SkillTarget target,
-		int damageAmount
+		float damage
 	)
 	{
 		if (target == null)
 			return;
 
-		target.TakeDamage(damageAmount);
+		target.TakeDamage(damage);
 	}
 }

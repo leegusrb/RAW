@@ -59,10 +59,12 @@ public class CharacterState : MonoBehaviour
 
     public bool IsMovable => isMovable && !isActivatingSkill;
 
-    public void TakeDamage(int damageAmount)
+    public void TakeDamage(float damage)
     {
-        if (damageAmount <= 0)
+        if (damage <= 0)
 			return;
+
+		int damageAmount = Mathf.CeilToInt(damage);
 		
 		HP = Mathf.Max(0, HP - damageAmount);
 

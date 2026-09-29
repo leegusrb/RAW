@@ -5,7 +5,7 @@ public static class SkillExecutor
 {
     public static void ExecutePrepared(
 		SkillExecutionContext context,
-		Action<SkillTarget, int> applyDamage
+		Action<SkillTarget, float> applyDamage
 	)
 	{
 		GameObject skillObject = UnityEngine.Object.Instantiate(

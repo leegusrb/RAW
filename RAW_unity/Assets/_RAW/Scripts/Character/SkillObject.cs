@@ -8,13 +8,13 @@ public class SkillObject : MonoBehaviour
     private Vector3 destinationPosition;
     private bool hasAppliedDamage;
 
-	private Action<SkillTarget, int> applyDamage;
+	private Action<SkillTarget, float> applyDamage;
 
     public void Initialize(
         SkillSpec skillSpec,
         Vector3 skillDestinationPosition,
         SkillTarget skillTarget,
-		Action<SkillTarget, int> damageApplier
+		Action<SkillTarget, float> damageApplier
     )
     {
         spec = skillSpec;
@@ -96,8 +96,6 @@ public class SkillObject : MonoBehaviour
 		if (spec.damage <= 0f)
 			return;
 
-		int damageAmount = Mathf.CeilToInt(spec.damage);
-
-		applyDamage?.Invoke(skillTarget, damageAmount);
+		applyDamage?.Invoke(skillTarget, spec.damage);
 	}
 }
