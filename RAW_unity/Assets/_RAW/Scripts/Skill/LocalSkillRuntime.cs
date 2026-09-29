@@ -47,43 +47,14 @@ public class LocalSkillRuntime :
 		SkillTarget skillTarget
 	)
 	{
-		if (skillSpec == null)
-		{
-			Debug.LogError("생성할 스킬 정보가 없습니다.", this);
-			return;
-		}
-
-		if (skillSpec.skillPrefab == null)
-		{
-			Debug.LogError(
-				$"{skillSpec.name} 스킬에 프리팹이 연결되지 않았습니다.",
-				skillSpec
-			);
-			return;
-		}
-
-		GameObject skillObject = Instantiate(
-			skillSpec.skillPrefab,
-			spawnPosition,
-			Quaternion.identity
-		);
-
-		skillObject.transform.localScale = skillObjectLocalScale;
-
-		if (!skillObject.TryGetComponent(out SkillObject skillObjectComponent))
-		{
-			Debug.LogError(
-				$"{skillSpec.name} 프리팹에 SkillObject가 없습니다.",
-				skillObject
-			);
-			Destroy(skillObject);
-			return;
-		}
-
-		skillObjectComponent.Initialize(
+		SkillExecutionContext executionContext = new SkillExecutionContext(
 			skillSpec,
+			spawnPosition,
 			destinationPosition,
+			skillObjectLocalScale,
 			skillTarget
 		);
+
+		SkillExecutor.ExecutePrepared(executionContext);
 	}
 }
