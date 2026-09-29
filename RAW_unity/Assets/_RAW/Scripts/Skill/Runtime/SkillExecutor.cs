@@ -1,10 +1,14 @@
+using System;
 using UnityEngine;
 
 public static class SkillExecutor
 {
-    public static void ExecutePrepared(SkillExecutionContext context)
+    public static void ExecutePrepared(
+		SkillExecutionContext context,
+		Action<SkillTarget, int> applyDamage
+	)
 	{
-		GameObject skillObject = Object.Instantiate(
+		GameObject skillObject = UnityEngine.Object.Instantiate(
 			context.Skill.skillPrefab,
 			context.SpawnPosition,
 			Quaternion.identity
@@ -17,7 +21,8 @@ public static class SkillExecutor
 		skillObjectComponent.Initialize(
 			context.Skill,
 			context.DestinationPosition,
-			context.Target
+			context.Target,
+			applyDamage
 		);
 	}
 }

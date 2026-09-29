@@ -18,8 +18,8 @@ public class SkillTarget : MonoBehaviour
         }
     }
 
-    public void TakeDamage(float damage)
+    public void TakeDamage(int damageAmount)
     {
-        characterState.TakeDamage(damage);
+        characterState.TakeDamage(damageAmount);
     }
 }

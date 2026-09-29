@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class SkillObject : MonoBehaviour
@@ -7,15 +8,19 @@ public class SkillObject : MonoBehaviour
     private Vector3 destinationPosition;
     private bool hasAppliedDamage;
 
+	private Action<SkillTarget, int> applyDamage;
+
     public void Initialize(
         SkillSpec skillSpec,
         Vector3 skillDestinationPosition,
-        SkillTarget skillTarget
+        SkillTarget skillTarget,
+		Action<SkillTarget, int> damageApplier
     )
     {
         spec = skillSpec;
         target = skillTarget;
         destinationPosition = skillDestinationPosition;
+		applyDamage = damageApplier;
 
         if (spec.castType == CastType.bar)
         {
@@ -66,11 +71,8 @@ public class SkillObject : MonoBehaviour
             return;
 
         SkillTarget skillTarget = other.GetComponentInParent<SkillTarget>();
-        if (skillTarget == null)
-            return;
-
-        skillTarget.TakeDamage(spec.damage);
-        hasAppliedDamage = true;
+        
+		ApplyDamageOnce(skillTarget);
     }
 
     private void ApplyDamageToTarget()
@@ -81,7 +83,21 @@ public class SkillObject : MonoBehaviour
             return;
         }
 
-        target.TakeDamage(spec.damage);
-        hasAppliedDamage = true;
+        ApplyDamageOnce(target);
     }
+
+	private void ApplyDamageOnce(SkillTarget skillTarget)
+	{
+		if (skillTarget == null || hasAppliedDamage)
+			return;
+
+		hasAppliedDamage = true;
+
+		if (spec.damage <= 0f)
+			return;
+
+		int damageAmount = Mathf.CeilToInt(spec.damage);
+
+		applyDamage?.Invoke(skillTarget, damageAmount);
+	}
 }

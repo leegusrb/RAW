@@ -55,6 +55,20 @@ public class LocalSkillRuntime :
 			skillTarget
 		);
 
-		SkillExecutor.ExecutePrepared(executionContext);
+		SkillExecutor.ExecutePrepared(
+			executionContext,
+			ApplyLocalDamage
+		);
+	}
+
+	private static void ApplyLocalDamage(
+		SkillTarget target,
+		int damageAmount
+	)
+	{
+		if (target == null)
+			return;
+
+		target.TakeDamage(damageAmount);
 	}
 }
