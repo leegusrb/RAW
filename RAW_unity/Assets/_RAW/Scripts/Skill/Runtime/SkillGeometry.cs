@@ -2,9 +2,19 @@ using UnityEngine;
 
 public static class SkillGeometry
 {
+	private const float PixelsPerRangeUnit = 64f;
+	private const float ReferencePixelsPerUnityUnit = 100f;
+
+	public const float VerticalRangeRatio = 0.5f;
+
+	public static float GetRangeRadius(float range)
+	{
+		return range * PixelsPerRangeUnit / ReferencePixelsPerUnityUnit;
+	}
+
     public static bool IsInsideRange(Vector2 center, Vector2 target, float semiMajorAxis)
     {
-        float semiMinorAxis = semiMajorAxis * 0.5f;
+        float semiMinorAxis = semiMajorAxis * VerticalRangeRatio;
         Vector2 offset = target - center;
 
         float value =
@@ -16,7 +26,7 @@ public static class SkillGeometry
 
 	public static Vector2 GetEllipseIntersection(Vector2 center, Vector2 target, float semiMajorAxis)
     {
-        float semiMinorAxis = semiMajorAxis * 0.5f;
+        float semiMinorAxis = semiMajorAxis * VerticalRangeRatio;
         Vector2 direction = (target - center).normalized;
 
         float scale = 1f / Mathf.Sqrt(
@@ -74,7 +84,7 @@ public static class SkillGeometry
 
         rayDirection.Normalize();
 
-        float semiMinorAxis = semiMajorAxis * 0.5f;
+        float semiMinorAxis = semiMajorAxis * VerticalRangeRatio;
         Vector2 originOffset = rayOrigin - ellipseCenter;
 
         float coefficientA =

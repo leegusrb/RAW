@@ -122,16 +122,17 @@ public class CharacterSkillCastingController : MonoBehaviour
                 return;
         }
 
-        skillRangeIndicator.transform.localScale = new Vector2(
-            currentCastingSkill.range,
-            currentCastingSkill.range
-        );
-        skillRangeIndicator.SetActive(true);
+		currentCastingSkillRangeRadius = SkillGeometry.GetRangeRadius(currentCastingSkill.range);
 
-        currentCastingSkillRangeRadius = Vector2.Distance(
-            skillRangeIndicator.transform.GetChild(0).position,
-            skillRangeIndicator.transform.GetChild(1).position
-        );
+		float indicatorScale = currentCastingSkillRangeRadius / 1.28f;
+
+		skillRangeIndicator.transform.localScale = new Vector3(
+			indicatorScale,
+			indicatorScale,
+			1f
+		);
+
+		skillRangeIndicator.SetActive(true);
 
         isIndicatingSkill = true;
     }
@@ -217,10 +218,18 @@ public class CharacterSkillCastingController : MonoBehaviour
             GetEllipseIntersection(center, center + castDirection, 1f)
         );
 
-        skillBarIndicator.transform.localScale = new Vector2(
-            currentCastingSkill.range * ratio,
-            currentCastingSkill.size
-        );
+        // skillBarIndicator.transform.localScale = new Vector2(
+        //     currentCastingSkill.range * ratio,
+        //     currentCastingSkill.size
+        // );
+
+		float rangeScale = currentCastingSkillRangeRadius / 1.28f;
+
+		skillBarIndicator.transform.localScale = new Vector3(
+			rangeScale * ratio,
+			currentCastingSkill.size,
+			1f
+		);
     }
 
     private void RequestSkill(SkillCastContext castContext)
