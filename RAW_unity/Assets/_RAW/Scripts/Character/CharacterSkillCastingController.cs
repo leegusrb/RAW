@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -421,22 +422,31 @@ public class CharacterSkillCastingController : MonoBehaviour
 
         yield return new WaitForSeconds(skill.preDelay);
 
-        GetSkillObjectPositions(
-            castContext,
-            out Vector3 spawnPosition,
-            out Vector3 destinationPosition
-        );
+        if (!TryPrepareExecution(
+			skill,
+			castContext.CastDirection,
+			castContext.TargetPosition,
+			castContext.Target,
+            out SkillExecutionContext executionContext
+        ))
+		{
+			Debug.LogWarning(
+				"스킬 실행 준비에 실패했습니다. " +
+				"스킬 프리펩, 대상, 발새 위치 설정을 확인하세요.",
+				this
+			);
+
+			characterState.IsActivatingSkill = false;
+			currentActivatingSkillCoroutine = null;
+			yield break;
+		}
 
         skillRuntime.CreateSkillObject(
-            skillSpec: skill,
-            spawnPosition: spawnPosition,
-            destinationPosition: destinationPosition,
-            skillObjectLocalScale: new Vector3(
-                transform.localScale.x < 0f ? -1f : 1f,
-                1f,
-                1f
-            ),
-            skillTarget: castContext.Target
+            skillSpec: executionContext.Skill,
+            spawnPosition: executionContext.SpawnPosition,
+            destinationPosition: executionContext.DestinationPosition,
+            skillObjectLocalScale: executionContext.LocalScale,
+            skillTarget: executionContext.Target
         );
 
         yield return new WaitForSeconds(skill.postDelay);
@@ -445,27 +455,81 @@ public class CharacterSkillCastingController : MonoBehaviour
         currentActivatingSkillCoroutine = null;
     }
 
-    private void GetSkillObjectPositions(
-        SkillCastContext castContext,
-        out Vector3 spawnPosition,
-        out Vector3 destinationPosition
+    public bool TryPrepareExecution(
+		SkillSpec skill,
+		Vector2 castDirection,
+		Vector2 targetPosition,
+		SkillTarget target,
+		out SkillExecutionContext executionContext
     )
     {
+		executionContext = default;
+
+		if (skill == null || skill.skillPrefab == null)
+			return false;
+
+		if (!skill.skillPrefab.TryGetComponent<SkillObject>(out _))
+			return false;
+
+		float rangeRadius = SkillGeometry.GetRangeRadius(skill.range);
+
+		if (float.IsNaN(rangeRadius) ||
+			float.IsInfinity(rangeRadius) ||
+			rangeRadius < 0f)
+		{
+			return false;
+		}
+
 		Vector3 projectilePosition = Vector3.zero;
 
-        if (castContext.Skill.castType == CastType.bar)
-			projectilePosition = projectileSpawnPoint.position;
+		switch (skill.castType)
+		{
+			case CastType.bar:
+				if (projectileSpawnPoint == null || castDirection.sqrMagnitude <= Mathf.Epsilon)
+					return false;
+
+				projectilePosition = projectileSpawnPoint.position;
+				break;
+
+			case CastType.target:
+				if (target == null)
+					return false;
+
+				break;
+
+			case CastType.area:
+				break;
+
+			default:
+				return false;
+		}
 
         SkillGeometry.GetSkillObjectPositions(
-			castContext.Skill.castType,
+			skill.castType,
 			transform.position,
 			projectilePosition,
-			castContext.CastDirection,
-			castContext.TargetPosition,
-			castContext.RangeRadius,
-			out spawnPosition,
-			out destinationPosition
+			castDirection,
+			targetPosition,
+			rangeRadius,
+			out Vector3 spawnPosition,
+			out Vector3 destinationPosition
 		);
+
+		Vector3 localScale = new Vector3(
+			transform.localScale.x < 0f ? -1f : 1f,
+			1f,
+			1f
+		);
+
+		executionContext = new SkillExecutionContext(
+			skill,
+			spawnPosition,
+			destinationPosition,
+			localScale,
+			target
+		);
+
+		return true;
     }
 
     private Vector2 GetBarCastDirection(Vector2 center, Vector2 target)
