@@ -63,9 +63,9 @@ public class CharacterState : MonoBehaviour
     {
         if (damage <= 0f)
 			return;
-		
-		int damageAmount = Mathf.CeilToInt(damage);
 
+		int damageAmount = Mathf.CeilToInt(damage);
+		
 		HP = Mathf.Max(0, HP - damageAmount);
 
 		if (HP == 0)

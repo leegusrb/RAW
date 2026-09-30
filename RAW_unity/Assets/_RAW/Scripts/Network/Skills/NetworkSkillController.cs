@@ -11,6 +11,36 @@ namespace RAW.Network
 	[RequireComponent(typeof(NetworkCharacterState))]
 	public class NetworkSkillController : NetworkBehaviour
 	{
+		private sealed class ServerSkillCast
+		{
+			public readonly ulong CastId;
+			public readonly NetworkSkillUseRequest Request;
+			public readonly SkillSpec Skill;
+
+			public readonly double StartedAt;
+			public readonly double ExecuteAt;
+			public readonly float PostDelay;
+
+			public bool IsCommitted;
+			public double RecoveryEndsAt;
+
+			public ServerSkillCast(
+				ulong castId,
+				NetworkSkillUseRequest request,
+				SkillSpec skill,
+				double startedAt
+			)
+			{
+				CastId = castId;
+				Request = request;
+				Skill = skill;
+
+				StartedAt = startedAt;
+				ExecuteAt = startedAt + Mathf.Max(0f, skill.preDelay);
+				PostDelay = Mathf.Max(0f, skill.postDelay);
+			}
+		}
+
 		[SerializeField] private NetworkCharacterState characterState;
 		[SerializeField] private SkillCatalog skillCatalog;
 
@@ -21,11 +51,19 @@ namespace RAW.Network
 		private NetworkList<NetworkSkillCooldownEntry> cooldownList;
 		private NetworkList<NetworkSkillLoadoutEntry> skillLoadout;
 
+		private ServerSkillCast activeCast;
+		private ulong lastCastId;
+
 		public event Action CooldownChanged;
 		public event Action LoadoutChanged;
 
 		public event Action<SkillUseRejectedEvent> SkillUseRejected;
 		public event Action<SkillCastEvent> SkillCast;
+
+		public event Action<SkillCastStartedEvent> SkillCastStarted;
+		public event Action<SkillCastCommittedEvent> SkillCastCommitted;
+		public event Action<SkillCastCancelledEvent> SkillCastCancelled;
+
 		public event Action<SkillHitEvent> SkillHit;
 
 		private void Reset()
@@ -81,6 +119,8 @@ namespace RAW.Network
 		{
 			cooldownList.OnListChanged -= HandleCooldownListChanged;
 			skillLoadout.OnListChanged -= HandleSkillLoadoutChanged;
+
+			activeCast = null;
 		}
 
 		private void CacheComponents()
@@ -227,8 +267,18 @@ namespace RAW.Network
 
 		private bool TryProcessSkillUseRequestOnServer(NetworkSkillUseRequest request)
 		{
-			if (!IsServer)
+			if (!IsSpawned || !IsServer)
 				return false;
+
+			if (activeCast != null)
+			{
+				SendSkillUseRejectedEvent(
+					request,
+					SkillUseRejectionReason.InvalidState
+				);
+
+				return false;
+			}
 
 			double serverTime = NetworkManager.ServerTime.Time;
 
@@ -249,6 +299,27 @@ namespace RAW.Network
 				);
 
 				SendSkillUseRejectedEvent(request, rejectionReason);
+
+				return false;
+			}
+
+			if (float.IsNaN(skill.preDelay) ||
+				float.IsInfinity(skill.preDelay) ||
+				float.IsNaN(skill.postDelay) ||
+				float.IsInfinity(skill.postDelay))
+			{
+				Debug.LogError(
+					$"스킬 시전 시간이 올바르지 않습니다. " +
+					$"SkillId={skillId}, " +
+					$"PreDelay={skill.preDelay}, " +
+					$"PostDelay={skill.postDelay}",
+					skill
+				);
+
+				SendSkillUseRejectedEvent(
+					request,
+					SkillUseRejectionReason.InvalidState
+				);
 
 				return false;
 			}
@@ -452,6 +523,92 @@ namespace RAW.Network
 			SkillCastEvent castEvent = NetworkSkillContractMapper.ToContract(networkEvent, NetworkObjectId);
 
 			SkillCast?.Invoke(castEvent);
+		}
+
+		private void SendSkillCastStartedEvent(ServerSkillCast cast)
+		{
+			if (!IsSpawned || !IsServer)
+				return;
+
+			NetworkSkillCastStartedEvent networkEvent =
+				new NetworkSkillCastStartedEvent
+				{
+					CastId = cast.CastId,
+					SkillId = cast.Request.SkillId,
+					TargetInfo = cast.Request.TargetInfo,
+					StartedAt = cast.StartedAt,
+					ExecuteAt = cast.ExecuteAt
+				};
+
+			NotifySkillCastStartedRpc(networkEvent);
+		}
+
+		[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
+		private void NotifySkillCastStartedRpc(NetworkSkillCastStartedEvent networkEvent)
+		{
+			SkillCastStartedEvent startedEvent =
+				NetworkSkillContractMapper.ToContract(networkEvent, NetworkObjectId);
+
+			SkillCastStarted?.Invoke(startedEvent);
+		}
+
+		private void SendSkillCastCommittedEvent(
+			ServerSkillCast cast,
+			NetworkSkillTargetInfo targetInfo,
+			Vector3 spawnPosition,
+			double executedAt
+		)
+		{
+			if (!IsSpawned || !IsServer)
+				return;
+
+			NetworkSkillCastCommittedEvent networkEvent =
+				new NetworkSkillCastCommittedEvent
+				{
+					CastId = cast.CastId,
+					SkillId = cast.Request.SkillId,
+					TargetInfo = targetInfo,
+					SpawnPosition = spawnPosition,
+					ExecutedAt = executedAt
+				};
+
+			NotifySkillCastCommittedRpc(networkEvent);
+		}
+
+		[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
+		private void NotifySkillCastCommittedRpc(NetworkSkillCastCommittedEvent networkEvent)
+		{
+			SkillCastCommittedEvent committedEvent =
+				NetworkSkillContractMapper.ToContract(networkEvent, NetworkObjectId);
+
+			SkillCastCommitted?.Invoke(committedEvent);
+		}
+
+		private void SendSkillCastCancelledEvent(
+			ServerSkillCast cast,
+			SkillUseRejectionReason reason
+		)
+		{
+			if (!IsSpawned || !IsServer)
+				return;
+
+			NetworkSkillCastCancelledEvent networkEvent =
+				new NetworkSkillCastCancelledEvent
+				{
+					CastId = cast.CastId,
+					Reason = reason
+				};
+
+			NotifySkillCastCancelledRpc(networkEvent);
+		}
+
+		[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
+		private void NotifySkillCastCancelledRpc(NetworkSkillCastCancelledEvent networkEvent)
+		{
+			SkillCastCancelledEvent cancelledEvent =
+				NetworkSkillContractMapper.ToContract(networkEvent, NetworkObjectId);
+
+			SkillCastCancelled?.Invoke(cancelledEvent);
 		}
 
 		private void SendSkillHitEvent(
