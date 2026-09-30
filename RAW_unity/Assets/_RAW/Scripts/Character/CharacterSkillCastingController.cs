@@ -123,17 +123,16 @@ public class CharacterSkillCastingController : MonoBehaviour
                 return;
         }
 
-		currentCastingSkillRangeRadius = SkillGeometry.GetRangeRadius(currentCastingSkill.range);
-
-		float indicatorScale = currentCastingSkillRangeRadius / 1.28f;
-
-		skillRangeIndicator.transform.localScale = new Vector3(
-			indicatorScale,
-			indicatorScale,
-			1f
+		skillRangeIndicator.transform.localScale = new Vector2(
+			currentCastingSkill.range,
+			currentCastingSkill.range
 		);
-
 		skillRangeIndicator.SetActive(true);
+
+		currentCastingSkillRangeRadius = SkillGeometry.GetRangeRadius(
+			skillRangeIndicator.transform.GetChild(0).position,
+			skillRangeIndicator.transform.GetChild(1).position
+		);
 
         isIndicatingSkill = true;
     }
@@ -219,18 +218,10 @@ public class CharacterSkillCastingController : MonoBehaviour
             GetEllipseIntersection(center, center + castDirection, 1f)
         );
 
-        // skillBarIndicator.transform.localScale = new Vector2(
-        //     currentCastingSkill.range * ratio,
-        //     currentCastingSkill.size
-        // );
-
-		float rangeScale = currentCastingSkillRangeRadius / 1.28f;
-
-		skillBarIndicator.transform.localScale = new Vector3(
-			rangeScale * ratio,
-			currentCastingSkill.size,
-			1f
-		);
+        skillBarIndicator.transform.localScale = new Vector2(
+            currentCastingSkill.range * ratio,
+            currentCastingSkill.size
+        );
     }
 
     private void RequestSkill(SkillCastContext castContext)
@@ -424,6 +415,7 @@ public class CharacterSkillCastingController : MonoBehaviour
 
         if (!TryPrepareExecution(
 			skill,
+			castContext.RangeRadius,
 			castContext.CastDirection,
 			castContext.TargetPosition,
 			castContext.Target,
@@ -457,6 +449,7 @@ public class CharacterSkillCastingController : MonoBehaviour
 
     public bool TryPrepareExecution(
 		SkillSpec skill,
+		float rangeRadius,
 		Vector2 castDirection,
 		Vector2 targetPosition,
 		SkillTarget target,
@@ -470,8 +463,6 @@ public class CharacterSkillCastingController : MonoBehaviour
 
 		if (!skill.skillPrefab.TryGetComponent<SkillObject>(out _))
 			return false;
-
-		float rangeRadius = SkillGeometry.GetRangeRadius(skill.range);
 
 		if (float.IsNaN(rangeRadius) ||
 			float.IsInfinity(rangeRadius) ||

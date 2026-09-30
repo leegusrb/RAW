@@ -47,14 +47,14 @@ public readonly struct SkillExecutionContext
 
 public static class SkillGeometry
 {
-	private const float PixelsPerRangeUnit = 64f;
-	private const float ReferencePixelsPerUnityUnit = 100f;
-
 	public const float VerticalRangeRatio = 0.5f;
 
-	public static float GetRangeRadius(float range)
+	public static float GetRangeRadius(
+		Vector2 center,
+		Vector2 boundary
+	)
 	{
-		return range * PixelsPerRangeUnit / ReferencePixelsPerUnityUnit;
+		return Vector2.Distance(center, boundary);
 	}
 
     public static bool IsInsideRange(Vector2 center, Vector2 target, float semiMajorAxis)

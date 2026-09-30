@@ -61,7 +61,7 @@ public class CharacterState : MonoBehaviour
 
     public void TakeDamage(float damage)
     {
-        if (damage <= 0)
+        if (damage <= 0f)
 			return;
 
 		int damageAmount = Mathf.CeilToInt(damage);
